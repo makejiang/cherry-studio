@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import KnowledgeSearchPopup from './components/KnowledgeSearchPopup'
-import KnowledgeSettingsPopup from './components/KnowledgeSettingsPopup'
+import KnowledgeSettings from './components/KnowledgeSettings'
 import StatusIcon from './components/StatusIcon'
 
 const { Dragger } = Upload
@@ -451,7 +451,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
         <Tag color="blue">{base.model.name}</Tag>
         <Tag color="cyan">{t('models.dimensions', { dimensions: base.dimensions || 0 })}</Tag>
         {providerName && <Tag color="purple">{providerName}</Tag>}
-        <Button icon={<SettingOutlined />} onClick={() => KnowledgeSettingsPopup.show({ base })} size="small" />
+        <Button icon={<SettingOutlined />} onClick={() => KnowledgeSettings.show({ base })} size="small" />
       </ModelInfo>
 
       <IndexSection>

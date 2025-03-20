@@ -259,6 +259,8 @@ export interface KnowledgeBase {
   threshold?: number
   rerankModel?: Model
   topN?: number
+  preprocessing?: boolean
+  doc2xApiKey?: string
 }
 
 export type KnowledgeBaseParams = {
