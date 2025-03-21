@@ -3,11 +3,11 @@ import { TopView } from '@renderer/components/TopView'
 import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
-import { useKnowledge } from '@renderer/hooks/useKnowledge'
+import { useKnowledge, useOcrProviders } from '@renderer/hooks/useKnowledge'
 import { useProviders } from '@renderer/hooks/useProvider'
-import { SettingHelpLink } from '@renderer/pages/settings'
+import { SettingRowTitle } from '@renderer/pages/settings'
 import { getModelUniqId } from '@renderer/services/ModelService'
-import { KnowledgeBase } from '@renderer/types'
+import { KnowledgeBase, OcrProvider } from '@renderer/types'
 import { Alert, Input, InputNumber, Modal, Select, Slider, Switch, Tabs, TabsProps, Tooltip } from 'antd'
 import { sortBy } from 'lodash'
 import { useState } from 'react'
@@ -23,6 +23,9 @@ interface Props extends ShowParams {
 }
 
 const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
+  const { ocrProviders } = useOcrProviders()
+  const [selectedProvider, setSelectedProvider] = useState<OcrProvider | undefined>(_base.ocrProvider)
+
   const [open, setOpen] = useState(true)
   const { t } = useTranslation()
   const { providers } = useProviders()
@@ -173,20 +176,21 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
       children: (
         <SettingsPanel>
           <SettingsItem>
-            <div className="settings-label">
-              {t('knowledge.settings.doc2x_api_key')}{' '}
-              <Tooltip title={t('knowledge.settings.doc2x_api_key_tooltip')} placement="right">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
+            <SettingRowTitle>{t('settings.knowledge.ocr.provider')}</SettingRowTitle>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Select
+                value={selectedProvider?.id}
+                style={{ width: '200px' }}
+                onChange={(value: string) => {
+                  const provider = ocrProviders.find((p) => p.id === value)
+                  if (!provider) return
+                  setSelectedProvider(provider)
+                  setNewBase({ ...newBase, ocrProvider: provider })
+                }}
+                placeholder={t('settings.websearch.search_provider_placeholder')}
+                options={ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
+              />
             </div>
-            <Input
-              value={base.doc2xApiKey}
-              placeholder={t('knowledge.settings.doc2x_api_key_placeholder')}
-              onChange={(e) => setNewBase({ ...newBase, doc2xApiKey: e.target.value })}
-            />
-            <SettingHelpLink target="_blank" href="https://open.noedgeai.com/apiKeys">
-              {t('settings.provider.get_api_key')}
-            </SettingHelpLink>
           </SettingsItem>
         </SettingsPanel>
       ),

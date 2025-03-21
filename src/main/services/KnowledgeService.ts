@@ -23,6 +23,7 @@ import { SitemapLoader } from '@llm-tools/embedjs-loader-sitemap'
 import { WebLoader } from '@llm-tools/embedjs-loader-web'
 import { AzureOpenAiEmbeddings, OpenAiEmbeddings } from '@llm-tools/embedjs-openai'
 import { addFileLoader } from '@main/loader'
+import OcrProvider from '@main/ocr/OcrProvider'
 import Reranker from '@main/reranker/Reranker'
 import { proxyManager } from '@main/services/ProxyManager'
 import { windowService } from '@main/services/WindowService'
@@ -425,8 +426,14 @@ class KnowledgeService {
     })
   }
 
-  public add = (_: Electron.IpcMainInvokeEvent, options: KnowledgeBaseAddItemOptions): Promise<LoaderReturn> => {
+  public add = async (_: Electron.IpcMainInvokeEvent, options: KnowledgeBaseAddItemOptions): Promise<LoaderReturn> => {
     proxyManager.setGlobalProxy()
+    const { base, item } = options
+    if (base.preprocessing) {
+      const ocrProvider = new OcrProvider(base)
+      const { uid } = await ocrProvider.parseFile((item.content as FileType).path)
+      await ocrProvider.exportFile((item.content as FileType).path, uid)
+    }
     return new Promise((resolve) => {
       const { base, item, forceReload = false } = options
       const optionsNonNullableAttribute = { base, item, forceReload }
