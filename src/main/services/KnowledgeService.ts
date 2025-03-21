@@ -132,7 +132,8 @@ class KnowledgeService {
               model,
               apiKey,
               dimensions,
-              batchSize
+              batchSize,
+              configuration: { baseURL }
             })
       )
       .setVectorDatabase(new LibSqlDb({ path: path.join(this.storageDir, id) }))
@@ -149,6 +150,7 @@ class KnowledgeService {
   }
 
   public delete = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<void> => {
+    console.log('id', id)
     const dbPath = path.join(this.storageDir, id)
     if (fs.existsSync(dbPath)) {
       fs.rmSync(dbPath, { recursive: true })
@@ -161,7 +163,6 @@ class KnowledgeService {
       this.workload >= KnowledgeService.MAXIMUM_WORKLOAD
     )
   }
-
   private fileTask(
     ragApplication: RAGApplication,
     options: KnowledgeBaseAddItemOptionsNonNullableAttribute
@@ -173,8 +174,27 @@ class KnowledgeService {
       loaderTasks: [
         {
           state: LoaderTaskItemState.PENDING,
-          task: () =>
-            addFileLoader(ragApplication, file, base, forceReload)
+          task: async () => {
+            // 添加OCR预处理逻辑
+            let fileToProcess: FileType = file
+            if (base.preprocessing && file.ext.toLowerCase() === '.pdf') {
+              try {
+                const ocrProvider = new OcrProvider(base)
+                Logger.info(`Starting OCR processing for file: ${file.path}`)
+
+                const { processedFile } = await ocrProvider.parseFile(item.id, file)
+
+                fileToProcess = processedFile
+                Logger.info(`OCR processing completed: ${fileToProcess.path}`)
+              } catch (err) {
+                Logger.error(`OCR processing failed: ${err}`)
+                // 如果OCR失败，使用原始文件
+                fileToProcess = file
+              }
+            }
+
+            // 使用处理后的文件进行加载
+            return addFileLoader(ragApplication, fileToProcess, base, forceReload)
               .then((result) => {
                 loaderTask.loaderDoneReturn = result
                 return result
@@ -182,7 +202,8 @@ class KnowledgeService {
               .catch((err) => {
                 Logger.error(err)
                 return KnowledgeService.ERROR_LOADER_RETURN
-              }),
+              })
+          },
           evaluateTaskWorkload: { workload: file.size }
         }
       ],
@@ -424,12 +445,6 @@ class KnowledgeService {
   }
 
   public add = async (_: Electron.IpcMainInvokeEvent, options: KnowledgeBaseAddItemOptions): Promise<LoaderReturn> => {
-    const { base, item } = options
-    if (base.preprocessing) {
-      const ocrProvider = new OcrProvider(base)
-      const { uid } = await ocrProvider.parseFile((item.content as FileType).path)
-      await ocrProvider.exportFile((item.content as FileType).path, uid)
-    }
     return new Promise((resolve) => {
       const { base, item, forceReload = false } = options
       const optionsNonNullableAttribute = { base, item, forceReload }

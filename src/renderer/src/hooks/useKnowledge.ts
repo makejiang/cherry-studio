@@ -149,6 +149,7 @@ export const useKnowledge = (baseId: string) => {
     }
     if (item.type === 'file' && typeof item.content === 'object') {
       await FileManager.deleteFile(item.content.id)
+      await window.api.file.deleteDir(item.content.id)
     }
   }
   // 刷新项目
@@ -223,6 +224,27 @@ export const useKnowledge = (baseId: string) => {
     }, [itemId])
 
     return percent
+  }
+
+  // 获取文件ocr处理进度
+  const getFileOcrProgress = (itemId: string) => {
+    const [progress, setProgress] = useState<number>(0)
+    useEffect(() => {
+      const cleanup = window.electron.ipcRenderer.on(
+        'file-ocr-progress',
+        (_, { itemId: id, progress }: { itemId: string; progress: number }) => {
+          if (itemId === id) {
+            setProgress(progress)
+          }
+        }
+      )
+
+      return () => {
+        cleanup()
+      }
+    }, [itemId])
+
+    return progress
   }
 
   // 清除已完成的项目
@@ -308,6 +330,7 @@ export const useKnowledge = (baseId: string) => {
     getProcessingStatus,
     getProcessingItemsByType,
     getDirectoryProcessingPercent,
+    getFileOcrProgress,
     clearCompleted,
     clearAll,
     removeItem,
