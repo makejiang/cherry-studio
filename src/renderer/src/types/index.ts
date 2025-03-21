@@ -260,7 +260,6 @@ export interface KnowledgeBase {
   rerankModel?: Model
   topN?: number
   preprocessing?: boolean
-  doc2xApiKey?: string
 }
 
 export type KnowledgeBaseParams = {
@@ -279,6 +278,12 @@ export type KnowledgeBaseParams = {
   topN?: number
 }
 
+export interface OcrProvider {
+  id: string
+  name: string
+  apiKey?: string
+  apiHost?: string
+}
 export type GenerateImageParams = {
   model: string
   prompt: string
