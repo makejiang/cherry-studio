@@ -25,7 +25,6 @@ import { AzureOpenAiEmbeddings, OpenAiEmbeddings } from '@llm-tools/embedjs-open
 import { addFileLoader } from '@main/loader'
 import OcrProvider from '@main/ocr/OcrProvider'
 import Reranker from '@main/reranker/Reranker'
-import { proxyManager } from '@main/services/ProxyManager'
 import { windowService } from '@main/services/WindowService'
 import { getInstanceName } from '@main/utils'
 import { getAllFiles } from '@main/utils/file'
@@ -126,14 +125,12 @@ class KnowledgeService {
               azureOpenAIApiVersion: apiVersion,
               azureOpenAIApiDeploymentName: model,
               azureOpenAIApiInstanceName: getInstanceName(baseURL),
-              configuration: { httpAgent: proxyManager.getProxyAgent() },
               dimensions,
               batchSize
             })
           : new OpenAiEmbeddings({
               model,
               apiKey,
-              configuration: { baseURL, httpAgent: proxyManager.getProxyAgent() },
               dimensions,
               batchSize
             })
@@ -427,7 +424,6 @@ class KnowledgeService {
   }
 
   public add = async (_: Electron.IpcMainInvokeEvent, options: KnowledgeBaseAddItemOptions): Promise<LoaderReturn> => {
-    proxyManager.setGlobalProxy()
     const { base, item } = options
     if (base.preprocessing) {
       const ocrProvider = new OcrProvider(base)

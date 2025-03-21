@@ -783,6 +783,23 @@ const migrateConfig = {
       apiKey: '',
       apiHost: 'https://v2.doc2x.noedgeai.com'
     })
+    const runtimeState = state.runtime as any
+    if (runtimeState?.webdavSync) {
+      state.backup = state.backup || {}
+      state.backup = {
+        ...state.backup,
+        webdavSync: {
+          lastSyncTime: runtimeState.webdavSync.lastSyncTime || null,
+          syncing: runtimeState.webdavSync.syncing || false,
+          lastSyncError: runtimeState.webdavSync.lastSyncError || null
+        }
+      }
+      delete runtimeState.webdavSync
+    }
+    return state
+  },
+  '83': (state: RootState) => {
+    state.settings.messageNavigation = 'buttons'
     return state
   }
 }
