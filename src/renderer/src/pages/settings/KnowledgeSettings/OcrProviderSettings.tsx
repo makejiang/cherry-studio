@@ -1,10 +1,10 @@
-import { CheckOutlined, ExportOutlined, LoadingOutlined } from '@ant-design/icons'
+import { ExportOutlined } from '@ant-design/icons'
 import { getOcrProviderLogo, OCR_PROVIDER_CONFIG } from '@renderer/config/ocrProviders'
 import { useOcrProvider } from '@renderer/hooks/useKnowledge'
 import { formatApiKeys } from '@renderer/services/ApiService'
 import { OcrProvider } from '@renderer/types'
 import { hasObjectKey } from '@renderer/utils'
-import { Avatar, Button, Divider, Flex, Input } from 'antd'
+import { Avatar, Divider, Flex, Input } from 'antd'
 import Link from 'antd/es/typography/Link'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,8 +21,6 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
   const { t } = useTranslation()
   const [apiKey, setApiKey] = useState(ocrProvider.apiKey || '')
   const [apiHost, setApiHost] = useState(ocrProvider.apiHost || '')
-  const [apiChecking, setApiChecking] = useState(false)
-  const [apiValid, setApiValid] = useState(false)
 
   const ocrProviderConfig = OCR_PROVIDER_CONFIG[ocrProvider.id]
   const apiKeyWebsite = ocrProviderConfig?.websites?.apiKey
@@ -79,13 +77,6 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
               type="password"
               autoFocus={apiKey === ''}
             />
-            <Button
-              ghost={apiValid}
-              type={apiValid ? 'primary' : 'default'}
-              // onClick={checkSearch}
-              disabled={apiChecking}>
-              {apiChecking ? <LoadingOutlined spin /> : apiValid ? <CheckOutlined /> : t('settings.websearch.check')}
-            </Button>
           </Flex>
           <SettingHelpTextRow style={{ justifyContent: 'space-between', marginTop: 5 }}>
             <SettingHelpLink target="_blank" href={apiKeyWebsite}>
