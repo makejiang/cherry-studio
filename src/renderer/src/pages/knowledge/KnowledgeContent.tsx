@@ -28,7 +28,6 @@ import styled from 'styled-components'
 import KnowledgeSearchPopup from './components/KnowledgeSearchPopup'
 import KnowledgeSettings from './components/KnowledgeSettings'
 import StatusIcon from './components/StatusIcon'
-import KnowledgeSettingsPopup from './components/KnowledgeSettingsPopup'
 
 const { Dragger } = Upload
 const { Title } = Typography
@@ -463,7 +462,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
       <ModelInfo>
         <div className="model-header">
           <label>{t('knowledge.model_info')}</label>
-          <Button icon={<SettingOutlined />} onClick={() => KnowledgeSettingsPopup.show({ base })} size="small" />
+          <Button icon={<SettingOutlined />} onClick={() => KnowledgeSettings.show({ base })} size="small" />
         </div>
 
         <div className="model-row">

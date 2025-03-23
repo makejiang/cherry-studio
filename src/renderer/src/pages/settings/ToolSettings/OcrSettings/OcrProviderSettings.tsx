@@ -1,6 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons'
 import { getOcrProviderLogo, OCR_PROVIDER_CONFIG } from '@renderer/config/ocrProviders'
-import { useOcrProvider } from '@renderer/hooks/useKnowledge'
+import { useOcrProvider } from '@renderer/hooks/useOcr'
 import { formatApiKeys } from '@renderer/services/ApiService'
 import { OcrProvider } from '@renderer/types'
 import { hasObjectKey } from '@renderer/utils'
@@ -10,14 +10,14 @@ import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import { SettingHelpLink, SettingHelpText, SettingHelpTextRow, SettingSubtitle, SettingTitle } from '..'
+import { SettingHelpLink, SettingHelpText, SettingHelpTextRow, SettingSubtitle, SettingTitle } from '../..'
 
 interface Props {
   provider: OcrProvider
 }
 
 const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
-  const { ocrProvider, updateOcrProvider } = useOcrProvider(_provider.id)
+  const { provider: ocrProvider, updateOcrProvider } = useOcrProvider(_provider.id)
   const { t } = useTranslation()
   const [apiKey, setApiKey] = useState(ocrProvider.apiKey || '')
   const [apiHost, setApiHost] = useState(ocrProvider.apiHost || '')
@@ -80,7 +80,7 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
           </Flex>
           <SettingHelpTextRow style={{ justifyContent: 'space-between', marginTop: 5 }}>
             <SettingHelpLink target="_blank" href={apiKeyWebsite}>
-              {t('settings.websearch.get_api_key')}
+              {t('settings.provider.get_api_key')}
             </SettingHelpLink>
             <SettingHelpText>{t('settings.provider.api_key.tip')}</SettingHelpText>
           </SettingHelpTextRow>

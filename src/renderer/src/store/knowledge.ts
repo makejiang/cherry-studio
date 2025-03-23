@@ -1,15 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import FileManager from '@renderer/services/FileManager'
-import { FileType, KnowledgeBase, KnowledgeItem, OcrProvider, ProcessingStatus } from '@renderer/types'
+import { FileType, KnowledgeBase, KnowledgeItem, ProcessingStatus } from '@renderer/types'
 
 export interface KnowledgeState {
   bases: KnowledgeBase[]
-  ocrProviders: OcrProvider[]
 }
 
 const initialState: KnowledgeState = {
-  bases: [],
-  ocrProviders: []
+  bases: []
 }
 
 const knowledgeSlice = createSlice({
@@ -185,17 +183,6 @@ const knowledgeSlice = createSlice({
           item.uniqueIds = action.payload.uniqueIds
         }
       }
-    },
-
-    updateOcrProviders(state, action: PayloadAction<OcrProvider[]>) {
-      state.ocrProviders = action.payload
-    },
-
-    updateOcrProvider(state, action: PayloadAction<OcrProvider>) {
-      const index = state.ocrProviders.findIndex((provider) => provider.id === action.payload.id)
-      if (index !== -1) {
-        state.ocrProviders[index] = action.payload
-      }
     }
   }
 })
@@ -214,9 +201,7 @@ export const {
   updateItemProcessingStatus,
   clearCompletedProcessing,
   clearAllProcessing,
-  updateBaseItemUniqueId,
-  updateOcrProviders,
-  updateOcrProvider
+  updateBaseItemUniqueId
 } = knowledgeSlice.actions
 
 export default knowledgeSlice.reducer

@@ -1,8 +1,6 @@
 import {
   CloudOutlined,
   CodeOutlined,
-  FileSearchOutlined,
-  GlobalOutlined,
   InfoCircleOutlined,
   LayoutOutlined,
   MacCommandOutlined,
@@ -11,6 +9,7 @@ import {
   SettingOutlined
 } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import ToolIcon from '@renderer/components/Icons/ToolIcon'
 import { isLocalAi } from '@renderer/config/env'
 import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
 import { FC } from 'react'
@@ -22,12 +21,11 @@ import AboutSettings from './AboutSettings'
 import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
 import GeneralSettings from './GeneralSettings'
-import KnowledgeSettings from './KnowledgeSettings'
 import MCPSettings from './MCPSettings'
 import ProvidersList from './ProviderSettings'
 import QuickAssistantSettings from './QuickAssistantSettings'
 import ShortcutSettings from './ShortcutSettings'
-import WebSearchSettings from './WebSearchSettings'
+import ToolSettings from './ToolSettings'
 
 const SettingsPage: FC = () => {
   const { pathname } = useLocation()
@@ -58,10 +56,10 @@ const SettingsPage: FC = () => {
               </MenuItemLink>
             </>
           )}
-          <MenuItemLink to="/settings/web-search">
-            <MenuItem className={isRoute('/settings/web-search')}>
-              <GlobalOutlined />
-              {t('settings.websearch.title')}
+          <MenuItemLink to="/settings/tool">
+            <MenuItem className={isRoute('/settings/tool')}>
+              <ToolIcon />
+              {t('settings.tool.title')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/mcp">
@@ -70,13 +68,6 @@ const SettingsPage: FC = () => {
               {t('settings.mcp.title')}
             </MenuItem>
           </MenuItemLink>
-          <MenuItemLink to="/settings/knowledge">
-            <MenuItem className={isRoute('/settings/knowledge')}>
-              <FileSearchOutlined />
-              {t('settings.knowledge.title')}
-            </MenuItem>
-          </MenuItemLink>
-
           <MenuItemLink to="/settings/general">
             <MenuItem className={isRoute('/settings/general')}>
               <SettingOutlined />
@@ -118,9 +109,8 @@ const SettingsPage: FC = () => {
           <Routes>
             <Route path="provider" element={<ProvidersList />} />
             <Route path="model" element={<ModelSettings />} />
-            <Route path="web-search" element={<WebSearchSettings />} />
+            <Route path="tool/*" element={<ToolSettings />} />
             <Route path="mcp" element={<MCPSettings />} />
-            <Route path="knowledge" element={<KnowledgeSettings />} />
             <Route path="general/*" element={<GeneralSettings />} />
             <Route path="display" element={<DisplaySettings />} />
             <Route path="data/*" element={<DataSettings />} />

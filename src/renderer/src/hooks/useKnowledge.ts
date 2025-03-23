@@ -17,11 +17,9 @@ import {
   updateBases,
   updateItem as updateItemAction,
   updateItemProcessingStatus,
-  updateNotes,
-  updateOcrProvider as _updateOcrProvider,
-  updateOcrProviders as _updateOcrProviders
+  updateNotes
 } from '@renderer/store/knowledge'
-import { FileType, KnowledgeBase, KnowledgeItem, OcrProvider, ProcessingStatus } from '@renderer/types'
+import { FileType, KnowledgeBase, KnowledgeItem, ProcessingStatus } from '@renderer/types'
 import { runAsyncFunction } from '@renderer/utils'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -392,33 +390,5 @@ export const useKnowledgeBases = () => {
     renameKnowledgeBase,
     deleteKnowledgeBase,
     updateKnowledgeBases
-  }
-}
-
-export const useOcrProviders = () => {
-  const dispatch = useDispatch()
-  const ocrProviders = useSelector((state: RootState) => state.knowledge.ocrProviders)
-  const updateOcrProviders = (ocrProviders: OcrProvider[]) => {
-    dispatch(_updateOcrProviders(ocrProviders))
-  }
-  return {
-    ocrProviders,
-    updateOcrProviders
-  }
-}
-export const useOcrProvider = (id: string) => {
-  const dispatch = useDispatch()
-  const ocrProviders = useSelector((state: RootState) => state.knowledge.ocrProviders)
-  const ocrProvider = ocrProviders.find((provider) => provider.id === id)
-  if (!ocrProvider) {
-    throw new Error(`ocr provider with id ${id} not found`)
-  }
-
-  const updateOcrProvider = (ocrProvider: OcrProvider) => {
-    dispatch(_updateOcrProvider(ocrProvider))
-  }
-  return {
-    ocrProvider,
-    updateOcrProvider
   }
 }

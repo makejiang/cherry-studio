@@ -3,7 +3,8 @@ import { TopView } from '@renderer/components/TopView'
 import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
-import { useKnowledge, useOcrProviders } from '@renderer/hooks/useKnowledge'
+import { useKnowledge } from '@renderer/hooks/useKnowledge'
+import { useOcrProviders } from '@renderer/hooks/useOcr'
 import { useProviders } from '@renderer/hooks/useProvider'
 import { SettingRowTitle } from '@renderer/pages/settings'
 import { getModelUniqId } from '@renderer/services/ModelService'
@@ -87,7 +88,7 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
   const settingItems: TabsProps['items'] = [
     {
       key: '1',
-      label: t('knowledge.settings.general'),
+      label: t('settings.general'),
       children: (
         <SettingsPanel>
           <SettingsItem>
@@ -172,11 +173,11 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
     },
     {
       key: '2',
-      label: t('knowledge.settings.ocr'),
+      label: t('settings.tool.ocr.title'),
       children: (
         <SettingsPanel>
           <SettingsItem>
-            <SettingRowTitle>{t('settings.knowledge.ocr.provider')}</SettingRowTitle>
+            <SettingRowTitle>{t('settings.tool.ocr.provider')}</SettingRowTitle>
             <div style={{ display: 'flex', gap: '8px' }}>
               <Select
                 value={selectedProvider?.id}
@@ -187,7 +188,7 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
                   setSelectedProvider(provider)
                   setNewBase({ ...newBase, ocrProvider: provider })
                 }}
-                placeholder={t('settings.websearch.search_provider_placeholder')}
+                placeholder={t('settings.tool.ocr.provider_placeholder')}
                 options={ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
               />
             </div>
@@ -198,7 +199,7 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
     },
     {
       key: '3',
-      label: t('knowledge.settings.advanced'),
+      label: t('settings.advanced.title'),
       children: (
         <SettingsPanel>
           <SettingsItem>
@@ -335,6 +336,9 @@ const SettingsModal = styled(Modal)`
       flex: 1;
       max-height: auto;
     }
+  }
+  .ant-tabs-tab {
+    padding-inline-start: 0px !important;
   }
 `
 

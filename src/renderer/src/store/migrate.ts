@@ -774,15 +774,6 @@ const migrateConfig = {
     return state
   },
   '82': (state: RootState) => {
-    if (!state.knowledge.ocrProviders) {
-      state.knowledge.ocrProviders = []
-    }
-    state.knowledge.ocrProviders.push({
-      id: 'doc2x',
-      name: 'Doc2x',
-      apiKey: '',
-      apiHost: 'https://v2.doc2x.noedgeai.com'
-    })
     const runtimeState = state.runtime as any
     if (runtimeState?.webdavSync) {
       state.backup = state.backup || {}
@@ -803,6 +794,19 @@ const migrateConfig = {
     state.settings.launchOnBoot = false
     state.settings.launchToTray = false
     state.settings.trayOnClose = true
+    return state
+  },
+  '84': (state: RootState) => {
+    if (!state.ocr.providers) {
+      state.ocr.providers = [
+        {
+          id: 'doc2x',
+          name: 'Doc2x',
+          apiKey: '',
+          apiHost: 'https://v2.doc2x.noedgeai.com'
+        }
+      ]
+    }
     return state
   }
 }
