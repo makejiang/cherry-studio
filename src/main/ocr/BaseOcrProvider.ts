@@ -1,21 +1,18 @@
 import fs from 'node:fs'
 
 import { windowService } from '@main/services/WindowService'
-import { FileType, KnowledgeBaseParams } from '@types'
+import { FileSource, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import pdfParse from 'pdf-parse'
 export default abstract class BaseOcrProvider {
-  protected base: KnowledgeBaseParams
-  constructor(base: KnowledgeBaseParams) {
-    if (!base) {
-      throw new Error('KnowledgeBaseParams is required')
+  protected provider: OcrProvider
+  constructor(provider: OcrProvider) {
+    if (!provider) {
+      throw new Error('Ocr provider is not set')
     }
-    if (!base.ocrProvider || base.ocrProvider?.apiKey === '') {
-      throw new Error('Ocr provider is not set or apiKey is empty')
-    }
-    this.base = base
+    this.provider = provider
   }
-  abstract parseFile(sourceId: string, file: FileType): Promise<{ processedFile: FileType }>
+  abstract parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: FileSource }>
   /**
    * 辅助方法：延迟执行
    */

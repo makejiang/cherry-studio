@@ -91,12 +91,14 @@ const api = {
     setMinimumSize: (width: number, height: number) => ipcRenderer.invoke('window:set-minimum-size', width, height),
     resetMinimumSize: () => ipcRenderer.invoke('window:reset-minimum-size')
   },
-  gemini: {
-    uploadFile: (file: FileType, apiKey: string) => ipcRenderer.invoke('gemini:upload-file', file, apiKey),
-    base64File: (file: FileType) => ipcRenderer.invoke('gemini:base64-file', file),
-    retrieveFile: (file: FileType, apiKey: string) => ipcRenderer.invoke('gemini:retrieve-file', file, apiKey),
-    listFiles: (apiKey: string) => ipcRenderer.invoke('gemini:list-files', apiKey),
-    deleteFile: (apiKey: string, fileId: string) => ipcRenderer.invoke('gemini:delete-file', apiKey, fileId)
+  fileService: {
+    upload: (type: string, apiKey: string, file: FileType) =>
+      ipcRenderer.invoke('file-service:upload', type, apiKey, file),
+    list: (type: string, apiKey: string) => ipcRenderer.invoke('file-service:list', type, apiKey),
+    delete: (type: string, apiKey: string, fileId: string) =>
+      ipcRenderer.invoke('file-service:delete', type, apiKey, fileId),
+    retrieve: (type: string, apiKey: string, fileId: string) =>
+      ipcRenderer.invoke('file-service:retrieve', type, apiKey, fileId)
   },
   selectionMenu: {
     action: (action: string) => ipcRenderer.invoke('selection-menu:action', action)

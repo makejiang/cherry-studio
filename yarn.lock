@@ -1985,6 +1985,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mistralai/mistralai@npm:^1.5.2":
+  version: 1.5.2
+  resolution: "@mistralai/mistralai@npm:1.5.2"
+  dependencies:
+    zod-to-json-schema: "npm:^3.24.1"
+  peerDependencies:
+    zod: ">= 3"
+  checksum: 10c0/d33a8a71adac4d2074ea4bfa09605b1c2158b5ffeaa9a78f3d9602c822cf0885df660b09f2372f17d8a81e78fa64795f31d9fad0cc40a1fab57ca0a4df9dc009
+  languageName: node
+  linkType: hard
+
 "@modelcontextprotocol/sdk@npm:1.6.1":
   version: 1.6.1
   resolution: "@modelcontextprotocol/sdk@npm:1.6.1"
@@ -3345,6 +3356,7 @@ __metadata:
     "@llm-tools/embedjs-loader-web": "npm:^0.1.28"
     "@llm-tools/embedjs-loader-xml": "npm:^0.1.28"
     "@llm-tools/embedjs-openai": "npm:^0.1.28"
+    "@mistralai/mistralai": "npm:^1.5.2"
     "@modelcontextprotocol/sdk": "patch:@modelcontextprotocol/sdk@npm%3A1.6.1#~/.yarn/patches/@modelcontextprotocol-sdk-npm-1.6.1-b46313efe7.patch"
     "@notionhq/client": "npm:^2.2.15"
     "@reduxjs/toolkit": "npm:^2.2.5"

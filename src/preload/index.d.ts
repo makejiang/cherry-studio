@@ -117,12 +117,11 @@ declare global {
         setMinimumSize: (width: number, height: number) => Promise<void>
         resetMinimumSize: () => Promise<void>
       }
-      gemini: {
-        uploadFile: (file: FileType, apiKey: string) => Promise<UploadFileResponse>
-        retrieveFile: (file: FileType, apiKey: string) => Promise<FileMetadataResponse | undefined>
-        base64File: (file: FileType) => Promise<{ data: string; mimeType: string }>
-        listFiles: (apiKey: string) => Promise<ListFilesResponse>
-        deleteFile: (apiKey: string, fileId: string) => Promise<void>
+      fileService: {
+        upload: (type: string, apiKey: string, file: FileType) => Promise<UploadFileResponse>
+        retrieve: (type: string, apiKey: string, fileId: string) => Promise<FileMetadataResponse | undefined>
+        list: (type: string, apiKey: string) => Promise<ListFilesResponse>
+        delete: (type: string, apiKey: string, fileId: string) => Promise<void>
       }
       selectionMenu: {
         action: (action: string) => Promise<void>

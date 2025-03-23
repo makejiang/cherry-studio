@@ -32,6 +32,7 @@ import {
 } from '@renderer/services/MessagesService'
 import { Assistant, FileType, FileTypes, MCPToolResponse, Message, Model, Provider, Suggestion } from '@renderer/types'
 import { removeSpecialCharactersForTopicName } from '@renderer/utils'
+import { fileToBase64 } from '@renderer/utils/file'
 import {
   callMCPTool,
   geminiFunctionCallToMcpTool,
@@ -74,7 +75,7 @@ export default class GeminiProvider extends BaseProvider {
     const isSmallFile = file.size < smallFileSize
 
     if (isSmallFile) {
-      const { data, mimeType } = await window.api.gemini.base64File(file)
+      const { data, mimeType } = await fileToBase64(file.path)
       return {
         inlineData: {
           data,
@@ -84,7 +85,7 @@ export default class GeminiProvider extends BaseProvider {
     }
 
     // Retrieve file from Gemini uploaded files
-    const fileMetadata = await window.api.gemini.retrieveFile(file, this.apiKey)
+    const fileMetadata = await window.api.fileService.retrieve(this.provider.type, this.apiKey, file.id)
 
     if (fileMetadata) {
       return {
@@ -96,7 +97,7 @@ export default class GeminiProvider extends BaseProvider {
     }
 
     // If file is not found, upload it to Gemini
-    const uploadResult = await window.api.gemini.uploadFile(file, this.apiKey)
+    const uploadResult = await window.api.fileService.upload(this.provider.type, this.apiKey, file)
 
     return {
       fileData: {

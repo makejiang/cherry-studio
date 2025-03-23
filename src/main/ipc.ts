@@ -2,7 +2,7 @@ import fs from 'node:fs'
 
 import { isMac, isWin } from '@main/constant'
 import { getBinaryPath, isBinaryExists, runInstallScript } from '@main/utils/process'
-import { MCPServer, Shortcut, ThemeMode } from '@types'
+import { LocalFileSource, MCPServer, Shortcut, ThemeMode } from '@types'
 import { BrowserWindow, ipcMain, session, shell } from 'electron'
 import log from 'electron-log'
 
@@ -12,9 +12,9 @@ import BackupManager from './services/BackupManager'
 import { configManager } from './services/ConfigManager'
 import CopilotService from './services/CopilotService'
 import { ExportService } from './services/ExportService'
+import { FileServiceManager } from './services/file/FileServiceManager'
 import FileService from './services/FileService'
 import FileStorage from './services/FileStorage'
-import { GeminiService } from './services/GeminiService'
 import KnowledgeService from './services/KnowledgeService'
 import MCPService from './services/MCPService'
 import { ProxyConfig, proxyManager } from './services/ProxyManager'
@@ -185,6 +185,27 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle('file:copy', fileManager.copyFile)
   ipcMain.handle('file:binaryFile', fileManager.binaryFile)
 
+  // file service
+  ipcMain.handle('file-service:upload', async (_, type: string, apiKey: string, file: LocalFileSource) => {
+    const service = FileServiceManager.getInstance().getService(type, apiKey)
+    return await service.uploadFile(file)
+  })
+
+  ipcMain.handle('file-service:list', async (_, type: string, apiKey: string) => {
+    const service = FileServiceManager.getInstance().getService(type, apiKey)
+    return await service.listFiles()
+  })
+
+  ipcMain.handle('file-service:delete', async (_, type: string, apiKey: string, fileId: string) => {
+    const service = FileServiceManager.getInstance().getService(type, apiKey)
+    return await service.deleteFile(fileId)
+  })
+
+  ipcMain.handle('file-service:retrieve', async (_, type: string, apiKey: string, fileId: string) => {
+    const service = FileServiceManager.getInstance().getService(type, apiKey)
+    return await service.retrieveFile(fileId)
+  })
+
   // fs
   ipcMain.handle('fs:read', FileService.readFile)
 
@@ -239,13 +260,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
       mainWindow?.setSize(1080, height)
     }
   })
-
-  // gemini
-  ipcMain.handle('gemini:upload-file', GeminiService.uploadFile)
-  ipcMain.handle('gemini:base64-file', GeminiService.base64File)
-  ipcMain.handle('gemini:retrieve-file', GeminiService.retrieveFile)
-  ipcMain.handle('gemini:list-files', GeminiService.listFiles)
-  ipcMain.handle('gemini:delete-file', GeminiService.deleteFile)
 
   // mini window
   ipcMain.handle('miniwindow:show', () => windowService.showMiniWindow())

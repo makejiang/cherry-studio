@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { FileType, KnowledgeBaseParams } from '@types'
+import { FileType, OcrProvider } from '@types'
 import AdmZip from 'adm-zip'
 import axios, { AxiosRequestConfig } from 'axios'
 import Logger from 'electron-log'
@@ -30,8 +30,8 @@ type ParsedFileResponse = {
 }
 
 export default class Doc2xOcrProvider extends BaseOcrProvider {
-  constructor(base: KnowledgeBaseParams) {
-    super(base)
+  constructor(provider: OcrProvider) {
+    super(provider)
   }
 
   public async parseFile(sourceId: string, file: FileType): Promise<{ processedFile: FileType }> {
@@ -130,7 +130,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
   private async preupload(): Promise<PreuploadResponse> {
     const config = this.createAuthConfig()
-    const endpoint = `${this.base.ocrProvider?.apiHost}/api/v2/parse/preupload`
+    const endpoint = `${this.provider.apiHost}/api/v2/parse/preupload`
 
     try {
       const { data } = await axios.post<ApiResponse<PreuploadResponse>>(endpoint, null, config)
@@ -162,7 +162,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
   private async getStatus(uid: string): Promise<StatusResponse> {
     const config = this.createAuthConfig()
-    const endpoint = `${this.base.ocrProvider?.apiHost}/api/v2/parse/status?uid=${uid}`
+    const endpoint = `${this.provider.apiHost}/api/v2/parse/status?uid=${uid}`
 
     try {
       const response = await axios.get<ApiResponse<StatusResponse>>(endpoint, config)
@@ -195,7 +195,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
       filename: fileName
     }
 
-    const endpoint = `${this.base.ocrProvider?.apiHost}/api/v2/convert/parse`
+    const endpoint = `${this.provider.apiHost}/api/v2/convert/parse`
 
     try {
       const response = await axios.post<ApiResponse<any>>(endpoint, payload, config)
@@ -211,7 +211,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
   private async getParsedFile(uid: string): Promise<ParsedFileResponse> {
     const config = this.createAuthConfig()
-    const endpoint = `${this.base.ocrProvider?.apiHost}/api/v2/convert/parse/result?uid=${uid}`
+    const endpoint = `${this.provider.apiHost}/api/v2/convert/parse/result?uid=${uid}`
 
     try {
       const response = await axios.get<ApiResponse<ParsedFileResponse>>(endpoint, config)
@@ -259,7 +259,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
   private createAuthConfig(): AxiosRequestConfig {
     return {
       headers: {
-        Authorization: `Bearer ${this.base.ocrProvider?.apiKey}`
+        Authorization: `Bearer ${this.provider.apiKey}`
       }
     }
   }

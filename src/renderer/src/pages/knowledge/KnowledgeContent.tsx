@@ -107,7 +107,8 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           count: 1,
           origin_name: file.name,
           type: file.type as FileTypes,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          source: 'local' as const
         }))
         .filter(({ ext }) => fileTypes.includes(ext))
       const uploadedFiles = await FileManager.uploadFiles(_files)
