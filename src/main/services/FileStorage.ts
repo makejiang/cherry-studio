@@ -73,7 +73,8 @@ class FileStorage {
             size: storedStats.size,
             ext,
             type: getFileType(ext),
-            count: 2
+            count: 2,
+            source: 'local'
           }
         }
       }
@@ -112,7 +113,8 @@ class FileStorage {
         size: stats.size,
         ext: ext,
         type: fileType,
-        count: 1
+        count: 1,
+        source: 'local' as const
       }
     })
 
@@ -177,7 +179,8 @@ class FileStorage {
       size: stats.size,
       ext: ext,
       type: fileType,
-      count: 1
+      count: 1,
+      source: 'local'
     }
 
     return fileMetadata
@@ -201,7 +204,8 @@ class FileStorage {
       size: stats.size,
       ext: ext,
       type: fileType,
-      count: 1
+      count: 1,
+      source: 'local'
     }
 
     return fileInfo
@@ -264,6 +268,16 @@ class FileStorage {
       mime,
       base64,
       data: `data:${mime};base64,${base64}`
+    }
+  }
+
+  public base64File = async (
+    _: Electron.IpcMainInvokeEvent,
+    filePath: string
+  ): Promise<{ data: Buffer; mime: string }> => {
+    return {
+      data: await fs.promises.readFile(filePath),
+      mime: 'application/pdf'
     }
   }
 
@@ -424,7 +438,8 @@ class FileStorage {
         size: stats.size,
         ext: ext,
         type: fileType,
-        count: 1
+        count: 1,
+        source: 'local'
       }
 
       return fileMetadata

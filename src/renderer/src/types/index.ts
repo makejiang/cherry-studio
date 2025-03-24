@@ -340,6 +340,7 @@ export type KnowledgeBaseParams = {
   rerankModelProvider?: string
   topN?: number
   preprocessing?: boolean
+  ocrProvider?: OcrProvider
 }
 
 export interface OcrProvider {

@@ -804,6 +804,13 @@ const migrateConfig = {
           name: 'Doc2x',
           apiKey: '',
           apiHost: 'https://v2.doc2x.noedgeai.com'
+        },
+        {
+          id: 'mistral',
+          name: 'Mistral',
+          model: 'mistral-ocr-latest',
+          apiKey: '',
+          apiHost: 'https://api.mistral.ai'
         }
       ]
     }

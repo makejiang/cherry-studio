@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 
 import { windowService } from '@main/services/WindowService'
-import { FileSource, OcrProvider } from '@types'
+import { FileSource, LocalFileSource, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import pdfParse from 'pdf-parse'
 export default abstract class BaseOcrProvider {
@@ -12,7 +12,7 @@ export default abstract class BaseOcrProvider {
     }
     this.provider = provider
   }
-  abstract parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: FileSource }>
+  abstract parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: LocalFileSource }>
   /**
    * 辅助方法：延迟执行
    */

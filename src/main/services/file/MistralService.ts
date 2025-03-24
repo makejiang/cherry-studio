@@ -1,11 +1,14 @@
+import fs from 'node:fs/promises'
+
+import { Mistral } from '@mistralai/mistralai'
 import { FileListResponse, FileUploadResponse, LocalFileSource } from '@types'
-import { fileFrom } from 'fetch-blob/from.js'
+import Logger from 'electron-log'
 
 import { MistralClientManager } from '../MistralClientManager'
 import { BaseFileService } from './BaseFileService'
 
 export class MistralService extends BaseFileService {
-  private readonly client
+  private readonly client: Mistral
 
   constructor(apiKey: string) {
     super(apiKey)
@@ -16,9 +19,12 @@ export class MistralService extends BaseFileService {
 
   async uploadFile(file: LocalFileSource): Promise<FileUploadResponse> {
     try {
-      const blob = await fileFrom(file.path)
+      const fileBuffer = await fs.readFile(file.path)
       const response = await this.client.files.upload({
-        file: blob,
+        file: {
+          fileName: file.path,
+          content: new Uint8Array(fileBuffer)
+        },
         purpose: 'ocr'
       })
 
@@ -28,7 +34,7 @@ export class MistralService extends BaseFileService {
         status: 'success'
       }
     } catch (error) {
-      console.error('Error uploading file:', error)
+      Logger.error('Error uploading file:', error)
       return {
         fileId: '',
         displayName: file.origin_name,
@@ -78,7 +84,12 @@ export class MistralService extends BaseFileService {
       }
     } catch (error) {
       console.error('Error retrieving file:', error)
-      throw error
+      return {
+        fileId: fileId,
+        displayName: '',
+        status: 'failed',
+        originalFile: undefined
+      }
     }
   }
 }

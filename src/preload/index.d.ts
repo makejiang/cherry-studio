@@ -1,8 +1,16 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { FileMetadataResponse, ListFilesResponse, UploadFileResponse } from '@google/generative-ai/server'
 import { ExtractChunkData } from '@llm-tools/embedjs-interfaces'
 import type { MCPServer, MCPTool } from '@renderer/types'
-import { AppInfo, FileType, KnowledgeBaseParams, KnowledgeItem, LanguageVarious, WebDavConfig } from '@renderer/types'
+import {
+  AppInfo,
+  FileListResponse,
+  FileType,
+  FileUploadResponse,
+  KnowledgeBaseParams,
+  KnowledgeItem,
+  LanguageVarious,
+  WebDavConfig
+} from '@renderer/types'
 import type { LoaderReturn } from '@shared/config/types'
 import type { OpenDialogOptions } from 'electron'
 import type { UpdateInfo } from 'electron-updater'
@@ -66,6 +74,7 @@ declare global {
         ) => Promise<string | null>
         saveImage: (name: string, data: string) => void
         base64Image: (fileId: string) => Promise<{ mime: string; base64: string; data: string }>
+        base64File: (filePath: string) => Promise<{ mime: string; data: Buffer }>
         download: (url: string) => Promise<FileType | null>
         copy: (fileId: string, destPath: string) => Promise<void>
         binaryFile: (fileId: string) => Promise<{ data: Buffer; mime: string }>
@@ -118,9 +127,9 @@ declare global {
         resetMinimumSize: () => Promise<void>
       }
       fileService: {
-        upload: (type: string, apiKey: string, file: FileType) => Promise<UploadFileResponse>
-        retrieve: (type: string, apiKey: string, fileId: string) => Promise<FileMetadataResponse | undefined>
-        list: (type: string, apiKey: string) => Promise<ListFilesResponse>
+        upload: (type: string, apiKey: string, file: FileType) => Promise<FileUploadResponse>
+        retrieve: (type: string, apiKey: string, fileId: string) => Promise<FileUploadResponse>
+        list: (type: string, apiKey: string) => Promise<FileListResponse>
         delete: (type: string, apiKey: string, fileId: string) => Promise<void>
       }
       selectionMenu: {

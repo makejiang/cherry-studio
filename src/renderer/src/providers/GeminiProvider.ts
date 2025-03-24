@@ -30,7 +30,17 @@ import {
   filterEmptyMessages,
   filterUserRoleStartMessages
 } from '@renderer/services/MessagesService'
-import { Assistant, FileType, FileTypes, MCPToolResponse, Message, Model, Provider, Suggestion } from '@renderer/types'
+import {
+  Assistant,
+  FileType,
+  FileTypes,
+  FileUploadResponse,
+  MCPToolResponse,
+  Message,
+  Model,
+  Provider,
+  Suggestion
+} from '@renderer/types'
 import { removeSpecialCharactersForTopicName } from '@renderer/utils'
 import { fileToBase64 } from '@renderer/utils/file'
 import {
@@ -84,25 +94,28 @@ export default class GeminiProvider extends BaseProvider {
       } as InlineDataPart
     }
 
-    // Retrieve file from Gemini uploaded files
-    const fileMetadata = await window.api.fileService.retrieve(this.provider.type, this.apiKey, file.id)
-
-    if (fileMetadata) {
+    // 尝试检索文件
+    const response: FileUploadResponse = await window.api.fileService.retrieve(this.provider.type, this.apiKey, file.id)
+    if (response && response.status === 'success') {
       return {
         fileData: {
-          fileUri: fileMetadata.uri,
-          mimeType: fileMetadata.mimeType
+          fileUri: response.originalFile.uri,
+          mimeType: response.originalFile.mimeType
         }
       } as FileDataPart
+    } else {
+      console.log('file not found', response)
     }
-
-    // If file is not found, upload it to Gemini
-    const uploadResult = await window.api.fileService.upload(this.provider.type, this.apiKey, file)
-
+    // 如果文件不存在，上传新文件
+    const uploadResponse: FileUploadResponse = await window.api.fileService.upload(
+      this.provider.type,
+      this.apiKey,
+      file
+    )
     return {
       fileData: {
-        fileUri: uploadResult.file.uri,
-        mimeType: uploadResult.file.mimeType
+        fileUri: uploadResponse.originalFile.file.uri,
+        mimeType: uploadResponse.originalFile.file.mimeType
       }
     } as FileDataPart
   }

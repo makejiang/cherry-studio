@@ -177,9 +177,10 @@ class KnowledgeService {
           task: async () => {
             // 添加OCR预处理逻辑
             let fileToProcess: FileType = file
-            if (base.preprocessing && file.ext.toLowerCase() === '.pdf') {
+            if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
               try {
-                const ocrProvider = new OcrProvider(base)
+                file.source = 'local'
+                const ocrProvider = new OcrProvider(base.ocrProvider)
                 Logger.info(`Starting OCR processing for file: ${file.path}`)
 
                 const { processedFile } = await ocrProvider.parseFile(item.id, file)
@@ -507,6 +508,10 @@ class KnowledgeService {
     { search, base, results }: { search: string; base: KnowledgeBaseParams; results: ExtractChunkData[] }
   ): Promise<ExtractChunkData[]> => {
     return await new Reranker(base).rerank(search, results)
+  }
+
+  public getStorageDir = (): string => {
+    return this.storageDir
   }
 }
 

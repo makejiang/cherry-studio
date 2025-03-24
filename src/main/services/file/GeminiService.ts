@@ -60,41 +60,26 @@ export class GeminiService extends BaseFileService {
       return cachedResponse
     }
 
-    const response = await this.fileManager.getFile(fileId)
+    const response = await this.fileManager.listFiles()
 
-    // 根据文件状态设置响应状态
-    let status: 'success' | 'processing' | 'failed' | 'unknown'
-    switch (response.state) {
-      case FileState.ACTIVE:
-        status = 'success'
-        break
-      case FileState.PROCESSING:
-        status = 'processing'
-        break
-      case FileState.FAILED:
-        status = 'failed'
-        break
-      default:
-        status = 'unknown'
+    if (response.files) {
+      const file = response.files.filter((file) => file.state === FileState.ACTIVE).find((file) => file.name === fileId)
+      if (file) {
+        return {
+          fileId: fileId,
+          displayName: file.displayName || '',
+          status: 'success',
+          originalFile: file
+        }
+      }
     }
 
-    const fileResponse: FileUploadResponse = {
-      fileId,
-      displayName: response.displayName || '',
-      status,
-      originalFile: response
+    return {
+      fileId: fileId,
+      displayName: '',
+      status: 'failed',
+      originalFile: undefined
     }
-
-    // 只缓存成功的文件
-    if (status === 'success') {
-      CacheService.set(
-        `${GeminiService.FILE_LIST_CACHE_KEY}_${fileId}`,
-        fileResponse,
-        GeminiService.FILE_CACHE_DURATION
-      )
-    }
-
-    return fileResponse
   }
 
   async listFiles(): Promise<FileListResponse> {
