@@ -52,7 +52,6 @@ const MenuList = styled.div`
   border-right: 0.5px solid var(--color-border);
   height: 100%;
   .iconfont {
-    color: var(--color-text-2);
     line-height: 16px;
   }
 `

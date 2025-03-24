@@ -58,7 +58,7 @@ const SettingsPage: FC = () => {
           )}
           <MenuItemLink to="/settings/tool">
             <MenuItem className={isRoute('/settings/tool')}>
-              <ToolIcon />
+              <ToolIcon style={{ opacity: 1 }} />
               {t('settings.tool.title')}
             </MenuItem>
           </MenuItemLink>
