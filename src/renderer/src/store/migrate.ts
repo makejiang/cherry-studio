@@ -797,6 +797,10 @@ const migrateConfig = {
     return state
   },
   '84': (state: RootState) => {
+    addProvider(state, 'voyageai')
+    return state
+  },
+  '85': (state: RootState) => {
     if (!state.ocr.providers) {
       state.ocr.providers = [
         {
