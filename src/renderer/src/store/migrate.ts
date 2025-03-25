@@ -801,6 +801,13 @@ const migrateConfig = {
     return state
   },
   '85': (state: RootState) => {
+    // @ts-ignore eslint-disable-next-line
+    state.settings.autoCheckUpdate = !state.settings.manualUpdateCheck
+    // @ts-ignore eslint-disable-next-line
+    delete state.settings.manualUpdateCheck
+    return state
+  },
+  '86': (state: RootState) => {
     if (!state.ocr.providers) {
       state.ocr.providers = [
         {
