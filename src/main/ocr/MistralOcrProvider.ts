@@ -189,7 +189,7 @@ export default class MistralOcrProvider extends BaseOcrProvider {
 
     return {
       id: conversionId,
-      name: mdFileName,
+      name: file.name.replace(/\.[^/.]+$/, '.md'),
       origin_name: mdFileName,
       path: mdFilePath,
       created_at: new Date().toISOString(),

@@ -19,8 +19,9 @@ const GeminiFiles: FC<GeminiFilesProps> = ({ id }) => {
   const [loading, setLoading] = useState(false)
 
   const fetchFiles = useCallback(async () => {
-    const { files } = await window.api.fileService.list(provider.type, provider.apiKey)
-    files && setFiles(files.filter((file) => file.state === 'ACTIVE'))
+    const reponses = await window.api.fileService.list(provider.type, provider.apiKey)
+    const files = reponses.files.map((file) => file.originalFile as FileMetadataResponse)
+    setFiles(files)
   }, [provider])
 
   const columns: ColumnsType<FileMetadataResponse> = [

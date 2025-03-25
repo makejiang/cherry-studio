@@ -159,6 +159,7 @@ class KnowledgeService {
   ): LoaderTask {
     const { base, item, forceReload } = options
     const file = item.content as FileType
+    file.source = 'local'
 
     const loaderTask: LoaderTask = {
       loaderTasks: [
@@ -169,12 +170,11 @@ class KnowledgeService {
             let fileToProcess: FileType = file
             if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
               try {
-                file.source = 'local'
                 const ocrProvider = new OcrProvider(base.ocrProvider)
                 Logger.info(`Starting OCR processing for file: ${file.path}`)
 
                 const { processedFile } = await ocrProvider.parseFile(item.id, file)
-
+                Logger.info(`OCR processing completed: ${processedFile.path}`)
                 fileToProcess = processedFile
                 Logger.info(`OCR processing completed: ${fileToProcess.path}`)
               } catch (err) {

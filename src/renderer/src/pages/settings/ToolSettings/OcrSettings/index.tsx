@@ -1,3 +1,4 @@
+import { isMac } from '@renderer/config/constant'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useDefaultOcrProvider, useOcrProviders } from '@renderer/hooks/useOcr'
 import { OcrProvider } from '@renderer/types'
@@ -37,7 +38,11 @@ const KnowledgeSettings: FC = () => {
               style={{ width: '200px' }}
               onChange={(value: string) => updateSelectedOcrProvider(value)}
               placeholder={t('settings.tool.ocr.provider_placeholder')}
-              options={ocrProviders.map((p) => ({ value: p.id, label: p.name }))}
+              options={ocrProviders.map((p) => ({
+                value: p.id,
+                label: p.name,
+                disabled: !isMac && p.id === 'system' // 在非 Mac 系统下禁用 system 选项
+              }))}
             />
           </div>
         </SettingRow>

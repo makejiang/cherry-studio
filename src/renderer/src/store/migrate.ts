@@ -818,6 +818,12 @@ const migrateConfig = {
         }
       ]
     }
+    if (!state.ocr.providers.find((provider) => provider.id === 'system')) {
+      state.ocr.providers.push({
+        id: 'system',
+        name: 'System(Mac Only)'
+      })
+    }
     return state
   }
 }

@@ -20,6 +20,10 @@ const initialState: OcrState = {
       model: 'mistral-ocr-latest',
       apiKey: '',
       apiHost: 'https://api.mistral.ai'
+    },
+    {
+      id: 'system',
+      name: 'System(Mac Only)'
     }
   ],
   defaultProvider: ''
