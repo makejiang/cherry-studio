@@ -88,7 +88,7 @@ export default class GeminiProvider extends BaseProvider {
       const { data, mimeType } = await fileToBase64(file.path)
       return {
         inlineData: {
-          data: data.toString('base64'),
+          data: data,
           mimeType
         }
       } as InlineDataPart
@@ -150,7 +150,6 @@ export default class GeminiProvider extends BaseProvider {
     }
 
     for (const file of message.files || []) {
-      console.log('file', file)
       if (file.type === FileTypes.IMAGE) {
         const base64Data = await window.api.file.base64Image(file.id + file.ext)
         parts.push({

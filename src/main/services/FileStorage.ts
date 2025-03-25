@@ -274,9 +274,10 @@ class FileStorage {
   public base64File = async (
     _: Electron.IpcMainInvokeEvent,
     filePath: string
-  ): Promise<{ data: Buffer; mime: string }> => {
+  ): Promise<{ data: string; mime: string }> => {
+    const fileBuffer = await fs.promises.readFile(filePath)
     return {
-      data: await fs.promises.readFile(filePath),
+      data: fileBuffer.toString('base64'),
       mime: 'application/pdf'
     }
   }

@@ -74,7 +74,7 @@ declare global {
         ) => Promise<string | null>
         saveImage: (name: string, data: string) => void
         base64Image: (fileId: string) => Promise<{ mime: string; base64: string; data: string }>
-        base64File: (filePath: string) => Promise<{ mime: string; data: Buffer }>
+        base64File: (filePath: string) => Promise<{ mime: string; data: string }>
         download: (url: string) => Promise<FileType | null>
         copy: (fileId: string, destPath: string) => Promise<void>
         binaryFile: (fileId: string) => Promise<{ data: Buffer; mime: string }>
