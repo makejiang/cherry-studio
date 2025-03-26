@@ -808,6 +808,13 @@ const migrateConfig = {
     return state
   },
   '86': (state: RootState) => {
+    if (!state.ocr) {
+      state.ocr = {
+        defaultProvider: '',
+        providers: []
+      }
+    }
+
     if (!state.ocr.providers) {
       state.ocr.providers = [
         {
