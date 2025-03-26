@@ -167,22 +167,7 @@ class KnowledgeService {
           state: LoaderTaskItemState.PENDING,
           task: async () => {
             // 添加OCR预处理逻辑
-            let fileToProcess: FileType = file
-            if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
-              try {
-                const ocrProvider = new OcrProvider(base.ocrProvider)
-                Logger.info(`Starting OCR processing for file: ${file.path}`)
-
-                const { processedFile } = await ocrProvider.parseFile(item.id, file)
-                Logger.info(`OCR processing completed: ${processedFile.path}`)
-                fileToProcess = processedFile
-                Logger.info(`OCR processing completed: ${fileToProcess.path}`)
-              } catch (err) {
-                Logger.error(`OCR processing failed: ${err}`)
-                // 如果OCR失败，使用原始文件
-                fileToProcess = file
-              }
-            }
+            const fileToProcess: FileType = await this.preprocessing(file, base, item)
 
             // 使用处理后的文件进行加载
             return addFileLoader(ragApplication, fileToProcess, base, forceReload)
@@ -203,7 +188,6 @@ class KnowledgeService {
 
     return loaderTask
   }
-
   private directoryTask(
     ragApplication: RAGApplication,
     options: KnowledgeBaseAddItemOptionsNonNullableAttribute
@@ -502,6 +486,26 @@ class KnowledgeService {
 
   public getStorageDir = (): string => {
     return this.storageDir
+  }
+
+  private preprocessing = async (file: FileType, base: KnowledgeBaseParams, item: KnowledgeItem): Promise<FileType> => {
+    let fileToProcess: FileType = file
+    if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
+      try {
+        const ocrProvider = new OcrProvider(base.ocrProvider)
+        Logger.info(`Starting OCR processing for file: ${file.path}`)
+
+        const { processedFile } = await ocrProvider.parseFile(item.id, file)
+        Logger.info(`OCR processing completed: ${processedFile.path}`)
+        fileToProcess = processedFile
+        Logger.info(`OCR processing completed: ${fileToProcess.path}`)
+      } catch (err) {
+        Logger.error(`OCR processing failed: ${err}`)
+        // 如果OCR失败，使用原始文件
+        fileToProcess = file
+      }
+    }
+    return fileToProcess
   }
 }
 
