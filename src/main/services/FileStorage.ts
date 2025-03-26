@@ -216,6 +216,9 @@ class FileStorage {
   }
 
   public deleteDir = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<void> => {
+    if (!fs.existsSync(path.join(this.storageDir, id))) {
+      return
+    }
     await fs.promises.rm(path.join(this.storageDir, id), { recursive: true })
   }
 
