@@ -815,7 +815,7 @@ const migrateConfig = {
       }
     }
 
-    if (!state.ocr.providers) {
+    if (state.ocr.providers.length === 0) {
       state.ocr.providers = [
         {
           id: 'doc2x',
