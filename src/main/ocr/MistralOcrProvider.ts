@@ -9,7 +9,6 @@ import { OCRResponse } from '@mistralai/mistralai/models/components/ocrresponse'
 import { FileSource, FileTypes, isLocalFile, LocalFileSource, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
 
 import BaseOcrProvider from './BaseOcrProvider'
 
@@ -109,7 +108,7 @@ export default class MistralOcrProvider extends BaseOcrProvider {
 
   private convertFile(result: OCRResponse, file: FileSource): LocalFileSource {
     // Create a unique directory for this conversion to store images
-    const conversionId = uuidv4()
+    const conversionId = file.id
     let outputPath = ''
     let outputFileName = ''
     if (isLocalFile(file)) {

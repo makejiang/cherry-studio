@@ -212,6 +212,9 @@ class FileStorage {
   }
 
   public deleteFile = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<void> => {
+    if (!fs.existsSync(path.join(this.storageDir, id))) {
+      return
+    }
     await fs.promises.unlink(path.join(this.storageDir, id))
   }
 

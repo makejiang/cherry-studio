@@ -69,14 +69,15 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
             })
             writeStream.on('error', reject)
           })
-
+          const movedPaths = this.moveToAttachmentsDir(file.id, [txtFilePath])
+          console.log('movedPaths', movedPaths)
           return {
             processedFile: {
               ...file,
               name: txtFileName,
-              path: txtFilePath,
+              path: movedPaths[0],
               ext: '.txt',
-              size: fs.statSync(txtFilePath).size
+              size: fs.statSync(movedPaths[0]).size
             }
           }
         } catch (error) {
