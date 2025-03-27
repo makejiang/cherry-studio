@@ -32,7 +32,9 @@
       "title": "エージェント"
     },
     "assistants": {
+      "title": "アシスタント",
       "abbr": "アシスタント",
+      "settings.title": "アシスタント設定",
       "clear.content": "トピックをクリアすると、アシスタント内のすべてのトピックとファイルが削除されます。続行しますか？",
       "clear.title": "トピックをクリア",
       "copy.title": "アシスタントをコピー",
@@ -53,7 +55,7 @@
       "settings.reasoning_effort.medium": "中程度",
       "settings.reasoning_effort.off": "オフ",
       "settings.reasoning_effort.tip": "OpenAIのoシリーズとAnthropicの推論モデルのみサポートしています",
-      "title": "アシスタント"
+      "settings.more": "アシスタント設定"
     },
     "auth": {
       "error": "APIキーの自動取得に失敗しました。手動で取得してください",
@@ -1122,7 +1124,7 @@
         "docs_more_details": "詳細を確認",
         "get_api_key": "APIキーを取得",
         "is_not_support_array_content": "互換モードを有効にする",
-        "no_models": "API接続をチェックする前に、モデルを追加してください",
+        "no_models_for_check": "チェックするモデルがありません（例：会話モデル）",
         "not_checked": "未チェック",
         "remove_duplicate_keys": "重複キーを削除",
         "remove_invalid_keys": "無効なキーを削除",

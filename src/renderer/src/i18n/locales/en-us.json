@@ -32,7 +32,9 @@
       "title": "Agents"
     },
     "assistants": {
+      "title": "Assistants",
       "abbr": "Assistant",
+      "settings.title": "Assistant Settings",
       "clear.content": "Clearing the topic will delete all topics and files in the assistant. Are you sure you want to continue?",
       "clear.title": "Clear topics",
       "copy.title": "Copy Assistant",
@@ -53,7 +55,7 @@
       "settings.reasoning_effort.medium": "medium",
       "settings.reasoning_effort.off": "off",
       "settings.reasoning_effort.tip": "Only supports OpenAI o-series and Anthropic reasoning models",
-      "title": "Assistants"
+      "settings.more": "Assistant Settings"
     },
     "auth": {
       "error": "API key automatically obtained failed, please get it manually",
@@ -1123,7 +1125,7 @@
         "docs_more_details": "for more details",
         "get_api_key": "Get API Key",
         "is_not_support_array_content": "Enable compatible mode",
-        "no_models": "Please add models first before checking the API connection",
+        "no_models_for_check": "No models available for checking (e.g. chat models)",
         "not_checked": "Not Checked",
         "remove_duplicate_keys": "Remove Duplicate Keys",
         "remove_invalid_keys": "Remove Invalid Keys",
