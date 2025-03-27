@@ -34,25 +34,31 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     super(provider)
   }
 
+  private async validateFile(filePath: string): Promise<void> {
+    const pdfBuffer = await fs.promises.readFile(filePath)
+
+    const doc = await this.readPdf(new Uint8Array(pdfBuffer))
+
+    // 文件页数小于1000页
+    if (doc.numPages >= 1000) {
+      throw new Error(`PDF page count (${doc.numPages}) exceeds the limit of 1000 pages`)
+    }
+    // 文件大小小于300MB
+    if (pdfBuffer.length >= 300 * 1024 * 1024) {
+      const fileSizeMB = Math.round(pdfBuffer.length / (1024 * 1024))
+      throw new Error(`PDF file size (${fileSizeMB}MB) exceeds the limit of 300MB`)
+    }
+  }
+
   public async parseFile(sourceId: string, file: FileType): Promise<{ processedFile: FileType }> {
     try {
       Logger.info(`OCR processing started: ${file.path}`)
 
-      const pdfInfo = await this.getPdfInfo(file.path)
-
-      // 文件页数小于1000页
-      if (pdfInfo.pageCount >= 1000) {
-        throw new Error(`PDF page count (${pdfInfo.pageCount}) exceeds the limit of 1000 pages`)
-      }
-      // 文件大小小于300MB
-      if (pdfInfo.fileSize >= 300 * 1024 * 1024) {
-        const fileSizeMB = Math.round(pdfInfo.fileSize / (1024 * 1024))
-        throw new Error(`PDF file size (${fileSizeMB}MB) exceeds the limit of 300MB`)
-      }
-
       // 步骤1: 准备上传
       const { uid, url } = await this.preupload()
       Logger.info(`OCR preupload completed: uid=${uid}`)
+
+      await this.validateFile(file.path)
 
       // 步骤2: 上传文件
       await this.putFile(file.path, url)
@@ -148,8 +154,8 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
   private async putFile(filePath: string, url: string): Promise<void> {
     try {
-      const fileContent = fs.readFileSync(filePath)
-      const response = await axios.put(url, fileContent)
+      const fileStream = fs.createReadStream(filePath)
+      const response = await axios.put(url, fileStream)
 
       if (response.status !== 200) {
         throw new Error(`HTTP status ${response.status}: ${response.statusText}`)
