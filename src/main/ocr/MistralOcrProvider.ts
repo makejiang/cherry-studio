@@ -31,15 +31,6 @@ export default class MistralOcrProvider extends BaseOcrProvider {
     if (isLocalFile(file)) {
       Logger.info(`OCR preupload started for local file: ${file.path}`)
 
-      const pdfInfo = await this.getPdfInfo(file.path)
-      if (pdfInfo.pageCount >= 1000) {
-        throw new Error(`PDF page count (${pdfInfo.pageCount}) exceeds the limit of 1000 pages`)
-      }
-      if (pdfInfo.fileSize >= 512 * 1024 * 1024) {
-        const fileSizeMB = Math.round(pdfInfo.fileSize / (1024 * 1024))
-        throw new Error(`PDF file size (${fileSizeMB}MB) exceeds the limit of 300MB`)
-      }
-
       if (file.ext.toLowerCase() === '.pdf') {
         const uploadResponse = await this.fileService.uploadFile(file)
 
@@ -47,12 +38,12 @@ export default class MistralOcrProvider extends BaseOcrProvider {
           Logger.error('File upload failed:', uploadResponse)
           throw new Error('Failed to upload file: ' + uploadResponse.displayName)
         }
-
+        await this.sendOcrProgress(file.id, 15)
         const fileUrl = await this.sdk.files.getSignedUrl({
           fileId: uploadResponse.fileId
         })
         Logger.info('Got signed URL:', fileUrl)
-
+        await this.sendOcrProgress(file.id, 20)
         document = {
           type: 'document_url',
           documentUrl: fileUrl.url
@@ -189,7 +180,7 @@ export default class MistralOcrProvider extends BaseOcrProvider {
     return {
       id: conversionId,
       name: file.name.replace(/\.[^/.]+$/, '.md'),
-      origin_name: mdFileName,
+      origin_name: (file as LocalFileSource).origin_name,
       path: mdFilePath,
       created_at: new Date().toISOString(),
       type: FileTypes.DOCUMENT,
@@ -197,6 +188,6 @@ export default class MistralOcrProvider extends BaseOcrProvider {
       size: fs.statSync(mdFilePath).size,
       count: result.pages.length,
       source: 'local'
-    }
+    } as LocalFileSource
   }
 }

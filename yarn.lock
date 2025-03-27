@@ -632,14 +632,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cherrystudio/mac-system-ocr@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@cherrystudio/mac-system-ocr@npm:0.2.0"
+"@cherrystudio/mac-system-ocr@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@cherrystudio/mac-system-ocr@npm:0.2.1"
   dependencies:
     bindings: "npm:^1.5.0"
     node-api-headers: "npm:^1.0.1"
     node-gyp: "npm:latest"
-  checksum: 10c0/3ece86759b9120958aa9682b2e666f6fe495fb15c10113f350a3f124a7116e8db84d186e7efb7fdbd02437b39e6f0ff763e1784d6ffe8d7179b81b458055711a
+  checksum: 10c0/fbba8f85c2244799f281b100fa6fbaf134f742a6f4d0a15f465ed4f0f048edc0acb60ed74908c462f0de424c2e3476892127f25d10ab805c123233e4922d415c
   languageName: node
   linkType: hard
 
@@ -3795,7 +3795,7 @@ __metadata:
     "@cherrystudio/embedjs-loader-web": "npm:^0.1.29"
     "@cherrystudio/embedjs-loader-xml": "npm:^0.1.29"
     "@cherrystudio/embedjs-openai": "npm:^0.1.29"
-    "@cherrystudio/mac-system-ocr": "npm:^0.2.0"
+    "@cherrystudio/mac-system-ocr": "npm:^0.2.1"
     "@electron-toolkit/eslint-config-prettier": "npm:^3.0.0"
     "@electron-toolkit/eslint-config-ts": "npm:^3.0.0"
     "@electron-toolkit/preload": "npm:^3.0.0"
