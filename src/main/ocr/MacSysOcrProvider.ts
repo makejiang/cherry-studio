@@ -98,7 +98,6 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
           }
           const results = await pdf(pdfBuffer)
           const totalPages = results.length
-          Logger.info('[OCR] PDF successfully converted to image')
 
           const baseDir = path.dirname(file.path)
           const baseName = path.basename(file.path, path.extname(file.path))
