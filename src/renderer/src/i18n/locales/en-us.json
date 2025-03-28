@@ -1213,8 +1213,15 @@
         "ocr": {
           "title": "OCR",
           "provider": "OCR Provider",
-          "ocr": "OCR Settings",
-          "provider_placeholder": "Choose a OCR provider"
+          "provider_placeholder": "Choose a OCR provider",
+          "mac_system_ocr_options": {
+            "mode": {
+              "title": "Recognition Mode",
+              "accurate": "Accurate",
+              "fast": "Fast"
+            },
+            "min_confidence": "Minimum Confidence"
+          }
         },
         "title": "Tool Settings"
       },

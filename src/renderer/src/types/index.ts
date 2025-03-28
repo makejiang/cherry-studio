@@ -349,6 +349,7 @@ export interface OcrProvider {
   apiKey?: string
   apiHost?: string
   model?: string
+  options?: any
 }
 
 export type GenerateImageParams = {

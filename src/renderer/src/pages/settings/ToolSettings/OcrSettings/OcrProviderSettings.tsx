@@ -4,13 +4,22 @@ import { useOcrProvider } from '@renderer/hooks/useOcr'
 import { formatApiKeys } from '@renderer/services/ApiService'
 import { OcrProvider } from '@renderer/types'
 import { hasObjectKey } from '@renderer/utils'
-import { Avatar, Divider, Flex, Input } from 'antd'
+import { Avatar, Divider, Flex, Input, InputNumber, Segmented } from 'antd'
 import Link from 'antd/es/typography/Link'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import { SettingHelpLink, SettingHelpText, SettingHelpTextRow, SettingSubtitle, SettingTitle } from '../..'
+import {
+  SettingDivider,
+  SettingHelpLink,
+  SettingHelpText,
+  SettingHelpTextRow,
+  SettingRow,
+  SettingRowTitle,
+  SettingSubtitle,
+  SettingTitle
+} from '../..'
 
 interface Props {
   provider: OcrProvider
@@ -21,6 +30,7 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
   const { t } = useTranslation()
   const [apiKey, setApiKey] = useState(ocrProvider.apiKey || '')
   const [apiHost, setApiHost] = useState(ocrProvider.apiHost || '')
+  const [options, setOptions] = useState(ocrProvider.options || {})
 
   const ocrProviderConfig = OCR_PROVIDER_CONFIG[ocrProvider.id]
   const apiKeyWebsite = ocrProviderConfig?.websites?.apiKey
@@ -29,7 +39,8 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
   useEffect(() => {
     setApiKey(ocrProvider.apiKey ?? '')
     setApiHost(ocrProvider.apiHost ?? '')
-  }, [ocrProvider.apiKey, ocrProvider.apiHost])
+    setOptions(ocrProvider.options ?? {})
+  }, [ocrProvider.apiKey, ocrProvider.apiHost, ocrProvider.options])
 
   const onUpdateApiKey = () => {
     if (apiKey !== ocrProvider.apiKey) {
@@ -47,6 +58,12 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
     } else {
       setApiHost(ocrProvider.apiHost || '')
     }
+  }
+
+  const onUpdateOptions = (key: string, value: any) => {
+    const newOptions = { ...options, [key]: value }
+    setOptions(newOptions)
+    updateOcrProvider({ ...ocrProvider, options: newOptions })
   }
 
   return (
@@ -100,6 +117,40 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
               onBlur={onUpdateApiHost}
             />
           </Flex>
+        </>
+      )}
+
+      {hasObjectKey(ocrProvider, 'options') && ocrProvider.id === 'system' && (
+        <>
+          <SettingDivider style={{ marginTop: 15, marginBottom: 12 }} />
+          <SettingRow>
+            <SettingRowTitle>{t('settings.tool.ocr.mac_system_ocr_options.mode.title')}</SettingRowTitle>
+            <Segmented
+              options={[
+                {
+                  label: t('settings.tool.ocr.mac_system_ocr_options.mode.accurate'),
+                  value: 1
+                },
+                {
+                  label: t('settings.tool.ocr.mac_system_ocr_options.mode.fast'),
+                  value: 0
+                }
+              ]}
+              value={options.recognitionLevel}
+              onChange={(value) => onUpdateOptions('recognitionLevel', value)}
+            />
+          </SettingRow>
+          <SettingDivider style={{ marginTop: 15, marginBottom: 12 }} />
+          <SettingRow>
+            <SettingRowTitle>{t('settings.tool.ocr.mac_system_ocr_options.min_confidence')}</SettingRowTitle>
+            <InputNumber
+              value={options.minConfidence}
+              onChange={(value) => onUpdateOptions('minConfidence', value)}
+              min={0}
+              max={1}
+              step={0.1}
+            />
+          </SettingRow>
         </>
       )}
     </>

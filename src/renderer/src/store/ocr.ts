@@ -23,7 +23,11 @@ const initialState: OcrState = {
     },
     {
       id: 'system',
-      name: 'System(Mac Only)'
+      name: 'System(Mac Only)',
+      options: {
+        recognitionLevel: 0,
+        minConfidence: 0.5
+      }
     }
   ],
   defaultProvider: ''

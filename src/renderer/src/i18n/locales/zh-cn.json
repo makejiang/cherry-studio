@@ -394,7 +394,11 @@
       "rename": "重命名",
       "search": "搜索知识库",
       "search_placeholder": "输入查询内容",
-      "settings": "知识库设置",
+      "settings": {
+        "title": "知识库设置",
+        "preprocessing": "预处理",
+        "preprocessing_tooltip": "使用 OCR 预处理上传的文件"
+      },
       "sitemap_placeholder": "请输入站点地图 URL",
       "sitemaps": "网站",
       "source": "来源",
@@ -952,13 +956,6 @@
       "launch.onboot": "开机自动启动",
       "launch.title": "启动",
       "launch.totray": "启动时最小化到托盘",
-      "knowledge": {
-        "title": "知识库",
-        "ocr": {
-          "title": "OCR设置",
-          "provider": "OCR服务商"
-        }
-      },
       "mcp": {
         "actions": "操作",
         "active": "启用",
@@ -1191,9 +1188,17 @@
       "tool": {
         "title": "工具设置",
         "ocr": {
-          "title": "知识库设置",
+          "title": "OCR设置",
           "provider": "OCR服务商",
-          "provider_placeholder": "选择一个OCR服务商"
+          "provider_placeholder": "选择一个OCR服务商",
+          "mac_system_ocr_options": {
+            "mode": {
+              "title": "识别模式",
+              "accurate": "精准",
+              "fast": "快速"
+            },
+            "min_confidence": "最小置信度"
+          }
         },
         "websearch": {
           "blacklist": "黑名单",

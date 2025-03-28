@@ -12,6 +12,11 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
   private readonly BATCH_SIZE = 4
   private readonly CONCURRENCY = 2
   private readonly MIN_TEXT_LENGTH = 1000
+
+  private getRecognitionLevel(level?: number) {
+    return level === 0 ? MacOCR.RECOGNITION_LEVEL_FAST : MacOCR.RECOGNITION_LEVEL_ACCURATE
+  }
+
   constructor(provider: OcrProvider) {
     super(provider)
   }
@@ -42,7 +47,8 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
         const ocrResults = await MacOCR.recognizeBatchFromBuffer(pageBuffers, {
           maxThreads: 4,
           ocrOptions: {
-            recognitionLevel: MacOCR.RECOGNITION_LEVEL_ACCURATE
+            recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),
+            minConfidence: this.provider.options?.minConfidence || 0.5
           }
         })
 

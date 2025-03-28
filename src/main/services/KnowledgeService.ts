@@ -497,7 +497,7 @@ class KnowledgeService {
       try {
         const ocrProvider = new OcrProvider(base.ocrProvider)
         Logger.info(`Starting OCR processing for file: ${file.path}`)
-
+        Logger.info(`OCR provider: ${base.ocrProvider?.options}`)
         const { processedFile } = await ocrProvider.parseFile(item.id, file)
         Logger.info(`OCR processing completed: ${processedFile.path}`)
         fileToProcess = processedFile
