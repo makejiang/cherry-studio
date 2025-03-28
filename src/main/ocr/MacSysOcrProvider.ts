@@ -9,8 +9,8 @@ import { TextItem } from 'pdfjs-dist/types/src/display/api'
 import BaseOcrProvider from './BaseOcrProvider'
 
 export default class MacSysOcrProvider extends BaseOcrProvider {
-  private readonly BATCH_SIZE = 5
-  private readonly CONCURRENCY = 5
+  private readonly BATCH_SIZE = 4
+  private readonly CONCURRENCY = 2
   private readonly MIN_TEXT_LENGTH = 1000
   constructor(provider: OcrProvider) {
     super(provider)
@@ -40,6 +40,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
 
         // Process batch
         const ocrResults = await MacOCR.recognizeBatchFromBuffer(pageBuffers, {
+          maxThreads: 4,
           ocrOptions: {
             recognitionLevel: MacOCR.RECOGNITION_LEVEL_ACCURATE
           }
@@ -103,7 +104,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
 
           await new Promise<void>((resolve, reject) => {
             writeStream.end(() => {
-              Logger.info('[OCR] OCR process completed successfully')
+              Logger.info(`[OCR] OCR process completed successfully for ${file.origin_name}`)
               resolve()
             })
             writeStream.on('error', reject)

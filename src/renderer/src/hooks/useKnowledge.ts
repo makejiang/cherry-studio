@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { db } from '@renderer/databases/index'
 import KnowledgeQueue from '@renderer/queue/KnowledgeQueue'
 import FileManager from '@renderer/services/FileManager'
@@ -21,7 +20,7 @@ import {
 } from '@renderer/store/knowledge'
 import { FileType, KnowledgeBase, KnowledgeItem, ProcessingStatus } from '@renderer/types'
 import { runAsyncFunction } from '@renderer/utils'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -189,60 +188,16 @@ export const useKnowledge = (baseId: string) => {
   }
 
   // 获取特定项目的处理状态
-  const getProcessingStatus = (itemId: string) => {
-    return base?.items.find((item) => item.id === itemId)?.processingStatus
-  }
+  const getProcessingStatus = useCallback(
+    (itemId: string) => {
+      return base?.items.find((item) => item.id === itemId)?.processingStatus
+    },
+    [base?.items]
+  )
 
   // 获取特定类型的所有处理项
   const getProcessingItemsByType = (type: 'file' | 'url' | 'note') => {
     return base?.items.filter((item) => item.type === type && item.processingStatus !== undefined) || []
-  }
-
-  // 获取目录处理进度
-  const getDirectoryProcessingPercent = (itemId?: string) => {
-    const [percent, setPercent] = useState<number>(0)
-
-    useEffect(() => {
-      if (!itemId) {
-        return
-      }
-
-      const cleanup = window.electron.ipcRenderer.on(
-        'directory-processing-percent',
-        (_, { itemId: id, percent }: { itemId: string; percent: number }) => {
-          if (itemId === id) {
-            setPercent(percent)
-          }
-        }
-      )
-
-      return () => {
-        cleanup()
-      }
-    }, [itemId])
-
-    return percent
-  }
-
-  // 获取文件ocr处理进度
-  const getFileOcrProgress = (itemId: string) => {
-    const [progress, setProgress] = useState<number>(0)
-    useEffect(() => {
-      const cleanup = window.electron.ipcRenderer.on(
-        'file-ocr-progress',
-        (_, { itemId: id, progress }: { itemId: string; progress: number }) => {
-          if (itemId === id) {
-            setProgress(progress)
-          }
-        }
-      )
-
-      return () => {
-        cleanup()
-      }
-    }, [itemId])
-
-    return progress
   }
 
   // 清除已完成的项目
@@ -327,8 +282,6 @@ export const useKnowledge = (baseId: string) => {
     refreshItem,
     getProcessingStatus,
     getProcessingItemsByType,
-    getDirectoryProcessingPercent,
-    getFileOcrProgress,
     clearCompleted,
     clearAll,
     removeItem,

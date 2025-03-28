@@ -21,7 +21,7 @@ import { getProviderName } from '@renderer/services/ProviderService'
 import { FileType, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
 import { bookExts, documentExts, textExts, thirdPartyApplicationExts } from '@shared/config/constant'
 import { Alert, Button, Card, Divider, Dropdown, message, Tag, Tooltip, Typography, Upload } from 'antd'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -39,6 +39,25 @@ interface KnowledgeContentProps {
 const fileTypes = [...bookExts, ...thirdPartyApplicationExts, ...documentExts, ...textExts]
 const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   const { t } = useTranslation()
+  const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map())
+
+  useEffect(() => {
+    const handlers = [
+      window.electron.ipcRenderer.on('file-ocr-progress', (_, { itemId, progress }) => {
+        console.log('[Progress] File OCR:', itemId, progress)
+        setProgressMap((prev) => new Map(prev).set(itemId, progress))
+      }),
+
+      window.electron.ipcRenderer.on('directory-processing-percent', (_, { itemId, percent }) => {
+        console.log('[Progress] Directory:', itemId, percent)
+        setProgressMap((prev) => new Map(prev).set(itemId, percent))
+      })
+    ]
+
+    return () => {
+      handlers.forEach((cleanup) => cleanup())
+    }
+  }, [])
 
   const {
     base,
@@ -54,8 +73,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     addSitemap,
     removeItem,
     getProcessingStatus,
-    getDirectoryProcessingPercent,
-    getFileOcrProgress,
     addNote,
     addDirectory,
     updateItem
@@ -67,13 +84,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
 
   if (!base) {
     return null
-  }
-
-  const getProgressingPercentForItem = (itemId: string) => getDirectoryProcessingPercent(itemId)
-
-  const getFileOcrProgressForItem = (itemId: string) => {
-    console.log('[KnowledgeContent] getFileOcrProgressForItem:', itemId)
-    return getFileOcrProgress(itemId)
   }
 
   const handleAddFile = () => {
@@ -282,8 +292,8 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                       sourceId={item.id}
                       base={base}
                       getProcessingStatus={getProcessingStatus}
-                      getProcessingPercent={getFileOcrProgressForItem}
                       type="file"
+                      progress={progressMap.get(item.id)}
                     />
                   </StatusIconWrapper>
                   <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
@@ -320,8 +330,8 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                       sourceId={item.id}
                       base={base}
                       getProcessingStatus={getProcessingStatus}
-                      getProcessingPercent={getProgressingPercentForItem}
                       type="directory"
+                      progress={progressMap.get(item.id)}
                     />
                   </StatusIconWrapper>
                   <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
