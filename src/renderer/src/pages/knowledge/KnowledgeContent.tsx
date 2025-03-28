@@ -264,7 +264,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
       <FileListSection>
         {fileItems.reverse().map((item) => {
           const file = item.content as FileType
-          console.log('item', item)
           return (
             <ItemCard key={item.id}>
               <ItemContent>

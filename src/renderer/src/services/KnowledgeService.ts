@@ -66,7 +66,9 @@ export const getFileFromUrl = async (url: string): Promise<FileType | null> => {
   }
 
   if (fileName) {
-    const fileId = fileName.split('.')[0]
+    const actualFileName = fileName.split(/[/\\]/).pop() || fileName
+    console.log('actualFileName', actualFileName)
+    const fileId = actualFileName.split('.')[0]
     const file = await FileManager.getFile(fileId)
     if (file) {
       return file

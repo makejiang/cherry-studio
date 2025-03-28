@@ -1,6 +1,5 @@
 import { ExtractChunkData } from '@cherrystudio/embedjs-interfaces'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { FileMetadataResponse, ListFilesResponse, UploadFileResponse } from '@google/generative-ai/server'
 import type { MCPServer, MCPTool } from '@renderer/types'
 import {
   AppInfo,
