@@ -849,6 +849,12 @@ const migrateConfig = {
         name: 'System(Mac Only)'
       })
     }
+
+    state.llm.providers.forEach((provider) => {
+      if (provider.id === 'mistral') {
+        provider.type = 'mistral'
+      }
+    })
     return state
   }
 }

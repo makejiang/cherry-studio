@@ -1,4 +1,3 @@
-import MacOCR from '@cherrystudio/mac-system-ocr'
 import { FileSource, isLocalFile, LocalFileSource, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import * as fs from 'fs'
@@ -12,9 +11,23 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
   private readonly BATCH_SIZE = 4
   private readonly CONCURRENCY = 2
   private readonly MIN_TEXT_LENGTH = 1000
+  private MacOCR: any
+
+  private async initMacOCR() {
+    if (!this.MacOCR) {
+      try {
+        const module = await import('@cherrystudio/mac-system-ocr')
+        this.MacOCR = module.default
+      } catch (error) {
+        Logger.error('[OCR] Failed to load mac-system-ocr:', error)
+        throw error
+      }
+    }
+    return this.MacOCR
+  }
 
   private getRecognitionLevel(level?: number) {
-    return level === 0 ? MacOCR.RECOGNITION_LEVEL_FAST : MacOCR.RECOGNITION_LEVEL_ACCURATE
+    return level === 0 ? this.MacOCR.RECOGNITION_LEVEL_FAST : this.MacOCR.RECOGNITION_LEVEL_ACCURATE
   }
 
   constructor(provider: OcrProvider) {
@@ -29,6 +42,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
   ): Promise<void> {
     const queue = new PQueue({ concurrency: this.CONCURRENCY })
     const batches: Promise<void>[] = []
+    await this.initMacOCR()
 
     // Create ordered batches
     for (let startPage = 0; startPage < totalPages; startPage += this.BATCH_SIZE) {
@@ -44,7 +58,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
         }
 
         // Process batch
-        const ocrResults = await MacOCR.recognizeBatchFromBuffer(pageBuffers, {
+        const ocrResults = await this.MacOCR.recognizeBatchFromBuffer(pageBuffers, {
           maxThreads: 4,
           ocrOptions: {
             recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),

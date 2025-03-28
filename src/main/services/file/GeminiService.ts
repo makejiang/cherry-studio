@@ -39,7 +39,7 @@ export class GeminiService extends BaseFileService {
     }
 
     const response: FileUploadResponse = {
-      fileId: uploadResult.file.name,
+      fileId: uploadResult.file.name || '',
       displayName: file.origin_name,
       status,
       originalFile: uploadResult
@@ -89,7 +89,7 @@ export class GeminiService extends BaseFileService {
     }
     const response = await this.fileManager.listFiles()
     const fileList: FileListResponse = {
-      files: response.files
+      files: (response.files || [])
         .filter((file) => file.state === FileState.ACTIVE)
         .map((file) => {
           // 更新单个文件的缓存

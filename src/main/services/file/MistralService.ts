@@ -22,7 +22,7 @@ export class MistralService extends BaseFileService {
       const fileBuffer = await fs.readFile(file.path)
       const response = await this.client.files.upload({
         file: {
-          fileName: file.path,
+          fileName: file.origin_name,
           content: new Uint8Array(fileBuffer)
         },
         purpose: 'ocr'
@@ -50,12 +50,13 @@ export class MistralService extends BaseFileService {
         files: response.data.map((file) => ({
           id: file.id,
           displayName: file.filename || '',
-          size: 0, // Size information not available in SDK response
-          status: 'success' // All listed files are processed
+          size: file.sizeBytes,
+          status: 'success', // All listed files are processed,
+          originalFile: file
         }))
       }
     } catch (error) {
-      console.error('Error listing files:', error)
+      Logger.error('Error listing files:', error)
       return { files: [] }
     }
   }
@@ -65,8 +66,9 @@ export class MistralService extends BaseFileService {
       await this.client.files.delete({
         fileId
       })
+      Logger.info(`File ${fileId} deleted`)
     } catch (error) {
-      console.error('Error deleting file:', error)
+      Logger.error('Error deleting file:', error)
       throw error
     }
   }
@@ -83,7 +85,7 @@ export class MistralService extends BaseFileService {
         status: 'success' // Retrieved files are always processed
       }
     } catch (error) {
-      console.error('Error retrieving file:', error)
+      Logger.error('Error retrieving file:', error)
       return {
         fileId: fileId,
         displayName: '',
