@@ -1,4 +1,4 @@
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -43,24 +43,27 @@ export default defineConfig({
     }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@shared': resolve('packages/shared')
+      }
+    }
   },
   renderer: {
     plugins: [
       react({
-        babel: {
-          plugins: [
-            [
-              'styled-components',
-              {
-                displayName: true, // 开发环境下启用组件名称
-                fileName: false, // 不在类名中包含文件名
-                pure: true, // 优化性能
-                ssr: false // 不需要服务端渲染
-              }
-            ]
+        plugins: [
+          [
+            '@swc/plugin-styled-components',
+            {
+              displayName: true, // 开发环境下启用组件名称
+              fileName: false, // 不在类名中包含文件名
+              pure: true, // 优化性能
+              ssr: false // 不需要服务端渲染
+            }
           ]
-        }
+        ]
       }),
       ...visualizerPlugin('renderer')
     ],
@@ -71,7 +74,7 @@ export default defineConfig({
       }
     },
     optimizeDeps: {
-      exclude: ['chunk-PZ64DZKH.js', 'chunk-JMKENWIY.js', 'chunk-UXYB6GHG.js', 'chunk-ALDIEZMG.js', 'chunk-4X6ZJEXY.js']
+      exclude: []
     }
   }
 })

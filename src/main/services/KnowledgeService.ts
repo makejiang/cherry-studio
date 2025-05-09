@@ -27,7 +27,9 @@ import OcrProvider from '@main/ocr/OcrProvider'
 import Reranker from '@main/reranker/Reranker'
 import { windowService } from '@main/services/WindowService'
 import { getAllFiles } from '@main/utils/file'
+import { MB } from '@shared/config/constant'
 import type { LoaderReturn } from '@shared/config/types'
+import { IpcChannel } from '@shared/IpcChannel'
 import { FileType, KnowledgeBaseParams, KnowledgeItem } from '@types'
 import { app } from 'electron'
 import Logger from 'electron-log'
@@ -92,7 +94,7 @@ class KnowledgeService {
   private workload = 0
   private processingItemCount = 0
   private knowledgeItemProcessingQueueMappingPromise: Map<LoaderTaskOfSet, () => void> = new Map()
-  private static MAXIMUM_WORKLOAD = 1024 * 1024 * 80
+  private static MAXIMUM_WORKLOAD = 80 * MB
   private static MAXIMUM_PROCESSING_ITEM_COUNT = 30
   private static ERROR_LOADER_RETURN: LoaderReturn = { entriesAdded: 0, uniqueId: '', uniqueIds: [''], loaderType: '' }
 
@@ -200,7 +202,7 @@ class KnowledgeService {
 
     const sendDirectoryProcessingPercent = (totalFiles: number, processedFiles: number) => {
       const mainWindow = windowService.getMainWindow()
-      mainWindow?.webContents.send('directory-processing-percent', {
+      mainWindow?.webContents.send(IpcChannel.DirectoryProcessingPercent, {
         itemId: item.id,
         percent: (processedFiles / totalFiles) * 100
       })
@@ -276,7 +278,7 @@ class KnowledgeService {
                 return KnowledgeService.ERROR_LOADER_RETURN
               })
           },
-          evaluateTaskWorkload: { workload: 1024 * 1024 * 2 }
+          evaluateTaskWorkload: { workload: 2 * MB }
         }
       ],
       loaderDoneReturn: null
@@ -315,7 +317,7 @@ class KnowledgeService {
                 Logger.error(err)
                 return KnowledgeService.ERROR_LOADER_RETURN
               }),
-          evaluateTaskWorkload: { workload: 1024 * 1024 * 20 }
+          evaluateTaskWorkload: { workload: 20 * MB }
         }
       ],
       loaderDoneReturn: null

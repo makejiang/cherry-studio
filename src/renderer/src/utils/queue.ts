@@ -9,9 +9,7 @@ const requestQueues: { [topicId: string]: PQueue } = {}
  * @returns A PQueue instance for the topic
  */
 export const getTopicQueue = (topicId: string, options = {}): PQueue => {
-  if (!requestQueues[topicId]) {
-    requestQueues[topicId] = new PQueue(options)
-  }
+  if (!requestQueues[topicId]) requestQueues[topicId] = new PQueue(options)
   return requestQueues[topicId]
 }
 

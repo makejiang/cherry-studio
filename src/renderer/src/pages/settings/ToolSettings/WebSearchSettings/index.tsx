@@ -1,6 +1,7 @@
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useDefaultWebSearchProvider, useWebSearchProviders } from '@renderer/hooks/useWebSearchProviders'
 import { WebSearchProvider } from '@renderer/types'
+import { hasObjectKey } from '@renderer/utils'
 import { Select } from 'antd'
 import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +17,8 @@ const WebSearchSettings: FC = () => {
   const { t } = useTranslation()
   const [selectedProvider, setSelectedProvider] = useState<WebSearchProvider | undefined>(defaultProvider)
   const { theme: themeMode } = useTheme()
+
+  const isLocalProvider = selectedProvider?.id.startsWith('local')
 
   function updateSelectedWebSearchProvider(providerId: string) {
     const provider = providers.find((p) => p.id === providerId)
@@ -39,14 +42,17 @@ const WebSearchSettings: FC = () => {
               style={{ width: '200px' }}
               onChange={(value: string) => updateSelectedWebSearchProvider(value)}
               placeholder={t('settings.tool.websearch.search_provider_placeholder')}
-              options={providers.map((p) => ({ value: p.id, label: p.name }))}
+              options={providers.map((p) => ({
+                value: p.id,
+                label: `${p.name} (${hasObjectKey(p, 'apiKey') ? t('settings.websearch.apikey') : t('settings.websearch.free')})`
+              }))}
             />
           </div>
         </SettingRow>
       </SettingGroup>
-      {selectedProvider && (
+      {!isLocalProvider && (
         <SettingGroup theme={themeMode}>
-          <WebSearchProviderSetting provider={selectedProvider} />
+          {selectedProvider && <WebSearchProviderSetting provider={selectedProvider} />}
         </SettingGroup>
       )}
       <BasicSettings />

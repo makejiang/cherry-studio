@@ -1,8 +1,10 @@
-import { LoadingOutlined, MinusOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons'
-import { Center } from '@renderer/components/Layout'
-import ModelTags from '@renderer/components/ModelTags'
+import { LoadingOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import CustomCollapse from '@renderer/components/CustomCollapse'
+import CustomTag from '@renderer/components/CustomTag'
+import ModelTagsWithLabel from '@renderer/components/ModelTagsWithLabel'
 import {
   getModelLogo,
+  groupQwenModels,
   isEmbeddingModel,
   isFunctionCallingModel,
   isReasoningModel,
@@ -12,13 +14,15 @@ import {
   SYSTEM_MODELS
 } from '@renderer/config/models'
 import { useProvider } from '@renderer/hooks/useProvider'
+import FileItem from '@renderer/pages/files/FileItem'
 import { fetchModels } from '@renderer/services/ApiService'
 import { Model, Provider } from '@renderer/types'
 import { getDefaultGroupName, isFreeModel, runAsyncFunction } from '@renderer/utils'
-import { Avatar, Button, Empty, Flex, Modal, Popover, Radio, Tooltip } from 'antd'
-import Search from 'antd/es/input/Search'
+import { Avatar, Button, Empty, Flex, Modal, Tabs, Tooltip, Typography } from 'antd'
+import Input from 'antd/es/input/Input'
 import { groupBy, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { Search } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -79,30 +83,36 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
     }
   })
 
-  const modelGroups = groupBy(list, 'group')
+  const modelGroups = useMemo(
+    () =>
+      provider.id === 'dashscope'
+        ? {
+            ...groupBy(
+              list.filter((model) => !model.id.startsWith('qwen')),
+              'group'
+            ),
+            ...groupQwenModels(list.filter((model) => model.id.startsWith('qwen')))
+          }
+        : groupBy(list, 'group'),
+    [list, provider.id]
+  )
 
-  const onOk = () => {
-    setOpen(false)
-  }
+  const onOk = useCallback(() => setOpen(false), [])
 
-  const onCancel = () => {
-    setOpen(false)
-  }
+  const onCancel = useCallback(() => setOpen(false), [])
 
-  const onClose = () => {
-    resolve({})
-  }
+  const onClose = useCallback(() => resolve({}), [resolve])
 
-  const onAddModel = (model: Model) => {
-    if (isEmpty(model.name)) {
-      return
-    }
-    addModel(model)
-  }
+  const onAddModel = useCallback(
+    (model: Model) => {
+      if (!isEmpty(model.name)) {
+        addModel(model)
+      }
+    },
+    [addModel]
+  )
 
-  const onRemoveModel = (model: Model) => {
-    removeModel(model)
-  }
+  const onRemoveModel = useCallback((model: Model) => removeModel(model), [removeModel])
 
   useEffect(() => {
     runAsyncFunction(async () => {
@@ -116,7 +126,7 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
               // @ts-ignore name
               name: model.name || model.id,
               provider: _provider.id,
-              group: getDefaultGroupName(model.id),
+              group: getDefaultGroupName(model.id, _provider.id),
               // @ts-ignore name
               description: model?.description,
               owned_by: model?.owned_by
@@ -152,6 +162,63 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
     )
   }
 
+  const renderTopTools = useCallback(() => {
+    const isAllFilteredInProvider = list.length > 0 && list.every((model) => isModelInProvider(provider, model.id))
+    return (
+      <Tooltip
+        destroyTooltipOnHide
+        title={
+          isAllFilteredInProvider ? t('settings.models.manage.remove_listed') : t('settings.models.manage.add_listed')
+        }
+        placement="top">
+        <Button
+          type={isAllFilteredInProvider ? 'default' : 'primary'}
+          icon={isAllFilteredInProvider ? <MinusOutlined /> : <PlusOutlined />}
+          size="large"
+          onClick={(e) => {
+            e.stopPropagation()
+            if (isAllFilteredInProvider) {
+              list.filter((model) => isModelInProvider(provider, model.id)).forEach(onRemoveModel)
+            } else {
+              list.filter((model) => !isModelInProvider(provider, model.id)).forEach(onAddModel)
+            }
+          }}
+          disabled={list.length === 0}
+        />
+      </Tooltip>
+    )
+  }, [list, provider, onAddModel, onRemoveModel, t])
+
+  const renderGroupTools = useCallback(
+    (group: string) => {
+      const isAllInProvider = modelGroups[group].every((model) => isModelInProvider(provider, model.id))
+      return (
+        <Tooltip
+          destroyTooltipOnHide
+          title={
+            isAllInProvider
+              ? t(`settings.models.manage.remove_whole_group`)
+              : t(`settings.models.manage.add_whole_group`)
+          }
+          placement="top">
+          <Button
+            type="text"
+            icon={isAllInProvider ? <MinusOutlined /> : <PlusOutlined />}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (isAllInProvider) {
+                modelGroups[group].filter((model) => isModelInProvider(provider, model.id)).forEach(onRemoveModel)
+              } else {
+                modelGroups[group].filter((model) => !isModelInProvider(provider, model.id)).forEach(onAddModel)
+              }
+            }}
+          />
+        </Tooltip>
+      )
+    },
+    [modelGroups, provider, onRemoveModel, onAddModel, t]
+  )
+
   return (
     <Modal
       title={<ModalHeader />}
@@ -160,97 +227,115 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
       onCancel={onCancel}
       afterClose={onClose}
       footer={null}
-      width="680px"
+      width="800px"
       styles={{
         content: { padding: 0 },
-        header: { padding: 22, paddingBottom: 15 }
+        header: { padding: '16px 22px 30px 22px' }
       }}
       centered>
       <SearchContainer>
-        <Center>
-          <Radio.Group
-            size={i18n.language.startsWith('zh') ? 'middle' : 'small'}
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            buttonStyle="solid">
-            <Radio.Button value="all">{t('models.all')}</Radio.Button>
-            <Radio.Button value="reasoning">{t('models.type.reasoning')}</Radio.Button>
-            <Radio.Button value="vision">{t('models.type.vision')}</Radio.Button>
-            <Radio.Button value="websearch">{t('models.type.websearch')}</Radio.Button>
-            <Radio.Button value="free">{t('models.type.free')}</Radio.Button>
-            <Radio.Button value="embedding">{t('models.type.embedding')}</Radio.Button>
-            <Radio.Button value="rerank">{t('models.type.rerank')}</Radio.Button>
-            <Radio.Button value="function_calling">{t('models.type.function_calling')}</Radio.Button>
-          </Radio.Group>
-        </Center>
-        <Search
-          ref={searchInputRef}
-          placeholder={t('settings.provider.search_placeholder')}
-          allowClear
-          onChange={(e) => setSearchText(e.target.value)}
-          onSearch={setSearchText}
+        <TopToolsWrapper>
+          <Input
+            prefix={<Search size={14} />}
+            size="large"
+            ref={searchInputRef}
+            placeholder={t('settings.provider.search_placeholder')}
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+          {renderTopTools()}
+        </TopToolsWrapper>
+        <Tabs
+          size={i18n.language.startsWith('zh') ? 'middle' : 'small'}
+          defaultActiveKey="all"
+          items={[
+            { label: t('models.all'), key: 'all' },
+            { label: t('models.type.reasoning'), key: 'reasoning' },
+            { label: t('models.type.vision'), key: 'vision' },
+            { label: t('models.type.websearch'), key: 'websearch' },
+            { label: t('models.type.free'), key: 'free' },
+            { label: t('models.type.embedding'), key: 'embedding' },
+            { label: t('models.type.rerank'), key: 'rerank' },
+            { label: t('models.type.function_calling'), key: 'function_calling' }
+          ]}
+          onChange={(key) => setFilterType(key)}
         />
       </SearchContainer>
       <ListContainer>
-        {Object.keys(modelGroups).map((group) => {
-          const isAllInProvider = modelGroups[group].every((model) => isModelInProvider(provider, model.id))
+        {Object.keys(modelGroups).map((group, i) => {
           return (
-            <div key={group}>
-              <ListHeader key={group}>
-                {group}
-                <div>
-                  <Button
-                    type="text"
-                    icon={isAllInProvider ? <MinusOutlined /> : <PlusOutlined />}
-                    title={
-                      isAllInProvider
-                        ? t(`settings.models.manage.remove_whole_group`)
-                        : t(`settings.models.manage.add_whole_group`)
-                    }
-                    onClick={() => {
-                      if (isAllInProvider) {
-                        modelGroups[group]
-                          .filter((model) => isModelInProvider(provider, model.id))
-                          .forEach(onRemoveModel)
-                      } else {
-                        modelGroups[group].filter((model) => !isModelInProvider(provider, model.id)).forEach(onAddModel)
-                      }
+            <CustomCollapse
+              key={i}
+              defaultActiveKey={['1']}
+              styles={{ body: { padding: '0 10px' } }}
+              label={
+                <Flex align="center" gap={10}>
+                  <span style={{ fontWeight: 600 }}>{group}</span>
+                  <CustomTag color="#02B96B" size={10}>
+                    {modelGroups[group].length}
+                  </CustomTag>
+                </Flex>
+              }
+              extra={renderGroupTools(group)}>
+              <FlexColumn style={{ margin: '10px 0' }}>
+                {modelGroups[group].map((model) => (
+                  <FileItem
+                    style={{
+                      backgroundColor: isModelInProvider(provider, model.id)
+                        ? 'rgba(0, 126, 0, 0.06)'
+                        : 'rgba(255, 255, 255, 0.04)',
+                      border: 'none',
+                      boxShadow: 'none'
+                    }}
+                    key={model.id}
+                    fileInfo={{
+                      icon: <Avatar src={getModelLogo(model.id)}>{model?.name?.[0]?.toUpperCase()}</Avatar>,
+                      name: (
+                        <ListItemName>
+                          <Tooltip
+                            styles={{
+                              root: {
+                                width: 'auto',
+                                maxWidth: '500px'
+                              }
+                            }}
+                            destroyTooltipOnHide
+                            title={
+                              <Typography.Text style={{ color: 'white' }} copyable={{ text: model.id }}>
+                                {model.id}
+                              </Typography.Text>
+                            }
+                            placement="top">
+                            <span style={{ cursor: 'help' }}>{model.name}</span>
+                          </Tooltip>
+                          <ModelTagsWithLabel model={model} size={11} />
+                        </ListItemName>
+                      ),
+                      extra: model.description && (
+                        <div style={{ marginTop: 6 }}>
+                          <Typography.Paragraph
+                            type="secondary"
+                            ellipsis={{ rows: 1, expandable: true }}
+                            style={{ marginBottom: 0, marginTop: 5 }}>
+                            {model.description}
+                          </Typography.Paragraph>
+                        </div>
+                      ),
+                      ext: '.model',
+                      actions: (
+                        <div>
+                          {isModelInProvider(provider, model.id) ? (
+                            <Button type="text" onClick={() => onRemoveModel(model)} icon={<MinusOutlined />} />
+                          ) : (
+                            <Button type="text" onClick={() => onAddModel(model)} icon={<PlusOutlined />} />
+                          )}
+                        </div>
+                      )
                     }}
                   />
-                </div>
-              </ListHeader>
-              {modelGroups[group].map((model) => {
-                return (
-                  <ListItem key={model.id}>
-                    <ListItemHeader>
-                      <Avatar src={getModelLogo(model.id)} size={24}>
-                        {model?.name?.[0]?.toUpperCase()}
-                      </Avatar>
-                      <ListItemName>
-                        <Tooltip title={model.id} placement="top">
-                          <span style={{ cursor: 'help' }}>{model.name}</span>
-                        </Tooltip>
-                        <ModelTags model={model} />
-                        {!isEmpty(model.description) && (
-                          <Popover
-                            trigger="click"
-                            title={model.name}
-                            content={model.description}
-                            overlayStyle={{ maxWidth: 600 }}>
-                            <Question />
-                          </Popover>
-                        )}
-                      </ListItemName>
-                    </ListItemHeader>
-                    {isModelInProvider(provider, model.id) ? (
-                      <Button type="default" onClick={() => onRemoveModel(model)} icon={<MinusOutlined />} />
-                    ) : (
-                      <Button type="primary" onClick={() => onAddModel(model)} icon={<PlusOutlined />} />
-                    )}
-                  </ListItem>
-                )
-              })}
-            </div>
+                ))}
+              </FlexColumn>
+            </CustomCollapse>
           )
         })}
         {isEmpty(list) && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('settings.models.empty')} />}
@@ -264,7 +349,6 @@ const SearchContainer = styled.div`
   flex-direction: column;
   gap: 15px;
   padding: 0 22px;
-  padding-bottom: 10px;
   margin-top: -10px;
 
   .ant-radio-group {
@@ -273,38 +357,28 @@ const SearchContainer = styled.div`
   }
 `
 
+const TopToolsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
 const ListContainer = styled.div`
-  max-height: 70vh;
+  height: calc(100vh - 300px);
   overflow-y: scroll;
-  padding-bottom: 20px;
-`
-
-const ListHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--color-background-soft);
-  padding: 8px 22px;
-  color: var(--color-text);
-  opacity: 0.4;
-`
-
-const ListItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 22px;
-`
-
-const ListItemHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
+  padding: 0 6px 16px 6px;
+  margin-left: 16px;
   margin-right: 10px;
-  height: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`
+
+const FlexColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
 `
 
 const ListItemName = styled.div`
@@ -314,8 +388,8 @@ const ListItemName = styled.div`
   gap: 10px;
   color: var(--color-text);
   font-size: 14px;
+  line-height: 1;
   font-weight: 600;
-  margin-left: 6px;
 `
 
 const ModelHeaderTitle = styled.div`
@@ -323,11 +397,6 @@ const ModelHeaderTitle = styled.div`
   font-size: 18px;
   font-weight: 600;
   margin-right: 10px;
-`
-
-const Question = styled(QuestionCircleOutlined)`
-  cursor: pointer;
-  color: #888;
 `
 
 export default class EditModelsPopup {

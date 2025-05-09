@@ -28,7 +28,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'silicon',
     name: 'Silicon',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.siliconflow.cn',
     models: SYSTEM_MODELS.silicon,
@@ -38,7 +38,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'aihubmix',
     name: 'AiHubMix',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://aihubmix.com',
     models: SYSTEM_MODELS.aihubmix,
@@ -46,19 +46,9 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
-    id: 'o3',
-    name: 'O3',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'https://api.o3.fan',
-    models: SYSTEM_MODELS.o3,
-    isSystem: true,
-    enabled: false
-  },
-  {
     id: 'ocoolai',
     name: 'ocoolAI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.ocoolai.com',
     models: SYSTEM_MODELS.ocoolai,
@@ -66,19 +56,9 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
-    id: 'openrouter',
-    name: 'OpenRouter',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'https://openrouter.ai/api/v1/',
-    models: SYSTEM_MODELS.openrouter,
-    isSystem: true,
-    enabled: false
-  },
-  {
     id: 'deepseek',
     name: 'deepseek',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.deepseek.com',
     models: SYSTEM_MODELS.deepseek,
@@ -86,29 +66,19 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
-    id: 'ollama',
-    name: 'Ollama',
-    type: 'openai',
+    id: 'openrouter',
+    name: 'OpenRouter',
+    type: 'openai-compatible',
     apiKey: '',
-    apiHost: 'http://localhost:11434',
-    models: SYSTEM_MODELS.ollama,
-    isSystem: true,
-    enabled: false
-  },
-  {
-    id: 'lmstudio',
-    name: 'LM Studio',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'http://localhost:1234',
-    models: SYSTEM_MODELS.lmstudio,
+    apiHost: 'https://openrouter.ai/api/v1/',
+    models: SYSTEM_MODELS.openrouter,
     isSystem: true,
     enabled: false
   },
   {
     id: 'ppio',
     name: 'PPIO',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.ppinfra.com/v3/openai',
     models: SYSTEM_MODELS.ppio,
@@ -118,7 +88,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'alayanew',
     name: 'AlayaNew',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://deepseek.alayanew.com',
     models: SYSTEM_MODELS.alayanew,
@@ -128,7 +98,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'infini',
     name: 'Infini',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://cloud.infini-ai.com/maas',
     models: SYSTEM_MODELS.infini,
@@ -136,12 +106,52 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
-    id: 'baidu-cloud',
-    name: 'Baidu Cloud',
-    type: 'openai',
+    id: 'qiniu',
+    name: 'Qiniu',
+    type: 'openai-compatible',
     apiKey: '',
-    apiHost: 'https://qianfan.baidubce.com/v2/',
-    models: SYSTEM_MODELS['baidu-cloud'],
+    apiHost: 'https://api.qnaigc.com',
+    models: SYSTEM_MODELS.qiniu,
+    isSystem: true,
+    enabled: false
+  },
+  {
+    id: 'dmxapi',
+    name: 'DMXAPI',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'https://www.dmxapi.cn',
+    models: SYSTEM_MODELS.dmxapi,
+    isSystem: true,
+    enabled: false
+  },
+  {
+    id: 'o3',
+    name: 'O3',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'https://api.o3.fan',
+    models: SYSTEM_MODELS.o3,
+    isSystem: true,
+    enabled: false
+  },
+  {
+    id: 'ollama',
+    name: 'Ollama',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'http://localhost:11434',
+    models: SYSTEM_MODELS.ollama,
+    isSystem: true,
+    enabled: false
+  },
+  {
+    id: 'lmstudio',
+    name: 'LM Studio',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'http://localhost:1234',
+    models: SYSTEM_MODELS.lmstudio,
     isSystem: true,
     enabled: false
   },
@@ -168,7 +178,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'azure-openai',
     name: 'Azure OpenAI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: '',
     apiVersion: '',
@@ -187,9 +197,19 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
+    id: 'zhipu',
+    name: 'ZhiPu',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'https://open.bigmodel.cn/api/paas/v4/',
+    models: SYSTEM_MODELS.zhipu,
+    isSystem: true,
+    enabled: false
+  },
+  {
     id: 'github',
     name: 'Github Models',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://models.inference.ai.azure.com/',
     models: SYSTEM_MODELS.github,
@@ -199,7 +219,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'copilot',
     name: 'Github Copilot',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.githubcopilot.com/',
     models: SYSTEM_MODELS.copilot,
@@ -208,19 +228,9 @@ export const INITIAL_PROVIDERS: Provider[] = [
     isAuthed: false
   },
   {
-    id: 'dmxapi',
-    name: 'DMXAPI',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'https://www.dmxapi.cn',
-    models: SYSTEM_MODELS.dmxapi,
-    isSystem: true,
-    enabled: false
-  },
-  {
     id: 'yi',
     name: 'Yi',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.lingyiwanwu.com',
     models: SYSTEM_MODELS.yi,
@@ -228,19 +238,9 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
-    id: 'zhipu',
-    name: 'ZhiPu',
-    type: 'openai',
-    apiKey: '',
-    apiHost: 'https://open.bigmodel.cn/api/paas/v4/',
-    models: SYSTEM_MODELS.zhipu,
-    isSystem: true,
-    enabled: false
-  },
-  {
     id: 'moonshot',
     name: 'Moonshot AI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.moonshot.cn',
     models: SYSTEM_MODELS.moonshot,
@@ -250,7 +250,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'baichuan',
     name: 'BAICHUAN AI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.baichuan-ai.com',
     models: SYSTEM_MODELS.baichuan,
@@ -260,7 +260,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'dashscope',
     name: 'Bailian',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://dashscope.aliyuncs.com/compatible-mode/v1/',
     models: SYSTEM_MODELS.bailian,
@@ -270,7 +270,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'stepfun',
     name: 'StepFun',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.stepfun.com',
     models: SYSTEM_MODELS.stepfun,
@@ -280,7 +280,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'doubao',
     name: 'doubao',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://ark.cn-beijing.volces.com/api/v3/',
     models: SYSTEM_MODELS.doubao,
@@ -290,7 +290,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'minimax',
     name: 'MiniMax',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.minimax.chat/v1/',
     models: SYSTEM_MODELS.minimax,
@@ -300,7 +300,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'groq',
     name: 'Groq',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.groq.com/openai',
     models: SYSTEM_MODELS.groq,
@@ -310,7 +310,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'together',
     name: 'Together',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.together.xyz',
     models: SYSTEM_MODELS.together,
@@ -320,7 +320,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'fireworks',
     name: 'Fireworks',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.fireworks.ai/inference',
     models: SYSTEM_MODELS.fireworks,
@@ -330,7 +330,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'zhinao',
     name: 'zhinao',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.360.cn',
     models: SYSTEM_MODELS.zhinao,
@@ -340,7 +340,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'hunyuan',
     name: 'hunyuan',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.hunyuan.cloud.tencent.com',
     models: SYSTEM_MODELS.hunyuan,
@@ -350,7 +350,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'nvidia',
     name: 'nvidia',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://integrate.api.nvidia.com',
     models: SYSTEM_MODELS.nvidia,
@@ -360,7 +360,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'grok',
     name: 'Grok',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.x.ai',
     models: SYSTEM_MODELS.grok,
@@ -370,7 +370,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'hyperbolic',
     name: 'Hyperbolic',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.hyperbolic.xyz',
     models: SYSTEM_MODELS.hyperbolic,
@@ -380,7 +380,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'mistral',
     name: 'Mistral',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.mistral.ai',
     models: SYSTEM_MODELS.mistral,
@@ -390,7 +390,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'jina',
     name: 'Jina',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.jina.ai',
     models: SYSTEM_MODELS.jina,
@@ -400,7 +400,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'gitee-ai',
     name: 'gitee ai',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://ai.gitee.com',
     models: SYSTEM_MODELS['gitee-ai'],
@@ -410,7 +410,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'perplexity',
     name: 'Perplexity',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.perplexity.ai/',
     models: SYSTEM_MODELS.perplexity,
@@ -420,7 +420,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'modelscope',
     name: 'ModelScope',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api-inference.modelscope.cn/v1/',
     models: SYSTEM_MODELS.modelscope,
@@ -430,7 +430,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'xirang',
     name: 'Xirang',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://wishub-x1.ctyun.cn',
     models: SYSTEM_MODELS.xirang,
@@ -440,7 +440,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'tencent-cloud-ti',
     name: 'Tencent Cloud TI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.lkeap.cloud.tencent.com',
     models: SYSTEM_MODELS['tencent-cloud-ti'],
@@ -448,9 +448,19 @@ export const INITIAL_PROVIDERS: Provider[] = [
     enabled: false
   },
   {
+    id: 'baidu-cloud',
+    name: 'Baidu Cloud',
+    type: 'openai-compatible',
+    apiKey: '',
+    apiHost: 'https://qianfan.baidubce.com/v2/',
+    models: SYSTEM_MODELS['baidu-cloud'],
+    isSystem: true,
+    enabled: false
+  },
+  {
     id: 'gpustack',
     name: 'GPUStack',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: '',
     models: SYSTEM_MODELS.gpustack,
@@ -460,7 +470,7 @@ export const INITIAL_PROVIDERS: Provider[] = [
   {
     id: 'voyageai',
     name: 'VoyageAI',
-    type: 'openai',
+    type: 'openai-compatible',
     apiKey: '',
     apiHost: 'https://api.voyageai.com',
     models: SYSTEM_MODELS.voyageai,
@@ -530,7 +540,7 @@ export const moveProvider = (providers: Provider[], id: string, position: number
   return newProviders
 }
 
-const settingsSlice = createSlice({
+const llmSlice = createSlice({
   name: 'llm',
   initialState: isLocalAi ? getIntegratedInitialState() : initialState,
   reducers: {
@@ -572,7 +582,6 @@ const settingsSlice = createSlice({
     },
     setDefaultModel: (state, action: PayloadAction<{ model: Model }>) => {
       state.defaultModel = action.payload.model
-      window.electron.ipcRenderer.send('miniwindow-reload')
     },
     setTopicNamingModel: (state, action: PayloadAction<{ model: Model }>) => {
       state.topicNamingModel = action.payload.model
@@ -621,6 +630,6 @@ export const {
   setLMStudioKeepAliveTime,
   setGPUStackKeepAliveTime,
   updateModel
-} = settingsSlice.actions
+} = llmSlice.actions
 
-export default settingsSlice.reducer
+export default llmSlice.reducer

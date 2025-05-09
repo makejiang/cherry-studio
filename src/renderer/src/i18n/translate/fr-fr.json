@@ -53,7 +53,7 @@
       "settings.reasoning_effort.medium": "Moyen",
       "settings.reasoning_effort.off": "Off",
       "settings.reasoning_effort.tip": "Prise en charge uniquement des modèles de raisonnement OpenAI o-series et Anthropic",
-      "title": "Aides"
+      "title": "Agent"
     },
     "auth": {
       "error": "Échec de l'obtention automatique de la clé, veuillez la récupérer manuellement",
@@ -130,7 +130,10 @@
         "first": "Déjà premier message",
         "last": "Déjà dernier message",
         "next": "Prochain message",
-        "prev": "Précédent message"
+        "prev": "Précédent message",
+        "top": "Retour en haut",
+        "bottom": "Retour en bas",
+        "close": "Fermer"
       },
       "resend": "Réenvoyer",
       "save": "Enregistrer",
@@ -500,7 +503,9 @@
       "switch.disabled": "Veuillez attendre la fin de la réponse actuelle avant de procéder",
       "tools": {
         "completed": "Terminé",
-        "invoking": "En cours d'exécution"
+        "invoking": "En cours d'exécution",
+        "raw": "Brut",
+        "preview": "Aperçu"
       },
       "topic.added": "Thème ajouté avec succès",
       "upgrade.success.button": "Redémarrer",
@@ -640,7 +645,6 @@
       "gitee-ai": "Gitee IA",
       "github": "GitHub Modèles",
       "gpustack": "GPUStack",
-      "graphrag-kylin-mountain": "GraphRAG",
       "grok": "Grok",
       "groq": "Groq",
       "hunyuan": "Tencent HunYuan",
@@ -812,7 +816,9 @@
           "syncError": "Erreur de sauvegarde",
           "syncStatus": "Statut de la sauvegarde",
           "title": "WebDAV",
-          "user": "Nom d'utilisateur WebDAV"
+          "user": "Nom d'utilisateur WebDAV",
+          "maxBackups": "Nombre maximal de sauvegardes",
+          "maxBackups.unlimited": "Illimité"
         },
         "yuque": {
           "check": {
@@ -910,7 +916,6 @@
         "noServers": "Aucun serveur configuré",
         "npx_list": {
           "actions": "Actions",
-          "desc": "Rechercher et ajouter un package npm en tant que service MCP",
           "description": "Description",
           "no_packages": "Aucun package trouvé",
           "npm": "NPM",
@@ -919,7 +924,6 @@
           "scope_required": "Veuillez entrer le scope npm",
           "search": "Rechercher",
           "search_error": "La recherche a échoué",
-          "title": "Liste des packages NPX",
           "usage": "Utilisation",
           "version": "Version"
         },
@@ -1112,8 +1116,6 @@
         "check": "Vérifier",
         "check_failed": "Échec de la vérification",
         "check_success": "Vérification réussie",
-        "enhance_mode": "Mode de recherche amélioré",
-        "enhance_mode_tooltip": "Utilisez le modèle par défaut pour extraire les mots-clés avant de rechercher",
         "get_api_key": "Cliquez ici pour obtenir la clé",
         "no_provider_selected": "Veuillez sélectionner un fournisseur de recherche avant de vérifier",
         "search_max_result": "Nombre de résultats de recherche",

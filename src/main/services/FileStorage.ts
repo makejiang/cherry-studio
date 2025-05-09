@@ -1,5 +1,5 @@
 import { getFilesDir, getFileType, getTempDir } from '@main/utils/file'
-import { documentExts, imageExts } from '@shared/config/constant'
+import { documentExts, imageExts, MB } from '@shared/config/constant'
 import { FileType } from '@types'
 import * as crypto from 'crypto'
 import {
@@ -28,11 +28,16 @@ class FileStorage {
   }
 
   private initStorageDir = (): void => {
-    if (!fs.existsSync(this.storageDir)) {
-      fs.mkdirSync(this.storageDir, { recursive: true })
-    }
-    if (!fs.existsSync(this.tempDir)) {
-      fs.mkdirSync(this.tempDir, { recursive: true })
+    try {
+      if (!fs.existsSync(this.storageDir)) {
+        fs.mkdirSync(this.storageDir, { recursive: true })
+      }
+      if (!fs.existsSync(this.tempDir)) {
+        fs.mkdirSync(this.tempDir, { recursive: true })
+      }
+    } catch (error) {
+      logger.error('[FileStorage] Failed to initialize storage directories:', error)
+      throw error
     }
   }
 
@@ -124,7 +129,7 @@ class FileStorage {
   private async compressImage(sourcePath: string, destPath: string): Promise<void> {
     try {
       const stats = fs.statSync(sourcePath)
-      const fileSizeInMB = stats.size / (1024 * 1024)
+      const fileSizeInMB = stats.size / MB
 
       // 如果图片大于1MB才进行压缩
       if (fileSizeInMB > 1) {
@@ -277,18 +282,15 @@ class FileStorage {
     }
   }
 
-  public base64File = async (
-    _: Electron.IpcMainInvokeEvent,
-    filePath: string
-  ): Promise<{ data: string; mime: string }> => {
-    const fileBuffer = await fs.promises.readFile(filePath)
-    return {
-      data: fileBuffer.toString('base64'),
-      mime: 'application/pdf'
-    }
+  public base64File = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<{ data: string; mime: string }> => {
+    const filePath = path.join(this.storageDir, id)
+    const buffer = await fs.promises.readFile(filePath)
+    const base64 = buffer.toString('base64')
+    const mime = `application/${path.extname(filePath).slice(1)}`
+    return { data: base64, mime }
   }
 
-  public binaryFile = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<{ data: Buffer; mime: string }> => {
+  public binaryImage = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<{ data: Buffer; mime: string }> => {
     const filePath = path.join(this.storageDir, id)
     const data = await fs.promises.readFile(filePath)
     const mime = `image/${path.extname(filePath).slice(1)}`
@@ -490,6 +492,25 @@ class FileStorage {
       logger.info('[FileStorage] File copied successfully:', { from: sourcePath, to: destPath })
     } catch (error) {
       logger.error('[FileStorage] Copy file failed:', error)
+      throw error
+    }
+  }
+
+  public writeFileWithId = async (_: Electron.IpcMainInvokeEvent, id: string, content: string): Promise<void> => {
+    try {
+      const filePath = path.join(this.storageDir, id)
+      logger.info('[FileStorage] Writing file:', filePath)
+
+      // 确保目录存在
+      if (!fs.existsSync(this.storageDir)) {
+        logger.info('[FileStorage] Creating storage directory:', this.storageDir)
+        fs.mkdirSync(this.storageDir, { recursive: true })
+      }
+
+      await fs.promises.writeFile(filePath, content, 'utf8')
+      logger.info('[FileStorage] File written successfully:', filePath)
+    } catch (error) {
+      logger.error('[FileStorage] Failed to write file:', error)
       throw error
     }
   }
