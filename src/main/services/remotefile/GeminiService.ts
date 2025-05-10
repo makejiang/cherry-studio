@@ -47,7 +47,10 @@ export class GeminiService extends BaseFileService {
       fileId: uploadResult.name || '',
       displayName: file.origin_name,
       status,
-      originalFile: uploadResult
+      originalFile: {
+        type: 'gemini',
+        file: uploadResult
+      }
     }
 
     // 只缓存成功的文件
