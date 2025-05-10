@@ -130,7 +130,7 @@ const BlacklistSettings: FC = () => {
           console.error(`Error updating subscribe source ${source.url}:`, error)
           // 显示具体源更新失败的消息
           window.message.warning({
-            content: t('settings.websearch.subscribe_source_update_failed', { url: source.url }),
+            content: t('settings.tool.websearch.subscribe_source_update_failed', { url: source.url }),
             duration: 3
           })
         }
@@ -142,7 +142,7 @@ const BlacklistSettings: FC = () => {
         setSubscribeValid(true)
         // 显示成功消息
         window.message.success({
-          content: t('settings.websearch.subscribe_update_success'),
+          content: t('settings.tool.websearch.subscribe_update_success'),
           duration: 2
         })
         setTimeout(() => setSubscribeValid(false), 3000)
@@ -153,7 +153,7 @@ const BlacklistSettings: FC = () => {
     } catch (error) {
       console.error('Error updating subscribes:', error)
       window.message.error({
-        content: t('settings.websearch.subscribe_update_failed'),
+        content: t('settings.tool.websearch.subscribe_update_failed'),
         duration: 2
       })
     }
@@ -164,7 +164,7 @@ const BlacklistSettings: FC = () => {
   async function handleAddSubscribe() {
     setSubscribeChecking(true)
     const result = await AddSubscribePopup.show({
-      title: t('settings.websearch.subscribe_add')
+      title: t('settings.tool.websearch.subscribe_add')
     })
 
     if (result && result.url) {
@@ -184,14 +184,14 @@ const BlacklistSettings: FC = () => {
         setSubscribeValid(true)
         // 显示成功消息
         window.message.success({
-          content: t('settings.websearch.subscribe_add_success'),
+          content: t('settings.tool.websearch.subscribe_add_success'),
           duration: 2
         })
         setTimeout(() => setSubscribeValid(false), 3000)
       } catch (error) {
         setSubscribeValid(false)
         window.message.error({
-          content: t('settings.websearch.subscribe_add_failed'),
+          content: t('settings.tool.websearch.subscribe_add_failed'),
           duration: 2
         })
       }
@@ -236,13 +236,13 @@ const BlacklistSettings: FC = () => {
       </SettingGroup>
       <SettingGroup theme={theme}>
         <SettingTitle>
-          {t('settings.websearch.subscribe')}
+          {t('settings.tool.websearch.subscribe')}
           <Button
             type={subscribeValid ? 'primary' : 'default'}
             ghost={subscribeValid}
             disabled={subscribeChecking}
             onClick={handleAddSubscribe}>
-            {t('settings.websearch.subscribe_add')}
+            {t('settings.tool.websearch.subscribe_add')}
           </Button>
         </SettingTitle>
         <SettingDivider />
@@ -265,11 +265,11 @@ const BlacklistSettings: FC = () => {
               ) : subscribeValid ? (
                 <CheckOutlined />
               ) : (
-                t('settings.websearch.subscribe_update')
+                t('settings.tool.websearch.subscribe_update')
               )}
             </Button>
             <Button style={{ width: 100 }} disabled={selectedRowKeys.length === 0} onClick={handleDeleteSubscribe}>
-              {t('settings.websearch.subscribe_delete')}
+              {t('settings.tool.websearch.subscribe_delete')}
             </Button>
           </SettingRow>
         </div>

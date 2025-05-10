@@ -198,12 +198,12 @@ const WebSearchProviderSetting: FC<Props> = ({ provider: _provider }) => {
       {hasObjectKey(provider, 'apiHost') && (
         <>
           <SettingSubtitle style={{ marginTop: 5, marginBottom: 10 }}>
-            {t('settings.tool.provider.api_host')}
+            {t('settings.provider.api_host')}
           </SettingSubtitle>
           <Flex gap={8}>
             <Input
               value={apiHost}
-              placeholder={t('settings.tool.provider.api_host')}
+              placeholder={t('settings.provider.api_host')}
               onChange={(e) => setApiHost(e.target.value)}
               onBlur={onUpdateApiHost}
             />

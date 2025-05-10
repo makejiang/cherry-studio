@@ -38,7 +38,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
     const name = values.name?.trim() || url
 
     if (!url) {
-      window.message.error(t('settings.websearch.url_required'))
+      window.message.error(t('settings.tool.websearch.url_required'))
       return
     }
 
@@ -85,12 +85,12 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
             }}
           />
         </Form.Item>
-        <Form.Item name="name" label={t('settings.websearch.subscribe_name')}>
-          <Input placeholder={t('settings.websearch.subscribe_name.placeholder')} spellCheck={false} />
+        <Form.Item name="name" label={t('settings.tool.websearch.subscribe_name')}>
+          <Input placeholder={t('settings.tool.websearch.subscribe_name.placeholder')} spellCheck={false} />
         </Form.Item>
         <Form.Item label=" ">
           <Button type="primary" htmlType="submit">
-            {t('settings.websearch.subscribe_add')}
+            {t('settings.tool.websearch.subscribe_add')}
           </Button>
         </Form.Item>
       </Form>

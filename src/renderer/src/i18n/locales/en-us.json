@@ -159,7 +159,7 @@
       "input.translate": "Translate to {{target_language}}",
       "input.upload": "Upload image or document file",
       "input.upload.document": "Upload document file (model does not support images)",
-      "input.web_search": "Web search",
+      "input.web_search": "Web Search",
       "input.web_search.button.ok": "Go to Settings",
       "input.web_search.enable": "Enable web search",
       "input.web_search.enable_content": "Need to check web search connectivity in settings first",
@@ -1549,6 +1549,14 @@
           "search_max_result": "Number of search results",
           "search_provider": "Search service provider",
           "search_provider_placeholder": "Choose a search service provider.",
+          "subscribe": "Blacklist Subscription",
+          "subscribe_update": "Update",
+          "subscribe_add": "Add Subscription",
+          "subscribe_url": "Subscription Url",
+          "subscribe_name": "Alternative name",
+          "subscribe_name.placeholder": "Alternative name used when the downloaded subscription feed has no name.",
+          "subscribe_add_success": "Subscription feed added successfully!",
+          "subscribe_delete": "Delete",
           "search_result_default": "Default",
           "search_with_time": "Search with dates included",
           "tavily": {
@@ -1557,7 +1565,11 @@
             "description": "Tavily is a search engine tailored for AI agents, delivering real-time, accurate results, intelligent query suggestions, and in-depth research capabilities.",
             "title": "Tavily"
           },
-          "title": "Web Search"
+          "title": "Web Search",
+          "apikey": "API Key",
+          "free": "Free",
+          "content_limit": "Content length limit",
+          "content_limit_tooltip": "Limit the content length of search results, content exceeding the limit will be truncated"
         },
         "ocr": {
           "title": "OCR",
