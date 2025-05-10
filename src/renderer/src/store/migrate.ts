@@ -1110,11 +1110,9 @@ const migrateConfig = {
     } catch (error) {
       console.error(error)
       return state
-    },
+    }
     return state
   },
-
-  
   '87': (state: RootState) => {
     try {
       state.settings.maxKeepAliveMinapps = 3
@@ -1257,47 +1255,47 @@ const migrateConfig = {
   '99': (state: RootState) => {
     try {
       if (!state.ocr) {
-      state.ocr = {
-        defaultProvider: '',
-        providers: []
-      }
-    }
-
-    if (state.ocr.providers.length === 0) {
-      state.ocr.providers = [
-        {
-          id: 'doc2x',
-          name: 'Doc2x',
-          apiKey: '',
-          apiHost: 'https://v2.doc2x.noedgeai.com'
-        },
-        {
-          id: 'mistral',
-          name: 'Mistral',
-          model: 'mistral-ocr-latest',
-          apiKey: '',
-          apiHost: 'https://api.mistral.ai'
+        state.ocr = {
+          defaultProvider: '',
+          providers: []
         }
-      ]
-    }
-    if (!state.ocr.providers.find((provider) => provider.id === 'system')) {
-      state.ocr.providers.push({
-        id: 'system',
-        name: 'System(Mac Only)',
-        options: {
-          recognitionLevel: 0,
-          minConfidence: 0.5
+      }
+
+      if (state.ocr.providers.length === 0) {
+        state.ocr.providers = [
+          {
+            id: 'doc2x',
+            name: 'Doc2x',
+            apiKey: '',
+            apiHost: 'https://v2.doc2x.noedgeai.com'
+          },
+          {
+            id: 'mistral',
+            name: 'Mistral',
+            model: 'mistral-ocr-latest',
+            apiKey: '',
+            apiHost: 'https://api.mistral.ai'
+          }
+        ]
+      }
+      if (!state.ocr.providers.find((provider) => provider.id === 'system')) {
+        state.ocr.providers.push({
+          id: 'system',
+          name: 'System(Mac Only)',
+          options: {
+            recognitionLevel: 0,
+            minConfidence: 0.5
+          }
+        })
+      }
+
+      state.llm.providers.forEach((provider) => {
+        if (provider.id === 'mistral') {
+          provider.type = 'mistral'
         }
       })
-    }
-
-    state.llm.providers.forEach((provider) => {
-      if (provider.id === 'mistral') {
-        provider.type = 'mistral'
-      }
-    })
-    return state
-    } catch(error) {
+      return state
+    } catch (error) {
       return state
     }
   }

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 
-import { MistralService } from '@main/services/file/MistralService'
 import { MistralClientManager } from '@main/services/MistralClientManager'
+import { MistralService } from '@main/services/remotefile/MistralService'
 import { Mistral } from '@mistralai/mistralai'
 import { DocumentURLChunk } from '@mistralai/mistralai/models/components/documenturlchunk'
 import { ImageURLChunk } from '@mistralai/mistralai/models/components/imageurlchunk'

@@ -44,7 +44,7 @@ const WebSearchSettings: FC = () => {
               placeholder={t('settings.tool.websearch.search_provider_placeholder')}
               options={providers.map((p) => ({
                 value: p.id,
-                label: `${p.name} (${hasObjectKey(p, 'apiKey') ? t('settings.websearch.apikey') : t('settings.websearch.free')})`
+                label: `${p.name} (${hasObjectKey(p, 'apiKey') ? t('settings.tool.websearch.apikey') : t('settings.tool.websearch.free')})`
               }))}
             />
           </div>

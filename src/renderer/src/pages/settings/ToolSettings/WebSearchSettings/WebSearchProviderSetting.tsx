@@ -12,7 +12,14 @@ import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import { SettingDivider, SettingHelpLink, SettingHelpText, SettingHelpTextRow, SettingSubtitle, SettingTitle } from '../..'
+import {
+  SettingDivider,
+  SettingHelpLink,
+  SettingHelpText,
+  SettingHelpTextRow,
+  SettingSubtitle,
+  SettingTitle
+} from '../..'
 import ApiCheckPopup from '../../ProviderSettings/ApiCheckPopup'
 
 interface Props {

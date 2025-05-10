@@ -46,7 +46,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
     try {
       new URL(url)
     } catch (e) {
-      window.message.error(t('settings.websearch.url_invalid'))
+      window.message.error(t('settings.tool.websearch.url_invalid'))
       return
     }
 
@@ -70,7 +70,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
         colon={false}
         style={{ marginTop: 25 }}
         onFinish={onFinish}>
-        <Form.Item name="url" label={t('settings.websearch.subscribe_url')} rules={[{ required: true }]}>
+        <Form.Item name="url" label={t('settings.tool.websearch.subscribe_url')} rules={[{ required: true }]}>
           <Input
             placeholder="https://git.io/ublacklist"
             spellCheck={false}

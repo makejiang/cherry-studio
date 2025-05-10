@@ -9,7 +9,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { t } from 'i18next'
 import { FC, useEffect, useState } from 'react'
 
-import { SettingDivider, SettingGroup, SettingRow, SettingRowTitle, SettingTitle } from '..'
+import { SettingDivider, SettingGroup, SettingRow, SettingRowTitle, SettingTitle } from '../..'
 import AddSubscribePopup from './AddSubscribePopup'
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection']
@@ -27,7 +27,6 @@ const columns: TableProps<DataType>['columns'] = [
     key: 'url'
   }
 ]
-import { SettingDivider, SettingGroup, SettingRow, SettingRowTitle, SettingTitle } from '../..'
 
 const BlacklistSettings: FC = () => {
   const [errFormat, setErrFormat] = useState(false)

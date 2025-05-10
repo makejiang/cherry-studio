@@ -1,5 +1,6 @@
-import { FileState, GoogleAIFileManager } from '@google/generative-ai/server'
+import { File, Files, FileState, GoogleGenAI } from '@google/genai'
 import { FileListResponse, FileUploadResponse, LocalFileSource } from '@types'
+import { v4 as uuidv4 } from 'uuid'
 
 import { CacheService } from '../CacheService'
 import { BaseFileService } from './BaseFileService'
@@ -9,22 +10,26 @@ export class GeminiService extends BaseFileService {
   private static readonly FILE_CACHE_DURATION = 48 * 60 * 60 * 1000
   private static readonly LIST_CACHE_DURATION = 3000
 
-  protected readonly fileManager: GoogleAIFileManager
+  protected readonly fileManager: Files
 
   constructor(apiKey: string) {
     super(apiKey)
-    this.fileManager = new GoogleAIFileManager(apiKey)
+    this.fileManager = new GoogleGenAI({ vertexai: false, apiKey }).files
   }
 
   async uploadFile(file: LocalFileSource): Promise<FileUploadResponse> {
-    const uploadResult = await this.fileManager.uploadFile(file.path, {
-      mimeType: 'application/pdf',
-      displayName: file.origin_name
+    const uploadResult = await this.fileManager.upload({
+      file: file.path,
+      config: {
+        mimeType: 'application/pdf',
+        name: file.id,
+        displayName: file.origin_name
+      }
     })
 
     // 根据文件状态设置响应状态
     let status: 'success' | 'processing' | 'failed' | 'unknown'
-    switch (uploadResult.file.state) {
+    switch (uploadResult.state) {
       case FileState.ACTIVE:
         status = 'success'
         break
@@ -39,7 +44,7 @@ export class GeminiService extends BaseFileService {
     }
 
     const response: FileUploadResponse = {
-      fileId: uploadResult.file.name || '',
+      fileId: uploadResult.name || '',
       displayName: file.origin_name,
       status,
       originalFile: uploadResult
@@ -59,17 +64,20 @@ export class GeminiService extends BaseFileService {
     if (cachedResponse) {
       return cachedResponse
     }
+    const files: File[] = []
 
-    const response = await this.fileManager.listFiles()
-
-    if (response.files) {
-      const file = response.files.filter((file) => file.state === FileState.ACTIVE).find((file) => file.name === fileId)
-      if (file) {
-        return {
-          fileId: fileId,
-          displayName: file.displayName || '',
-          status: 'success',
-          originalFile: file
+    for await (const f of await this.fileManager.list()) {
+      files.push(f)
+    }
+    const file = files.filter((file) => file.state === FileState.ACTIVE).find((file) => file.name === fileId)
+    if (file) {
+      return {
+        fileId: fileId,
+        displayName: file.displayName || '',
+        status: 'success',
+        originalFile: {
+          type: 'gemini',
+          file
         }
       }
     }
@@ -87,17 +95,24 @@ export class GeminiService extends BaseFileService {
     if (cachedList) {
       return cachedList
     }
-    const response = await this.fileManager.listFiles()
+    const geminiFiles: File[] = []
+
+    for await (const f of await this.fileManager.list()) {
+      geminiFiles.push(f)
+    }
     const fileList: FileListResponse = {
-      files: (response.files || [])
+      files: geminiFiles
         .filter((file) => file.state === FileState.ACTIVE)
         .map((file) => {
           // 更新单个文件的缓存
           const fileResponse: FileUploadResponse = {
-            fileId: file.name,
+            fileId: file.name || uuidv4(),
             displayName: file.displayName || '',
             status: 'success',
-            originalFile: file
+            originalFile: {
+              type: 'gemini',
+              file
+            }
           }
           CacheService.set(
             `${GeminiService.FILE_LIST_CACHE_KEY}_${file.name}`,
@@ -106,11 +121,14 @@ export class GeminiService extends BaseFileService {
           )
 
           return {
-            id: file.name,
+            id: file.name || uuidv4(),
             displayName: file.displayName || '',
             size: Number(file.sizeBytes),
             status: 'success',
-            originalFile: file
+            originalFile: {
+              type: 'gemini',
+              file
+            }
           }
         })
     }
@@ -121,6 +139,6 @@ export class GeminiService extends BaseFileService {
   }
 
   async deleteFile(fileId: string): Promise<void> {
-    await this.fileManager.deleteFile(fileId)
+    await this.fileManager.delete({ name: fileId })
   }
 }

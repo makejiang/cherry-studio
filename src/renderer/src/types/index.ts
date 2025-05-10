@@ -4,6 +4,8 @@ import type OpenAI from 'openai'
 import React from 'react'
 import { BuiltinTheme } from 'shiki'
 
+export * from './file'
+import type { FileType } from './file'
 import type { Message } from './newMessage'
 
 export type Assistant = {
@@ -161,7 +163,14 @@ export type Provider = {
   notes?: string
 }
 
-export type ProviderType = 'openai' | 'openai-compatible' | 'anthropic' | 'gemini' | 'qwenlm' | 'azure-openai' | 'mistral'
+export type ProviderType =
+  | 'openai'
+  | 'openai-compatible'
+  | 'anthropic'
+  | 'gemini'
+  | 'qwenlm'
+  | 'azure-openai'
+  | 'mistral'
 
 export type ModelType = 'text' | 'vision' | 'embedding' | 'reasoning' | 'function_calling' | 'web_search'
 
@@ -262,73 +271,6 @@ export type MinAppType = {
   style?: React.CSSProperties
   addTime?: string
   type?: 'Custom' | 'Default' // Added the 'type' property
-}
-
-interface BaseFileSource {
-  id: string
-  name: string
-  type: FileTypes
-  size: number
-  ext: string
-  source: 'local' | 'remote'
-}
-
-export interface RemoteFileSource extends BaseFileSource {
-  source: 'remote'
-  url: string
-  status: 'pending' | 'downloading' | 'downloaded' | 'error'
-  downloadProgress?: number
-  localPath?: string // 下载后的本地路径
-}
-
-export interface FileUploadResponse {
-  fileId: string
-  displayName: string
-  status: 'success' | 'processing' | 'failed' | 'unknown'
-  originalFile?: any // 保留原始响应，以备需要
-}
-
-export interface FileListResponse {
-  files: Array<{
-    id: string
-    displayName: string
-    size?: number
-    status: 'success' | 'processing' | 'failed' | 'unknown'
-    originalFile?: any // 保留原始文件对象
-  }>
-}
-
-export interface LocalFileSource extends BaseFileSource {
-  origin_name: string
-  path: string
-  created_at: string
-  count: number
-  tokens?: number
-  source: 'local'
-}
-
-// 联合类型，表示一个文件可以是本地的或远程的
-export type FileSource = LocalFileSource | RemoteFileSource
-
-// 为了保持向后兼容
-export type FileType = LocalFileSource
-
-// 类型保护函数，用于区分文件类型
-export const isLocalFile = (file: FileSource): file is LocalFileSource => {
-  return file.source === 'local'
-}
-
-export const isRemoteFile = (file: FileSource): file is RemoteFileSource => {
-  return file.source === 'remote'
-}
-
-export enum FileTypes {
-  IMAGE = 'image',
-  VIDEO = 'video',
-  AUDIO = 'audio',
-  TEXT = 'text',
-  DOCUMENT = 'document',
-  OTHER = 'other'
 }
 
 export enum ThemeMode {

@@ -10,10 +10,10 @@ import {
   LayoutGrid,
   MonitorCog,
   Package,
+  PenTool,
   Rocket,
   Settings2,
   SquareTerminal,
-  Tool,
   Zap
 } from 'lucide-react'
 // 导入useAppSelector
@@ -69,9 +69,9 @@ const SettingsPage: FC = () => {
               {t('settings.websearch.title')}
             </MenuItem>
           </MenuItemLink>
-          <MenuItemLink to="/settings/tools">
-            <MenuItem className={isRoute('/settings/tools')}>
-              <Tool size={18} />
+          <MenuItemLink to="/settings/tool">
+            <MenuItem className={isRoute('/settings/tool')}>
+              <PenTool size={18} />
               {t('settings.tool.title')}
             </MenuItem>
           </MenuItemLink>

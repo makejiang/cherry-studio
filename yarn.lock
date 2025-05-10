@@ -637,6 +637,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cherrystudio/mac-system-ocr@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@cherrystudio/mac-system-ocr@npm:0.2.1"
+  dependencies:
+    bindings: "npm:^1.5.0"
+    node-api-headers: "npm:^1.0.1"
+    node-gyp: "npm:latest"
+  checksum: 10c0/fbba8f85c2244799f281b100fa6fbaf134f742a6f4d0a15f465ed4f0f048edc0acb60ed74908c462f0de424c2e3476892127f25d10ab805c123233e4922d415c
+  languageName: node
+  linkType: hard
+
 "@csstools/color-helpers@npm:^5.0.2":
   version: 5.0.2
   resolution: "@csstools/color-helpers@npm:5.0.2"
@@ -680,17 +691,6 @@ __metadata:
   version: 3.0.3
   resolution: "@csstools/css-tokenizer@npm:3.0.3"
   checksum: 10c0/c31bf410e1244b942e71798e37c54639d040cb59e0121b21712b40015fced2b0fb1ffe588434c5f8923c9cd0017cfc1c1c8f3921abc94c96edf471aac2eba5e5
-  languageName: node
-  linkType: hard
-
-"@cherrystudio/mac-system-ocr@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "@cherrystudio/mac-system-ocr@npm:0.2.1"
-  dependencies:
-    bindings: "npm:^1.5.0"
-    node-api-headers: "npm:^1.0.1"
-    node-gyp: "npm:latest"
-  checksum: 10c0/fbba8f85c2244799f281b100fa6fbaf134f742a6f4d0a15f465ed4f0f048edc0acb60ed74908c462f0de424c2e3476892127f25d10ab805c123233e4922d415c
   languageName: node
   linkType: hard
 
@@ -2671,14 +2671,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mistralai/mistralai@npm:^1.5.2":
-  version: 1.5.2
-  resolution: "@mistralai/mistralai@npm:1.5.2"
+"@mistralai/mistralai@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "@mistralai/mistralai@npm:1.6.0"
   dependencies:
     zod-to-json-schema: "npm:^3.24.1"
   peerDependencies:
     zod: ">= 3"
-  checksum: 10c0/d33a8a71adac4d2074ea4bfa09605b1c2158b5ffeaa9a78f3d9602c822cf0885df660b09f2372f17d8a81e78fa64795f31d9fad0cc40a1fab57ca0a4df9dc009
+  checksum: 10c0/2d1778f58eb3586801d3baaf9f814c455a32e9113f941160a36cbf2a0946f307929a2ba3e34fadfd198f703cb58fef5fea1c03e255ce4dcc65af6734acf36d08
   languageName: node
   linkType: hard
 
@@ -4436,7 +4436,7 @@ __metadata:
     "@iconify-json/svg-spinners": "npm:^1.2.2"
     "@kangfenmao/keyv-storage": "npm:^0.1.0"
     "@langchain/community": "npm:^0.3.36"
-    "@mistralai/mistralai": "npm:^1.5.2"
+    "@mistralai/mistralai": "npm:^1.6.0"
     "@modelcontextprotocol/sdk": "npm:^1.10.2"
     "@mozilla/readability": "npm:^0.6.0"
     "@notionhq/client": "npm:^2.2.15"
@@ -4474,8 +4474,8 @@ __metadata:
     babel-plugin-styled-components: "npm:^2.1.4"
     browser-image-compression: "npm:^2.0.2"
     bufferutil: "npm:^4.0.9"
-    color: "npm:^5.0.0"
     canvas: "npm:3.1.0"
+    color: "npm:^5.0.0"
     dayjs: "npm:^1.11.11"
     dexie: "npm:^4.0.8"
     dexie-react-hooks: "npm:^1.1.7"
@@ -5619,17 +5619,6 @@ __metadata:
   version: 1.0.30001706
   resolution: "caniuse-lite@npm:1.0.30001706"
   checksum: 10c0/b502d0a509611fd5b009e1123d482e983696984b6b749c3f485fd8d02cc58376c59cf0bb15f22fa2d337da104970edd27dd525d4663cebc728e26ac4adedff0d
-  languageName: node
-  linkType: hard
-
-"canvas@npm:3.1.0":
-  version: 3.1.0
-  resolution: "canvas@npm:3.1.0"
-  dependencies:
-    node-addon-api: "npm:^7.0.0"
-    node-gyp: "npm:latest"
-    prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/28da5184c1d7e97049ba6a24f10690b9ed4b303bbd25517d95c892fa3a6331417791657a3a7467068e40af0dda2dcc9120d062f7426a3d796131e69a30e3cbf1
   languageName: node
   linkType: hard
 
@@ -12615,19 +12604,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-api-headers@npm:^1.0.1":
+  version: 1.5.0
+  resolution: "node-api-headers@npm:1.5.0"
+  checksum: 10c0/e8dfe99e8e3ca92cd5d37989413dfc96551e8f7883110b948917dad07e554cfbf1119130e96d0167f5cb5a05f651a4ac735402a305ff25d9ace422a2e429ae3b
+  languageName: node
+  linkType: hard
+
 "node-api-version@npm:^0.2.0":
   version: 0.2.1
   resolution: "node-api-version@npm:0.2.1"
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10c0/3fe6c273e4f9dd184bb8b959ba3d8afae7eade663611d82c8538c79ac3a7b8f1d136632ceb4bf8cdc46a851fc169407746996cf7d1096de9a186e0e70fca95fa
-  languageName: node
-  linkType: hard
-
-"node-api-headers@npm:^1.0.1":
-  version: 1.5.0
-  resolution: "node-api-headers@npm:1.5.0"
-  checksum: 10c0/e8dfe99e8e3ca92cd5d37989413dfc96551e8f7883110b948917dad07e554cfbf1119130e96d0167f5cb5a05f651a4ac735402a305ff25d9ace422a2e429ae3b
   languageName: node
   linkType: hard
 
@@ -13512,6 +13501,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"path2d@npm:^0.2.0":
+  version: 0.2.2
+  resolution: "path2d@npm:0.2.2"
+  checksum: 10c0/1bb76c7f275d07f1bc7ca12171d828e91bf8a12596f0765a52e9d4d47fe1a428455dc1dd4c9002924a9bc554f6ac25e09a6c22eaecf32e5e33fba2985b5168f8
+  languageName: node
+  linkType: hard
+
 "pathe@npm:^2.0.3":
   version: 2.0.3
   resolution: "pathe@npm:2.0.3"
@@ -13523,13 +13519,6 @@ __metadata:
   version: 2.0.0
   resolution: "pathval@npm:2.0.0"
   checksum: 10c0/602e4ee347fba8a599115af2ccd8179836a63c925c23e04bd056d0674a64b39e3a081b643cc7bc0b84390517df2d800a46fcc5598d42c155fe4977095c2f77c5
-  languageName: node
-  linkType: hard
-
-"path2d@npm:^0.2.0":
-  version: 0.2.2
-  resolution: "path2d@npm:0.2.2"
-  checksum: 10c0/1bb76c7f275d07f1bc7ca12171d828e91bf8a12596f0765a52e9d4d47fe1a428455dc1dd4c9002924a9bc554f6ac25e09a6c22eaecf32e5e33fba2985b5168f8
   languageName: node
   linkType: hard
 
@@ -13550,13 +13539,6 @@ __metadata:
     debug: "npm:^3.1.0"
     node-ensure: "npm:^0.0.0"
   checksum: 10c0/ba96bfcc9f67b6605bac3a657e4c0bae7a08ad73bab33bfc19ec742753e0a0cabd5e69cb9d5c6227965bc074905cda54367d61be2011cb30abd76f40fd5571fc
-  languageName: node
-  linkType: hard
-
-"pe-library@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "pe-library@npm:0.4.1"
-  checksum: 10c0/75c772e74c75d9710a2bf6b7e88fb57e4c26788422abd3b38c8100c796e311c72102ef71159b9e0b56f05f616a968e11b8ec218bcd625c896df067235af8da77
   languageName: node
   linkType: hard
 
@@ -13584,6 +13566,13 @@ __metadata:
     path2d:
       optional: true
   checksum: 10c0/1d6d427a2253b2c15cbb168d7f95fc26428134ff61113359653c36f92475a4abd8552913b1492489933304ccc4285328b5cbcff36825ae533b8cd4c279881348
+  languageName: node
+  linkType: hard
+
+"pe-library@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "pe-library@npm:0.4.1"
+  checksum: 10c0/75c772e74c75d9710a2bf6b7e88fb57e4c26788422abd3b38c8100c796e311c72102ef71159b9e0b56f05f616a968e11b8ec218bcd625c896df067235af8da77
   languageName: node
   linkType: hard
 

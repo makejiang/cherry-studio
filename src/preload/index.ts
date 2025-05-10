@@ -65,12 +65,11 @@ const api = {
       ipcRenderer.invoke(IpcChannel.File_Save, path, content, options),
     selectFolder: () => ipcRenderer.invoke(IpcChannel.File_SelectFolder),
     saveImage: (name: string, data: string) => ipcRenderer.invoke(IpcChannel.File_SaveImage, name, data),
-    base64Image: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Base64Image, fileId),
-    base64File: (filePath: string) => ipcRenderer.invoke('file:base64File', filePath),
-    download: (url: string) => ipcRenderer.invoke(IpcChannel.File_Download, url),
-    copy: (fileId: string, destPath: string) => ipcRenderer.invoke(IpcChannel.File_Copy, fileId, destPath),
     binaryImage: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_BinaryImage, fileId),
-    base64File: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Base64File, fileId)
+    base64Image: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Base64Image, fileId),
+    base64File: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Base64File, fileId),
+    download: (url: string) => ipcRenderer.invoke(IpcChannel.File_Download, url),
+    copy: (fileId: string, destPath: string) => ipcRenderer.invoke(IpcChannel.File_Copy, fileId, destPath)
   },
   fs: {
     read: (path: string) => ipcRenderer.invoke(IpcChannel.Fs_Read, path)
@@ -109,12 +108,12 @@ const api = {
   },
   fileService: {
     upload: (type: string, apiKey: string, file: FileType) =>
-      ipcRenderer.invoke('file-service:upload', type, apiKey, file),
-    list: (type: string, apiKey: string) => ipcRenderer.invoke('file-service:list', type, apiKey),
+      ipcRenderer.invoke(IpcChannel.FileService_Upload, type, apiKey, file),
+    list: (type: string, apiKey: string) => ipcRenderer.invoke(IpcChannel.FileService_List, type, apiKey),
     delete: (type: string, apiKey: string, fileId: string) =>
-      ipcRenderer.invoke('file-service:delete', type, apiKey, fileId),
+      ipcRenderer.invoke(IpcChannel.FileService_Delete, type, apiKey, fileId),
     retrieve: (type: string, apiKey: string, fileId: string) =>
-      ipcRenderer.invoke('file-service:retrieve', type, apiKey, fileId)
+      ipcRenderer.invoke(IpcChannel.FileService_Retrieve, type, apiKey, fileId)
   },
   selectionMenu: {
     action: (action: string) => ipcRenderer.invoke('selection-menu:action', action)

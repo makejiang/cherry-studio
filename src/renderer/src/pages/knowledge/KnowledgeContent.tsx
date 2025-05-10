@@ -15,7 +15,7 @@ import { Alert, Button, Dropdown, Empty, message, Tag, Tooltip, Upload } from 'a
 import dayjs from 'dayjs'
 import { ChevronsDown, ChevronsUp, Plus, Search, Settings2 } from 'lucide-react'
 import VirtualList from 'rc-virtual-list'
-import { FC, useState, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -247,7 +247,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           <Button
             type="text"
             icon={<Settings2 size={18} color="var(--color-icon)" />}
-            onClick={() => KnowledgeSettingsPopup.show({ base })}
+            onClick={() => KnowledgeSettings.show({ base })}
             size="small"
           />
           <div className="model-row">
@@ -361,6 +361,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                                   base={base}
                                   getProcessingStatus={getProcessingStatus}
                                   type="file"
+                                  progress={progressMap.get(item.id)}
                                 />
                               </StatusIconWrapper>
                               <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
@@ -415,7 +416,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                           sourceId={item.id}
                           base={base}
                           getProcessingStatus={getProcessingStatus}
-                          getProcessingPercent={getProgressingPercentForItem}
                           type="directory"
                         />
                       </StatusIconWrapper>

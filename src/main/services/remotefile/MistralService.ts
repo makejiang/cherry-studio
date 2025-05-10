@@ -52,7 +52,10 @@ export class MistralService extends BaseFileService {
           displayName: file.filename || '',
           size: file.sizeBytes,
           status: 'success', // All listed files are processed,
-          originalFile: file
+          originalFile: {
+            type: 'mistral',
+            file
+          }
         }))
       }
     } catch (error) {

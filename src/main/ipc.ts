@@ -14,14 +14,14 @@ import BackupManager from './services/BackupManager'
 import { configManager } from './services/ConfigManager'
 import CopilotService from './services/CopilotService'
 import { ExportService } from './services/ExportService'
-import { FileServiceManager } from './services/file/FileServiceManager'
-import FileService from './services/FileService'
 import FileStorage from './services/FileStorage'
+import FileService from './services/FileSystemService'
 import KnowledgeService from './services/KnowledgeService'
 import mcpService from './services/MCPService'
 import * as NutstoreService from './services/NutstoreService'
 import ObsidianVaultService from './services/ObsidianVaultService'
 import { ProxyConfig, proxyManager } from './services/ProxyManager'
+import { FileServiceManager } from './services/remotefile/FileServiceManager'
 import { searchService } from './services/SearchService'
 import { registerShortcuts, unregisterAllShortcuts } from './services/ShortcutService'
 import storeSyncService from './services/StoreSyncService'
@@ -217,22 +217,22 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.File_BinaryImage, fileManager.binaryImage)
 
   // file service
-  ipcMain.handle('file-service:upload', async (_, type: string, apiKey: string, file: LocalFileSource) => {
+  ipcMain.handle(IpcChannel.FileService_Upload, async (_, type: string, apiKey: string, file: LocalFileSource) => {
     const service = FileServiceManager.getInstance().getService(type, apiKey)
     return await service.uploadFile(file)
   })
 
-  ipcMain.handle('file-service:list', async (_, type: string, apiKey: string) => {
+  ipcMain.handle(IpcChannel.FileService_List, async (_, type: string, apiKey: string) => {
     const service = FileServiceManager.getInstance().getService(type, apiKey)
     return await service.listFiles()
   })
 
-  ipcMain.handle('file-service:delete', async (_, type: string, apiKey: string, fileId: string) => {
+  ipcMain.handle(IpcChannel.FileService_Delete, async (_, type: string, apiKey: string, fileId: string) => {
     const service = FileServiceManager.getInstance().getService(type, apiKey)
     return await service.deleteFile(fileId)
   })
 
-  ipcMain.handle('file-service:retrieve', async (_, type: string, apiKey: string, fileId: string) => {
+  ipcMain.handle(IpcChannel.FileService_Retrieve, async (_, type: string, apiKey: string, fileId: string) => {
     const service = FileServiceManager.getInstance().getService(type, apiKey)
     return await service.retrieveFile(fileId)
   })
@@ -335,8 +335,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.Nutstore_GetDirectoryContents, (_, token: string, path: string) =>
     NutstoreService.getDirectoryContents(token, path)
   )
-
-
 
   // search window
   ipcMain.handle(IpcChannel.SearchWindow_Open, async (_, uid: string) => {

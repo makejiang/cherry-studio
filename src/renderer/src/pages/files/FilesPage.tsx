@@ -10,6 +10,7 @@ import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import ListItem from '@renderer/components/ListItem'
 import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import db from '@renderer/databases'
+import { useProviders } from '@renderer/hooks/useProvider'
 import FileManager from '@renderer/services/FileManager'
 import store from '@renderer/store'
 import { FileType, FileTypes } from '@renderer/types'
@@ -33,6 +34,7 @@ const FilesPage: FC = () => {
   const [fileType, setFileType] = useState<string>('document')
   const [sortField, setSortField] = useState<SortField>('created_at')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+  const { providers } = useProviders()
   const mistralProviders = providers.filter((provider) => provider.type === 'mistral')
   const tempFilesSort = (files: FileType[]) => {
     return files.sort((a, b) => {
