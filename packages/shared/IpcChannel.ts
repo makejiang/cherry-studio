@@ -99,6 +99,7 @@ export enum IpcChannel {
   File_Clear = 'file:clear',
   File_Read = 'file:read',
   File_Delete = 'file:delete',
+  File_DeleteDir = 'file:deleteDir',
   File_Get = 'file:get',
   File_SelectFolder = 'file:selectFolder',
   File_Create = 'file:create',
