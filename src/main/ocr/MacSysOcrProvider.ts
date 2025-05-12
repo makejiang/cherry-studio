@@ -20,6 +20,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
     }
     if (!this.MacOCR) {
       try {
+        // @ts-ignore This module is optional and only installed/available on macOS. Runtime checks prevent execution on other platforms.
         const module = await import('@cherrystudio/mac-system-ocr')
         this.MacOCR = module.default
       } catch (error) {
