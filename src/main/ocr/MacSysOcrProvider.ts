@@ -1,3 +1,4 @@
+import { isMac } from '@main/constant'
 import { FileSource, isLocalFile, LocalFileSource, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import * as fs from 'fs'
@@ -14,6 +15,9 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
   private MacOCR: any
 
   private async initMacOCR() {
+    if (!isMac) {
+      throw new Error('MacSysOcrProvider is only available on macOS')
+    }
     if (!this.MacOCR) {
       try {
         const module = await import('@cherrystudio/mac-system-ocr')
