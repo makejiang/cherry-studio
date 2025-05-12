@@ -110,7 +110,7 @@
     "zipread": "^1.3.3"
   },
   "optionalDependencies": {
-    "@cherrystudio/mac-system-ocr": "^0.2.1"
+    "@cherrystudio/mac-system-ocr": "^0.2.2"
   },
   "devDependencies": {
     "@agentic/exa": "^7.3.3",
