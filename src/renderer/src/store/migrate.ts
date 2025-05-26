@@ -1271,7 +1271,7 @@ const migrateConfig = {
       return state
     }
   },
-  '100': (state: RootState) => {
+  '99': (state: RootState) => {
     try {
       state.settings.showPrompt = true
 

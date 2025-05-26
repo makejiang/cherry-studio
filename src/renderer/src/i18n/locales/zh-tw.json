@@ -1665,8 +1665,6 @@
           "check": "檢查",
           "check_failed": "驗證失敗",
           "check_success": "驗證成功",
-          "enhance_mode": "搜索增強模式",
-          "enhance_mode_tooltip": "使用預設模型提取關鍵詞後搜索",
           "get_api_key": "點選這裡取得金鑰",
           "no_provider_selected": "請選擇搜尋服務商後再檢查",
           "search_max_result": "搜尋結果個數",
@@ -1680,7 +1678,21 @@
             "description": "Tavily 是一個為 AI 代理量身訂製的搜尋引擎，提供即時、準確的結果、智慧查詢建議和深入的研究能力",
             "title": "Tavily"
           },
-          "title": "網路搜尋"
+          "title": "網路搜尋",
+          "subscribe": "黑名單訂閱",
+          "subscribe_update": "更新",
+          "subscribe_add": "新增訂閱",
+          "subscribe_url": "訂閱網址",
+          "subscribe_name": "替代名稱",
+          "subscribe_name.placeholder": "下載的訂閱源沒有名稱時使用的替代名稱。",
+          "subscribe_add_success": "訂閱源新增成功!",
+          "subscribe_delete": "刪除",
+          "overwrite": "覆蓋搜尋服務",
+          "overwrite_tooltip": "強制使用搜尋服務而不是 LLM",
+          "apikey": "API 金鑰",
+          "free": "免費",
+          "content_limit": "內容長度限制",
+          "content_limit_tooltip": "限制搜尋結果的內容長度；超過限制的內容將被截斷。"
         }
       },
       "topic.pin_to_top": "固定話題置頂",
