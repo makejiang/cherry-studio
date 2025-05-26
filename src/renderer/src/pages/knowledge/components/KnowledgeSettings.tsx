@@ -262,18 +262,6 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
             />
           </SettingsItem>
 
-          <SettingsItem>
-            <div className="settings-label">{t('knowledge.topN')}</div>
-            <InputNumber
-              style={{ width: '100%' }}
-              min={0}
-              max={10}
-              value={base.topN}
-              placeholder={t('knowledge.topN_placeholder')}
-              onChange={(value) => setNewBase({ ...newBase, topN: value || undefined })}
-            />
-          </SettingsItem>
-
           <Alert
             message={t('knowledge.chunk_size_change_warning')}
             type="warning"
