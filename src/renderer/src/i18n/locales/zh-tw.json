@@ -1644,7 +1644,7 @@
       "theme.window.style.transparent": "透明視窗",
       "title": "設定",
       "tool": {
-        "title": "工具",
+        "title": "工具設定",
         "ocr": {
           "title": "OCR",
           "provider": "OCR 提供者",
