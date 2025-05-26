@@ -8,6 +8,7 @@ import agents from './agents'
 import assistants from './assistants'
 import backup from './backup'
 import copilot from './copilot'
+import inputToolsReducer from './inputTools'
 import knowledge from './knowledge'
 import llm from './llm'
 import mcp from './mcp'
@@ -19,6 +20,7 @@ import nutstore from './nutstore'
 import ocr from './ocr'
 import paintings from './paintings'
 import runtime from './runtime'
+import selectionStore from './selectionStore'
 import settings from './settings'
 import shortcuts from './shortcuts'
 import websearch from './websearch'
@@ -38,17 +40,19 @@ const rootReducer = combineReducers({
   websearch,
   mcp,
   copilot,
+  selectionStore,
   // messages: messagesReducer,
   ocr,
   messages: newMessagesReducer,
-  messageBlocks: messageBlocksReducer
+  messageBlocks: messageBlocksReducer,
+  inputTools: inputToolsReducer
 })
 
 const persistedReducer = persistReducer(
   {
     key: 'cherry-studio',
     storage,
-    version: 100,
+    version: 108,
     blacklist: ['runtime', 'messages', 'messageBlocks'],
     migrate
   },
@@ -67,7 +71,7 @@ const persistedReducer = persistReducer(
  * Call storeSyncService.subscribe() in the window's entryPoint.tsx
  */
 storeSyncService.setOptions({
-  syncList: ['assistants/', 'settings/', 'llm/']
+  syncList: ['assistants/', 'settings/', 'llm/', 'selectionStore/']
 })
 
 const store = configureStore({
