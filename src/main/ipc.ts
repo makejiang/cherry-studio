@@ -5,7 +5,7 @@ import { isMac, isWin } from '@main/constant'
 import { getBinaryPath, isBinaryExists, runInstallScript } from '@main/utils/process'
 import { handleZoomFactor } from '@main/utils/zoom'
 import { IpcChannel } from '@shared/IpcChannel'
-import { LocalFileSource, Shortcut, ThemeMode } from '@types'
+import { FileMetadata, Provider, Shortcut, ThemeMode } from '@types'
 import { BrowserWindow, ipcMain, nativeTheme, session, shell } from 'electron'
 import log from 'electron-log'
 import { Notification } from 'src/renderer/src/types/notification'
@@ -246,7 +246,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle('file:deleteDir', fileManager.deleteDir)
   ipcMain.handle(IpcChannel.File_Get, fileManager.getFile)
   ipcMain.handle(IpcChannel.File_SelectFolder, fileManager.selectFolder)
-  ipcMain.handle(IpcChannel.File_Create, fileManager.createTempFile)
+  ipcMain.handle(IpcChannel.File_CreateTempFile, fileManager.createTempFile)
   ipcMain.handle(IpcChannel.File_Write, fileManager.writeFile)
   ipcMain.handle(IpcChannel.File_WriteWithId, fileManager.writeFileWithId)
   ipcMain.handle(IpcChannel.File_SaveImage, fileManager.saveImage)
@@ -257,23 +257,23 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.File_BinaryImage, fileManager.binaryImage)
 
   // file service
-  ipcMain.handle(IpcChannel.FileService_Upload, async (_, type: string, apiKey: string, file: LocalFileSource) => {
-    const service = FileServiceManager.getInstance().getService(type, apiKey)
+  ipcMain.handle(IpcChannel.FileService_Upload, async (_, provider: Provider, file: FileMetadata) => {
+    const service = FileServiceManager.getInstance().getService(provider)
     return await service.uploadFile(file)
   })
 
-  ipcMain.handle(IpcChannel.FileService_List, async (_, type: string, apiKey: string) => {
-    const service = FileServiceManager.getInstance().getService(type, apiKey)
+  ipcMain.handle(IpcChannel.FileService_List, async (_, provider: Provider) => {
+    const service = FileServiceManager.getInstance().getService(provider)
     return await service.listFiles()
   })
 
-  ipcMain.handle(IpcChannel.FileService_Delete, async (_, type: string, apiKey: string, fileId: string) => {
-    const service = FileServiceManager.getInstance().getService(type, apiKey)
+  ipcMain.handle(IpcChannel.FileService_Delete, async (_, provider: Provider, fileId: string) => {
+    const service = FileServiceManager.getInstance().getService(provider)
     return await service.deleteFile(fileId)
   })
 
-  ipcMain.handle(IpcChannel.FileService_Retrieve, async (_, type: string, apiKey: string, fileId: string) => {
-    const service = FileServiceManager.getInstance().getService(type, apiKey)
+  ipcMain.handle(IpcChannel.FileService_Retrieve, async (_, provider: Provider, fileId: string) => {
+    const service = FileServiceManager.getInstance().getService(provider)
     return await service.retrieveFile(fileId)
   })
 

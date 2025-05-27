@@ -38,12 +38,12 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {
-        external: ['@libsql/client']
+        external: ['@libsql/client', '@cherrystudio/mac-system-ocr']
       },
       sourcemap: process.env.NODE_ENV === 'development'
     },
     optimizeDeps: {
-      noDiscovery: process.env.NODE_ENV === 'development'
+      disabled: 'dev'
     }
   },
   preload: {

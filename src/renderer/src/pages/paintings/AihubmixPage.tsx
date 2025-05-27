@@ -15,7 +15,7 @@ import FileManager from '@renderer/services/FileManager'
 import { translateText } from '@renderer/services/TranslateService'
 import { useAppDispatch } from '@renderer/store'
 import { setGenerating } from '@renderer/store/runtime'
-import type { FileType } from '@renderer/types'
+import type { FileMetadata } from '@renderer/types'
 import type { PaintingAction, PaintingsState } from '@renderer/types'
 import { getErrorMessage, uuid } from '@renderer/utils'
 import { Avatar, Button, Input, InputNumber, Radio, Segmented, Select, Slider, Switch, Tooltip, Upload } from 'antd'
@@ -47,7 +47,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [spaceClickCount, setSpaceClickCount] = useState(0)
   const [isTranslating, setIsTranslating] = useState(false)
-  const [fileMap, setFileMap] = useState<{ [key: string]: FileType }>({})
+  const [fileMap, setFileMap] = useState<{ [key: string]: FileMetadata }>({})
 
   const { t } = useTranslation()
   const { theme } = useTheme()
@@ -246,7 +246,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
                 })
               )
 
-              const validFiles = downloadedFiles.filter((file): file is FileType => file !== null)
+              const validFiles = downloadedFiles.filter((file): file is FileMetadata => file !== null)
               await FileManager.addFiles(validFiles)
               updatePaintingState({ files: validFiles, urls })
             }
@@ -382,7 +382,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
               })
             )
 
-            const validFiles = downloadedFiles.filter((file): file is FileType => file !== null)
+            const validFiles = downloadedFiles.filter((file): file is FileMetadata => file !== null)
             await FileManager.addFiles(validFiles)
             updatePaintingState({ files: validFiles, urls })
           }
@@ -498,7 +498,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
               })
             )
 
-            const validFiles = downloadedFiles.filter((file): file is FileType => file !== null)
+            const validFiles = downloadedFiles.filter((file): file is FileMetadata => file !== null)
             await FileManager.addFiles(validFiles)
             updatePaintingState({ files: validFiles, urls })
           }
@@ -594,7 +594,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
             })
           )
 
-          const validFiles = downloadedFiles.filter((file): file is FileType => file !== null)
+          const validFiles = downloadedFiles.filter((file): file is FileMetadata => file !== null)
 
           await FileManager.addFiles(validFiles)
 
@@ -648,7 +648,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
       })
     )
 
-    const validFiles = downloadedFiles.filter((file): file is FileType => file !== null)
+    const validFiles = downloadedFiles.filter((file): file is FileMetadata => file !== null)
 
     await FileManager.addFiles(validFiles)
 
@@ -906,7 +906,7 @@ const AihubmixPage: FC<{ Options: string[] }> = ({ Options }) => {
             listType="picture-card"
             onChange={async ({ file }) => {
               const path = file.originFileObj?.path || ''
-              setFileMap({ ...fileMap, [path]: file.originFileObj as unknown as FileType })
+              setFileMap({ ...fileMap, [path]: file.originFileObj as unknown as FileMetadata })
               updatePaintingState({ [item.key!]: path })
             }}>
             {painting[item.key!] ? (

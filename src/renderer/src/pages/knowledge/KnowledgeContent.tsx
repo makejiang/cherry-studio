@@ -9,7 +9,7 @@ import Logger from '@renderer/config/logger'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
 import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
-import { FileType, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
+import { FileMetadata, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
 import { formatFileSize } from '@renderer/utils'
 import { bookExts, documentExts, textExts, thirdPartyApplicationExts } from '@shared/config/constant'
 import { Alert, Button, Dropdown, Empty, message, Tag, Tooltip, Upload } from 'antd'
@@ -43,7 +43,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   useEffect(() => {
     const handlers = [
       window.electron.ipcRenderer.on('file-ocr-progress', (_, { itemId, progress }) => {
-        console.log('[Progress] File OCR:', itemId, progress)
         setProgressMap((prev) => new Map(prev).set(itemId, progress))
       }),
 
@@ -105,7 +104,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     }
 
     if (files) {
-      const _files: FileType[] = files
+      const _files: FileMetadata[] = files
         .map((file) => ({
           id: file.name,
           name: file.name,
@@ -115,8 +114,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           count: 1,
           origin_name: file.name,
           type: file.type as FileTypes,
-          created_at: new Date().toISOString(),
-          source: 'local' as const
+          created_at: new Date().toISOString()
         }))
         .filter(({ ext }) => fileTypes.includes(ext))
       const uploadedFiles = await FileManager.uploadFiles(_files)
@@ -338,7 +336,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                   }
                 }}>
                 {(item) => {
-                  const file = item.content as FileType
+                  const file = item.content as FileMetadata
                   return (
                     <div style={{ height: '75px', paddingTop: '12px' }}>
                       <FileItem

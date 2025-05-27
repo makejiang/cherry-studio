@@ -18,7 +18,7 @@ import {
   updateItemProcessingStatus,
   updateNotes
 } from '@renderer/store/knowledge'
-import { FileType, KnowledgeBase, KnowledgeItem, ProcessingStatus } from '@renderer/types'
+import { FileMetadata, KnowledgeBase, KnowledgeItem, ProcessingStatus } from '@renderer/types'
 import { runAsyncFunction } from '@renderer/utils'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -42,7 +42,7 @@ export const useKnowledge = (baseId: string) => {
   }
 
   // 批量添加文件
-  const addFiles = (files: FileType[]) => {
+  const addFiles = (files: FileMetadata[]) => {
     const filesItems: KnowledgeItem[] = files.map((file) => ({
       id: uuidv4(),
       type: 'file' as const,

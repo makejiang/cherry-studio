@@ -4,7 +4,7 @@ import type OpenAI from 'openai'
 import React from 'react'
 
 export * from './file'
-import type { FileType } from './file'
+import type { FileMetadata } from './file'
 import type { Message } from './newMessage'
 
 export type Assistant = {
@@ -81,7 +81,7 @@ export type LegacyMessage = {
   status: 'sending' | 'pending' | 'searching' | 'success' | 'paused' | 'error'
   modelId?: string
   model?: Model
-  files?: FileType[]
+  files?: FileMetadata[]
   images?: string[]
   usage?: Usage
   metrics?: Metrics
@@ -184,7 +184,7 @@ export type Suggestion = {
 export type PaintingParams = {
   id: string
   urls: string[]
-  files: FileType[]
+  files: FileMetadata[]
 }
 
 export interface Painting extends PaintingParams {
@@ -213,7 +213,7 @@ export interface GeneratePainting extends PaintingParams {
 
 export interface EditPainting extends PaintingParams {
   imageFile: string
-  mask: FileType
+  mask: FileMetadata
   model: string
   prompt: string
   numImages?: number
@@ -342,7 +342,7 @@ export type KnowledgeItem = {
   uniqueId?: string
   uniqueIds?: string[]
   type: KnowledgeItemType
-  content: string | FileType
+  content: string | FileMetadata
   remark?: string
   created_at: number
   updated_at: number
@@ -491,7 +491,7 @@ export type KnowledgeReference = {
   content: string
   sourceUrl: string
   type: KnowledgeItemType
-  file?: FileType
+  file?: FileMetadata
 }
 
 export type MCPArgType = 'string' | 'list' | 'number'

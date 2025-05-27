@@ -6,7 +6,7 @@ import { Mistral } from '@mistralai/mistralai'
 import { DocumentURLChunk } from '@mistralai/mistralai/models/components/documenturlchunk'
 import { ImageURLChunk } from '@mistralai/mistralai/models/components/imageurlchunk'
 import { OCRResponse } from '@mistralai/mistralai/models/components/ocrresponse'
-import { FileSource, FileTypes, isLocalFile, LocalFileSource, OcrProvider } from '@types'
+import { FileMetadata, FileTypes, OcrProvider, Provider } from '@types'
 import Logger from 'electron-log'
 import path from 'path'
 
@@ -21,51 +21,45 @@ export default class MistralOcrProvider extends BaseOcrProvider {
   constructor(provider: OcrProvider) {
     super(provider)
     const clientManager = MistralClientManager.getInstance()
-    clientManager.initializeClient(provider.apiKey!)
+    const aiProvider: Provider = {
+      id: provider.id,
+      type: 'mistral',
+      name: provider.name,
+      apiKey: provider.apiKey!,
+      apiHost: provider.apiHost!,
+      models: []
+    }
+    clientManager.initializeClient(aiProvider)
     this.sdk = clientManager.getClient()
-    this.fileService = new MistralService(provider.apiKey!)
+    this.fileService = new MistralService(aiProvider)
   }
 
-  private async preupload(file: FileSource): Promise<PreuploadResponse> {
+  private async preupload(file: FileMetadata): Promise<PreuploadResponse> {
     let document: PreuploadResponse
-    if (isLocalFile(file)) {
-      Logger.info(`OCR preupload started for local file: ${file.path}`)
+    Logger.info(`OCR preupload started for local file: ${file.path}`)
 
-      if (file.ext.toLowerCase() === '.pdf') {
-        const uploadResponse = await this.fileService.uploadFile(file)
+    if (file.ext.toLowerCase() === '.pdf') {
+      const uploadResponse = await this.fileService.uploadFile(file)
 
-        if (uploadResponse.status === 'failed') {
-          Logger.error('File upload failed:', uploadResponse)
-          throw new Error('Failed to upload file: ' + uploadResponse.displayName)
-        }
-        await this.sendOcrProgress(file.id, 15)
-        const fileUrl = await this.sdk.files.getSignedUrl({
-          fileId: uploadResponse.fileId
-        })
-        Logger.info('Got signed URL:', fileUrl)
-        await this.sendOcrProgress(file.id, 20)
-        document = {
-          type: 'document_url',
-          documentUrl: fileUrl.url
-        }
-      } else {
-        const base64Image = Buffer.from(fs.readFileSync(file.path)).toString('base64')
-        document = {
-          type: 'image_url',
-          imageUrl: `data:image/png;base64,${base64Image}`
-        }
+      if (uploadResponse.status === 'failed') {
+        Logger.error('File upload failed:', uploadResponse)
+        throw new Error('Failed to upload file: ' + uploadResponse.displayName)
+      }
+      await this.sendOcrProgress(file.id, 15)
+      const fileUrl = await this.sdk.files.getSignedUrl({
+        fileId: uploadResponse.fileId
+      })
+      Logger.info('Got signed URL:', fileUrl)
+      await this.sendOcrProgress(file.id, 20)
+      document = {
+        type: 'document_url',
+        documentUrl: fileUrl.url
       }
     } else {
-      if (file.ext.toLowerCase() === '.pdf') {
-        document = {
-          type: 'document_url',
-          documentUrl: file.url
-        }
-      } else {
-        document = {
-          type: 'image_url',
-          imageUrl: file.url
-        }
+      const base64Image = Buffer.from(fs.readFileSync(file.path)).toString('base64')
+      document = {
+        type: 'image_url',
+        imageUrl: `data:image/png;base64,${base64Image}`
       }
     }
 
@@ -75,7 +69,7 @@ export default class MistralOcrProvider extends BaseOcrProvider {
     return document
   }
 
-  public async parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: LocalFileSource }> {
+  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     try {
       const document = await this.preupload(file)
       const result = await this.sdk.ocr.process({
@@ -97,16 +91,12 @@ export default class MistralOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private convertFile(result: OCRResponse, file: FileSource): LocalFileSource {
-    // Create a unique directory for this conversion to store images
+  private convertFile(result: OCRResponse, file: FileMetadata): FileMetadata {
+    // 使用统一的存储路径：Data/Files/{file.id}/
     const conversionId = file.id
-    let outputPath = ''
-    let outputFileName = ''
-    if (isLocalFile(file)) {
-      outputPath = path.join(path.dirname(file.path), conversionId)
-      outputFileName = path.basename(file.path, path.extname(file.path))
-      fs.mkdirSync(outputPath, { recursive: true })
-    }
+    const outputPath = path.join(path.dirname(file.path), file.id)
+    const outputFileName = path.basename(file.path, path.extname(file.path))
+    fs.mkdirSync(outputPath, { recursive: true })
 
     const markdownParts: string[] = []
     let counter = 0
@@ -180,14 +170,13 @@ export default class MistralOcrProvider extends BaseOcrProvider {
     return {
       id: conversionId,
       name: file.name.replace(/\.[^/.]+$/, '.md'),
-      origin_name: (file as LocalFileSource).origin_name,
+      origin_name: file.origin_name,
       path: mdFilePath,
       created_at: new Date().toISOString(),
       type: FileTypes.DOCUMENT,
       ext: '.md',
       size: fs.statSync(mdFilePath).size,
-      count: result.pages.length,
-      source: 'local'
-    } as LocalFileSource
+      count: 1
+    } as FileMetadata
   }
 }

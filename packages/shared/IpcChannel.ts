@@ -107,7 +107,7 @@ export enum IpcChannel {
   File_DeleteDir = 'file:deleteDir',
   File_Get = 'file:get',
   File_SelectFolder = 'file:selectFolder',
-  File_Create = 'file:create',
+  File_CreateTempFile = 'file:createTempFile',
   File_Write = 'file:write',
   File_WriteWithId = 'file:writeWithId',
   File_SaveImage = 'file:saveImage',

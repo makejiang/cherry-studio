@@ -1,12 +1,12 @@
-import { FileListResponse, FileUploadResponse, LocalFileSource } from '@types'
+import { FileListResponse, FileMetadata, FileUploadResponse, Provider } from '@types'
 
 export abstract class BaseFileService {
-  protected readonly apiKey: string
-  protected constructor(apiKey: string) {
-    this.apiKey = apiKey
+  protected readonly provider: Provider
+  protected constructor(provider: Provider) {
+    this.provider = provider
   }
 
-  abstract uploadFile(file: LocalFileSource): Promise<FileUploadResponse>
+  abstract uploadFile(file: FileMetadata): Promise<FileUploadResponse>
   abstract deleteFile(fileId: string): Promise<void>
   abstract listFiles(): Promise<FileListResponse>
   abstract retrieveFile(fileId: string): Promise<FileUploadResponse>

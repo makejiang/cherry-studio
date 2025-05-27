@@ -5,7 +5,7 @@ import Logger from '@renderer/config/logger'
 import { ONLY_SUPPORTED_DIMENSION_PROVIDERS } from '@renderer/config/providers'
 import AiProvider from '@renderer/providers/AiProvider'
 import store from '@renderer/store'
-import { FileType, KnowledgeBase, KnowledgeBaseParams, KnowledgeReference } from '@renderer/types'
+import { FileMetadata, KnowledgeBase, KnowledgeBaseParams, KnowledgeReference } from '@renderer/types'
 import { ExtractResults } from '@renderer/utils/extract'
 import { isEmpty } from 'lodash'
 
@@ -55,7 +55,7 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
   }
 }
 
-export const getFileFromUrl = async (url: string): Promise<FileType | null> => {
+export const getFileFromUrl = async (url: string): Promise<FileMetadata | null> => {
   let fileName = ''
 
   if (url && url.includes('CherryStudio')) {
@@ -81,7 +81,7 @@ export const getFileFromUrl = async (url: string): Promise<FileType | null> => {
   return null
 }
 
-export const getKnowledgeSourceUrl = async (item: ExtractChunkData & { file: FileType | null }) => {
+export const getKnowledgeSourceUrl = async (item: ExtractChunkData & { file: FileMetadata | null }) => {
   if (item.metadata.source.startsWith('http')) {
     return item.metadata.source
   }
@@ -97,7 +97,7 @@ export const searchKnowledgeBase = async (
   query: string,
   base: KnowledgeBase,
   rewrite?: string
-): Promise<Array<ExtractChunkData & { file: FileType | null }>> => {
+): Promise<Array<ExtractChunkData & { file: FileMetadata | null }>> => {
   try {
     const baseParams = getKnowledgeBaseParams(base)
     const documentCount = base.documentCount || DEFAULT_KNOWLEDGE_DOCUMENT_COUNT

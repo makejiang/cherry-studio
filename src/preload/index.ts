@@ -1,7 +1,17 @@
 import type { ExtractChunkData } from '@cherrystudio/embedjs-interfaces'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IpcChannel } from '@shared/IpcChannel'
-import { FileType, KnowledgeBaseParams, KnowledgeItem, MCPServer, Shortcut, WebDavConfig } from '@types'
+import {
+  FileListResponse,
+  FileMetadata,
+  FileUploadResponse,
+  KnowledgeBaseParams,
+  KnowledgeItem,
+  MCPServer,
+  Provider,
+  Shortcut,
+  WebDavConfig
+} from '@types'
 import { contextBridge, ipcRenderer, OpenDialogOptions, shell, webUtils } from 'electron'
 import { Notification } from 'src/renderer/src/types/notification'
 import { CreateDirectoryOptions } from 'webdav'
@@ -61,14 +71,25 @@ const api = {
   },
   file: {
     select: (options?: OpenDialogOptions) => ipcRenderer.invoke(IpcChannel.File_Select, options),
-    upload: (file: FileType) => ipcRenderer.invoke(IpcChannel.File_Upload, file),
+    upload: (file: FileMetadata) => ipcRenderer.invoke(IpcChannel.File_Upload, file),
     delete: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Delete, fileId),
     deleteDir: (dirPath: string) => ipcRenderer.invoke(IpcChannel.File_DeleteDir, dirPath),
     read: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Read, fileId),
     clear: () => ipcRenderer.invoke(IpcChannel.File_Clear),
     get: (filePath: string) => ipcRenderer.invoke(IpcChannel.File_Get, filePath),
-    create: (fileName: string) => ipcRenderer.invoke(IpcChannel.File_Create, fileName),
+    /**
+     * 创建一个空的临时文件
+     * @param fileName 文件名
+     * @returns 临时文件路径
+     */
+    createTempFile: (fileName: string): Promise<string> => ipcRenderer.invoke(IpcChannel.File_CreateTempFile, fileName),
+    /**
+     * 写入文件
+     * @param filePath 文件路径
+     * @param data 数据
+     */
     write: (filePath: string, data: Uint8Array | string) => ipcRenderer.invoke(IpcChannel.File_Write, filePath, data),
+
     writeWithId: (id: string, content: string) => ipcRenderer.invoke(IpcChannel.File_WriteWithId, id, content),
     open: (options?: OpenDialogOptions) => ipcRenderer.invoke(IpcChannel.File_Open, options),
     openPath: (path: string) => ipcRenderer.invoke(IpcChannel.File_OpenPath, path),
@@ -120,13 +141,12 @@ const api = {
     resetMinimumSize: () => ipcRenderer.invoke(IpcChannel.Windows_ResetMinimumSize)
   },
   fileService: {
-    upload: (type: string, apiKey: string, file: FileType) =>
-      ipcRenderer.invoke(IpcChannel.FileService_Upload, type, apiKey, file),
-    list: (type: string, apiKey: string) => ipcRenderer.invoke(IpcChannel.FileService_List, type, apiKey),
-    delete: (type: string, apiKey: string, fileId: string) =>
-      ipcRenderer.invoke(IpcChannel.FileService_Delete, type, apiKey, fileId),
-    retrieve: (type: string, apiKey: string, fileId: string) =>
-      ipcRenderer.invoke(IpcChannel.FileService_Retrieve, type, apiKey, fileId)
+    upload: (provider: Provider, file: FileMetadata): Promise<FileUploadResponse> =>
+      ipcRenderer.invoke(IpcChannel.FileService_Upload, provider, file),
+    list: (provider: Provider): Promise<FileListResponse> => ipcRenderer.invoke(IpcChannel.FileService_List, provider),
+    delete: (provider: Provider, fileId: string) => ipcRenderer.invoke(IpcChannel.FileService_Delete, provider, fileId),
+    retrieve: (provider: Provider, fileId: string): Promise<FileUploadResponse> =>
+      ipcRenderer.invoke(IpcChannel.FileService_Retrieve, provider, fileId)
   },
   selectionMenu: {
     action: (action: string) => ipcRenderer.invoke('selection-menu:action', action)

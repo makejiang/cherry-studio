@@ -1,5 +1,5 @@
 import FileManager from '@renderer/services/FileManager'
-import { FileType, FileTypes } from '@renderer/types'
+import { FileMetadata, FileTypes } from '@renderer/types'
 import { formatFileSize } from '@renderer/utils'
 import { Col, Image, Row, Spin, Table } from 'antd'
 import React, { memo } from 'react'
@@ -9,7 +9,7 @@ import GeminiFiles from './GeminiFiles'
 import MistralFiles from './MistralFiles'
 interface ContentViewProps {
   id: FileTypes | 'all' | string
-  files?: FileType[]
+  files?: FileMetadata[]
   dataSource?: any[]
   columns: any[]
 }

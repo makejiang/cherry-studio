@@ -1,5 +1,5 @@
 import { isMac } from '@main/constant'
-import { FileSource, isLocalFile, LocalFileSource, OcrProvider } from '@types'
+import { FileMetadata, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import * as fs from 'fs'
 import PQueue from 'p-queue'
@@ -58,16 +58,16 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
         for (let i = startPage; i < endPage; i++) {
           const pageNum = i + 1
           const pageBuffer = await results.getPage(pageNum)
-          const croppedPageBuffer = await this.cropImage(pageBuffer)
-          pageBuffers.push(croppedPageBuffer)
+          // const croppedPageBuffer = await this.cropImage(pageBuffer)
+          pageBuffers.push(pageBuffer)
         }
 
         // Process batch
         const ocrResults = await this.MacOCR.recognizeBatchFromBuffer(pageBuffers, {
-          maxThreads: 4,
           ocrOptions: {
             recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),
-            minConfidence: this.provider.options?.minConfidence || 0.5
+            minConfidence: this.provider.options?.minConfidence || 0.5,
+            languages: this.provider.options?.language || 'zh-Hans'
           }
         })
 
@@ -103,53 +103,50 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
     return true
   }
 
-  public async parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: LocalFileSource }> {
+  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     Logger.info(`[OCR] Starting OCR process for file: ${file.name}`)
-    if (isLocalFile(file)) {
-      if (file.ext === '.pdf') {
-        try {
-          const { pdf } = await import('pdf-to-img')
-          const pdfBuffer = await fs.promises.readFile(file.path)
-          const isScanPdf = await this.isScanPdf(pdfBuffer)
-          if (!isScanPdf) {
-            Logger.info('[OCR] PDF is not a scan version, skipping OCR')
-            return { processedFile: file }
-          }
-          const results = await pdf(pdfBuffer)
-          const totalPages = results.length
-
-          const baseDir = path.dirname(file.path)
-          const baseName = path.basename(file.path, path.extname(file.path))
-          const txtFileName = `${baseName}.txt`
-          const txtFilePath = path.join(baseDir, txtFileName)
-
-          const writeStream = fs.createWriteStream(txtFilePath)
-          await this.processPages(results, totalPages, sourceId, writeStream)
-
-          await new Promise<void>((resolve, reject) => {
-            writeStream.end(() => {
-              Logger.info(`[OCR] OCR process completed successfully for ${file.origin_name}`)
-              resolve()
-            })
-            writeStream.on('error', reject)
-          })
-          const movedPaths = this.moveToAttachmentsDir(file.id, [txtFilePath])
-          return {
-            processedFile: {
-              ...file,
-              name: txtFileName,
-              path: movedPaths[0],
-              ext: '.txt',
-              size: fs.statSync(movedPaths[0]).size
-            }
-          }
-        } catch (error) {
-          Logger.error('[OCR] Error during OCR process:', error)
-          throw error
+    if (file.ext === '.pdf') {
+      try {
+        const { pdf } = await import('pdf-to-img')
+        const pdfBuffer = await fs.promises.readFile(file.path)
+        const isScanPdf = await this.isScanPdf(pdfBuffer)
+        if (!isScanPdf) {
+          Logger.info('[OCR] PDF is not a scan version, skipping OCR')
+          return { processedFile: file }
         }
+        const results = await pdf(pdfBuffer)
+        const totalPages = results.length
+
+        const baseDir = path.dirname(file.path)
+        const baseName = path.basename(file.path, path.extname(file.path))
+        const txtFileName = `${baseName}.txt`
+        const txtFilePath = path.join(baseDir, txtFileName)
+
+        const writeStream = fs.createWriteStream(txtFilePath)
+        await this.processPages(results, totalPages, sourceId, writeStream)
+
+        await new Promise<void>((resolve, reject) => {
+          writeStream.end(() => {
+            Logger.info(`[OCR] OCR process completed successfully for ${file.origin_name}`)
+            resolve()
+          })
+          writeStream.on('error', reject)
+        })
+        const movedPaths = this.moveToAttachmentsDir(file.id, [txtFilePath])
+        return {
+          processedFile: {
+            ...file,
+            name: txtFileName,
+            path: movedPaths[0],
+            ext: '.txt',
+            size: fs.statSync(movedPaths[0]).size
+          }
+        }
+      } catch (error) {
+        Logger.error('[OCR] Error during OCR process:', error)
+        throw error
       }
-      return { processedFile: file }
     }
-    throw new Error('Only local files are supported')
+    return { processedFile: file }
   }
 }

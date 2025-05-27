@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { FileType, OcrProvider } from '@types'
-import AdmZip from 'adm-zip'
+import { getFileDir } from '@main/utils/file'
+import { FileMetadata, OcrProvider } from '@types'
 import axios, { AxiosRequestConfig } from 'axios'
 import Logger from 'electron-log'
+import streamZip from 'node-stream-zip'
 
 import BaseOcrProvider from './BaseOcrProvider'
 
@@ -50,7 +51,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
-  public async parseFile(sourceId: string, file: FileType): Promise<{ processedFile: FileType }> {
+  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     try {
       Logger.info(`OCR processing started: ${file.path}`)
 
@@ -68,7 +69,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
       Logger.info(`OCR parsing completed successfully for: ${file.path}`)
 
       // 步骤4: 导出文件
-      const { path: outputPath } = await this.exportFile(file.path, uid)
+      const { path: outputPath } = await this.exportFile(file, uid)
 
       // 步骤5: 创建处理后的文件信息
       return {
@@ -80,7 +81,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private createProcessedFileInfo(file: FileType, outputPath: string): FileType {
+  private createProcessedFileInfo(file: FileMetadata, outputPath: string): FileMetadata {
     const outputFilePath = `${outputPath}/${file.id}.md`
     return {
       ...file,
@@ -91,20 +92,31 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
-  public async exportFile(filePath: string, uid: string): Promise<{ path: string }> {
-    Logger.info(`Exporting file: ${filePath}`)
+  /**
+   * 导出文件
+   * @param file 文件信息
+   * @param uid 预上传响应的uid
+   * @returns 导出文件的路径
+   */
+  public async exportFile(file: FileMetadata, uid: string): Promise<{ path: string }> {
+    Logger.info(`Exporting file: ${file.path}`)
 
     // 步骤1: 转换文件
-    await this.convertFile(uid, filePath)
-    Logger.info(`File conversion completed for: ${filePath}`)
+    await this.convertFile(uid, file.path)
+    Logger.info(`File conversion completed for: ${file.path}`)
 
     // 步骤2: 等待导出并获取URL
     const exportUrl = await this.waitForExport(uid)
 
     // 步骤3: 下载并解压文件
-    return this.downloadFile(exportUrl, filePath)
+    return this.downloadFile(exportUrl, file)
   }
 
+  /**
+   * 等待处理完成
+   * @param sourceId 源文件ID
+   * @param uid 预上传响应的uid
+   */
   private async waitForProcessing(sourceId: string, uid: string): Promise<void> {
     while (true) {
       await this.delay(1000)
@@ -120,6 +132,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
+  /**
+   * 等待导出完成
+   * @param uid 预上传响应的uid
+   * @returns 导出文件的url
+   */
   private async waitForExport(uid: string): Promise<string> {
     while (true) {
       await this.delay(1000)
@@ -134,6 +151,10 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
+  /**
+   * 预上传文件
+   * @returns 预上传响应的url和uid
+   */
   private async preupload(): Promise<PreuploadResponse> {
     const config = this.createAuthConfig()
     const endpoint = `${this.provider.apiHost}/api/v2/parse/preupload`
@@ -152,6 +173,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
+  /**
+   * 上传文件
+   * @param filePath 文件路径
+   * @param url 预上传响应的url
+   */
   private async putFile(filePath: string, url: string): Promise<void> {
     try {
       const fileStream = fs.createReadStream(filePath)
@@ -184,6 +210,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
+  /**
+   * OCR文件
+   * @param uid 预上传响应的uid
+   * @param filePath 文件路径
+   */
   private async convertFile(uid: string, filePath: string): Promise<void> {
     const fileName = path.basename(filePath).split('.')[0]
     const config = {
@@ -215,6 +246,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
+  /**
+   * 获取解析后的文件信息
+   * @param uid 预上传响应的uid
+   * @returns 解析后的文件信息
+   */
   private async getParsedFile(uid: string): Promise<ParsedFileResponse> {
     const config = this.createAuthConfig()
     const endpoint = `${this.provider.apiHost}/api/v2/convert/parse/result?uid=${uid}`
@@ -235,11 +271,22 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private async downloadFile(url: string, filePath: string): Promise<{ path: string }> {
-    const dirPath = path.dirname(filePath)
-    const baseName = path.basename(filePath, path.extname(filePath))
-    const zipPath = path.join(dirPath, `${baseName}.zip`)
-    const extractPath = path.join(dirPath, baseName)
+  /**
+   * 下载文件
+   * @param url 导出文件的url
+   * @param file 文件信息
+   * @returns 下载文件的路径
+   */
+  private async downloadFile(url: string, file: FileMetadata): Promise<{ path: string }> {
+    const dirPath = getFileDir(file.path)
+    // 使用统一的存储路径：Data/Files/{file.id}/
+    const extractPath = path.join(dirPath, file.id)
+    const tempDir = path.join(dirPath, 'temp')
+    const zipPath = path.join(tempDir, `${file.id}.zip`)
+
+    // 确保目录存在
+    fs.mkdirSync(tempDir, { recursive: true })
+    fs.mkdirSync(extractPath, { recursive: true })
 
     Logger.info(`Downloading to export path: ${zipPath}`)
 
@@ -249,8 +296,12 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
       fs.writeFileSync(zipPath, response.data)
 
       // 解压文件
-      const zip = new AdmZip(zipPath)
-      zip.extractAllTo(extractPath, true)
+      const zip = new streamZip({ file: zipPath })
+      zip.extract(null, extractPath, (err) => {
+        if (err) {
+          throw new Error(`Failed to extract file: ${err}`)
+        }
+      })
 
       // 删除临时ZIP文件
       fs.unlinkSync(zipPath)

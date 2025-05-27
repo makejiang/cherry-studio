@@ -2,7 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { windowService } from '@main/services/WindowService'
-import { FileSource, LocalFileSource, OcrProvider } from '@types'
+import { getFileExt } from '@main/utils/file'
+import { FileMetadata, OcrProvider } from '@types'
 import { createCanvas, loadImage } from 'canvas'
 import { app } from 'electron'
 import { TypedArray } from 'pdfjs-dist/types/src/display/api'
@@ -17,7 +18,54 @@ export default abstract class BaseOcrProvider {
     }
     this.provider = provider
   }
-  abstract parseFile(sourceId: string, file: FileSource): Promise<{ processedFile: LocalFileSource }>
+  abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }>
+
+  /**
+   * 检查文件是否已经被OCR处理过
+   * 统一检测方法：如果 Data/Files/{file.id} 是目录，说明已被OCR处理
+   * @param file 文件信息
+   * @returns 如果已处理返回处理后的文件信息，否则返回null
+   */
+  public async checkIfAlreadyProcessed(file: FileMetadata): Promise<FileMetadata | null> {
+    try {
+      // 检查 Data/Files/{file.id} 是否是目录
+      const ocrDirPath = path.join(this.storageDir, file.id)
+
+      if (fs.existsSync(ocrDirPath)) {
+        const stats = await fs.promises.stat(ocrDirPath)
+
+        // 如果是目录，说明已经被OCR处理过
+        if (stats.isDirectory()) {
+          // 查找目录中的处理结果文件
+          const files = await fs.promises.readdir(ocrDirPath)
+
+          // 查找主要的处理结果文件（.md 或 .txt）
+          const processedFile = files.find((fileName) => fileName.endsWith('.md') || fileName.endsWith('.txt'))
+
+          if (processedFile) {
+            const processedFilePath = path.join(ocrDirPath, processedFile)
+            const processedStats = await fs.promises.stat(processedFilePath)
+            const ext = getFileExt(processedFile)
+
+            return {
+              ...file,
+              name: file.name.replace(file.ext, ext),
+              path: processedFilePath,
+              ext: ext,
+              size: processedStats.size,
+              created_at: processedStats.birthtime.toISOString()
+            }
+          }
+        }
+      }
+
+      return null
+    } catch (error) {
+      // 如果检查过程中出现错误，返回null表示未处理
+      return null
+    }
+  }
+
   /**
    * 辅助方法：延迟执行
    */

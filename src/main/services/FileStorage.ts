@@ -1,6 +1,6 @@
 import { getFilesDir, getFileType, getTempDir } from '@main/utils/file'
 import { documentExts, imageExts, MB } from '@shared/config/constant'
-import { FileType } from '@types'
+import { FileMetadata } from '@types'
 import * as crypto from 'crypto'
 import {
   dialog,
@@ -51,7 +51,7 @@ class FileStorage {
     })
   }
 
-  findDuplicateFile = async (filePath: string): Promise<FileType | null> => {
+  findDuplicateFile = async (filePath: string): Promise<FileMetadata | null> => {
     const stats = fs.statSync(filePath)
     const fileSize = stats.size
 
@@ -78,8 +78,7 @@ class FileStorage {
             size: storedStats.size,
             ext,
             type: getFileType(ext),
-            count: 2,
-            source: 'local'
+            count: 2
           }
         }
       }
@@ -91,7 +90,7 @@ class FileStorage {
   public selectFile = async (
     _: Electron.IpcMainInvokeEvent,
     options?: OpenDialogOptions
-  ): Promise<FileType[] | null> => {
+  ): Promise<FileMetadata[] | null> => {
     const defaultOptions: OpenDialogOptions = {
       properties: ['openFile']
     }
@@ -118,8 +117,7 @@ class FileStorage {
         size: stats.size,
         ext: ext,
         type: fileType,
-        count: 1,
-        source: 'local' as const
+        count: 1
       }
     })
 
@@ -151,7 +149,7 @@ class FileStorage {
     }
   }
 
-  public uploadFile = async (_: Electron.IpcMainInvokeEvent, file: FileType): Promise<FileType> => {
+  public uploadFile = async (_: Electron.IpcMainInvokeEvent, file: FileMetadata): Promise<FileMetadata> => {
     const duplicateFile = await this.findDuplicateFile(file.path)
 
     if (duplicateFile) {
@@ -175,7 +173,7 @@ class FileStorage {
     const stats = await fs.promises.stat(destPath)
     const fileType = getFileType(ext)
 
-    const fileMetadata: FileType = {
+    const fileMetadata: FileMetadata = {
       id: uuid,
       origin_name,
       name: uuid + ext,
@@ -184,14 +182,13 @@ class FileStorage {
       size: stats.size,
       ext: ext,
       type: fileType,
-      count: 1,
-      source: 'local'
+      count: 1
     }
 
     return fileMetadata
   }
 
-  public getFile = async (_: Electron.IpcMainInvokeEvent, filePath: string): Promise<FileType | null> => {
+  public getFile = async (_: Electron.IpcMainInvokeEvent, filePath: string): Promise<FileMetadata | null> => {
     if (!fs.existsSync(filePath)) {
       return null
     }
@@ -200,7 +197,7 @@ class FileStorage {
     const ext = path.extname(filePath)
     const fileType = getFileType(ext)
 
-    const fileInfo: FileType = {
+    const fileInfo: FileMetadata = {
       id: uuidv4(),
       origin_name: path.basename(filePath),
       name: path.basename(filePath),
@@ -209,8 +206,7 @@ class FileStorage {
       size: stats.size,
       ext: ext,
       type: fileType,
-      count: 1,
-      source: 'local'
+      count: 1
     }
 
     return fileInfo
@@ -254,8 +250,8 @@ class FileStorage {
     if (!fs.existsSync(this.tempDir)) {
       fs.mkdirSync(this.tempDir, { recursive: true })
     }
-    const tempFilePath = path.join(this.tempDir, `temp_file_${uuidv4()}_${fileName}`)
-    return tempFilePath
+
+    return path.join(this.tempDir, `temp_file_${uuidv4()}_${fileName}`)
   }
 
   public writeFile = async (
@@ -404,7 +400,7 @@ class FileStorage {
     _: Electron.IpcMainInvokeEvent,
     url: string,
     isUseContentType?: boolean
-  ): Promise<FileType> => {
+  ): Promise<FileMetadata> => {
     try {
       const response = await fetch(url)
       if (!response.ok) {
@@ -446,7 +442,7 @@ class FileStorage {
       const stats = await fs.promises.stat(destPath)
       const fileType = getFileType(ext)
 
-      const fileMetadata: FileType = {
+      const fileMetadata: FileMetadata = {
         id: uuid,
         origin_name: filename,
         name: uuid + ext,
@@ -455,8 +451,7 @@ class FileStorage {
         size: stats.size,
         ext: ext,
         type: fileType,
-        count: 1,
-        source: 'local'
+        count: 1
       }
 
       return fileMetadata

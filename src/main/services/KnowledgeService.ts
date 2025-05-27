@@ -30,7 +30,7 @@ import { getAllFiles } from '@main/utils/file'
 import { MB } from '@shared/config/constant'
 import type { LoaderReturn } from '@shared/config/types'
 import { IpcChannel } from '@shared/IpcChannel'
-import { FileType, KnowledgeBaseParams, KnowledgeItem } from '@types'
+import { FileMetadata, KnowledgeBaseParams, KnowledgeItem } from '@types'
 import { app } from 'electron'
 import Logger from 'electron-log'
 import { v4 as uuidv4 } from 'uuid'
@@ -160,8 +160,7 @@ class KnowledgeService {
     options: KnowledgeBaseAddItemOptionsNonNullableAttribute
   ): LoaderTask {
     const { base, item, forceReload } = options
-    const file = item.content as FileType
-    file.source = 'local'
+    const file = item.content as FileMetadata
 
     const loaderTask: LoaderTask = {
       loaderTasks: [
@@ -169,7 +168,7 @@ class KnowledgeService {
           state: LoaderTaskItemState.PENDING,
           task: async () => {
             // 添加OCR预处理逻辑
-            const fileToProcess: FileType = await this.preprocessing(file, base, item)
+            const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
 
             // 使用处理后的文件进行加载
             return addFileLoader(ragApplication, fileToProcess, base, forceReload)
@@ -493,12 +492,26 @@ class KnowledgeService {
     return this.storageDir
   }
 
-  private preprocessing = async (file: FileType, base: KnowledgeBaseParams, item: KnowledgeItem): Promise<FileType> => {
-    let fileToProcess: FileType = file
+  private preprocessing = async (
+    file: FileMetadata,
+    base: KnowledgeBaseParams,
+    item: KnowledgeItem
+  ): Promise<FileMetadata> => {
+    let fileToProcess: FileMetadata = file
+
     if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
       try {
         const ocrProvider = new OcrProvider(base.ocrProvider)
-        Logger.info(`Starting OCR processing for file: ${file.path}`)
+
+        // 首先检查文件是否已经被OCR处理过
+        const alreadyProcessed = await ocrProvider.checkIfAlreadyProcessed(file)
+        if (alreadyProcessed) {
+          Logger.info(`File already OCR processed, using cached result: ${file.path}`)
+          return alreadyProcessed
+        }
+
+        // 执行OCR处理
+        Logger.info(`Starting OCR processing for scanned PDF: ${file.path}`)
         const { processedFile } = await ocrProvider.parseFile(item.id, file)
         fileToProcess = processedFile
       } catch (err) {
@@ -507,6 +520,7 @@ class KnowledgeService {
         fileToProcess = file
       }
     }
+
     return fileToProcess
   }
 }

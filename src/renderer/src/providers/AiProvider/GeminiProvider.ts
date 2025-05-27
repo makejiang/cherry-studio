@@ -16,6 +16,7 @@ import {
   Tool
 } from '@google/genai'
 import { nanoid } from '@reduxjs/toolkit'
+import Logger from '@renderer/config/logger'
 import {
   findTokenLimit,
   isGeminiReasoningModel,
@@ -36,7 +37,7 @@ import {
 import {
   Assistant,
   EFFORT_RATIO,
-  FileType,
+  FileMetadata,
   FileTypes,
   FileUploadResponse,
   MCPCallToolResponse,
@@ -87,41 +88,46 @@ export default class GeminiProvider extends BaseProvider {
    * @param file - The file
    * @returns The part
    */
-  private async handlePdfFile(file: FileType): Promise<Part> {
-    const smallFileSize = 20 * MB
-    const isSmallFile = file.size < smallFileSize
+  private async handlePdfFile(file: FileMetadata): Promise<Part> {
+    try {
+      const smallFileSize = 20 * MB
+      const isSmallFile = file.size < smallFileSize
 
-    if (isSmallFile) {
-      const { data, mime } = await window.api.file.base64File(file.path)
-      return {
-        inlineData: {
-          data,
-          mime
-        } as Part['inlineData']
+      if (isSmallFile) {
+        const { data, mime } = await window.api.file.base64File(file.path)
+        return {
+          inlineData: {
+            data,
+            mime
+          } as Part['inlineData']
+        }
       }
-    }
 
-    // Retrieve file from Gemini uploaded files
-    const response: FileUploadResponse = await window.api.fileService.retrieve(this.provider.type, this.apiKey, file.id)
-    const fileMetadata = response.originalFile as File
+      // Retrieve file from Gemini uploaded files
+      const response: FileUploadResponse = await window.api.fileService.retrieve(this.provider, file.id)
+      const fileMetadata = response.originalFile?.file as File
 
-    if (fileMetadata) {
+      if (fileMetadata) {
+        return {
+          fileData: {
+            fileUri: fileMetadata.uri,
+            mimeType: fileMetadata.mimeType
+          } as Part['fileData']
+        }
+      }
+
+      // If file is not found, upload it to Gemini
+      const result = (await window.api.fileService.upload(this.provider, file)).originalFile?.file as File
+
       return {
         fileData: {
-          fileUri: fileMetadata.uri,
-          mimeType: fileMetadata.mimeType
+          fileUri: result.uri,
+          mimeType: result.mimeType
         } as Part['fileData']
       }
-    }
-
-    // If file is not found, upload it to Gemini
-    const result = (await window.api.fileService.upload(this.provider.type, this.apiKey, file)).originalFile as File
-
-    return {
-      fileData: {
-        fileUri: result.uri,
-        mimeType: result.mimeType
-      } as Part['fileData']
+    } catch (error) {
+      Logger.error('Error handling PDF file:', error)
+      throw error
     }
   }
 

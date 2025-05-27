@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
 import { Mistral } from '@mistralai/mistralai'
-import { FileListResponse, FileUploadResponse, LocalFileSource } from '@types'
+import { FileListResponse, FileMetadata, FileUploadResponse, Provider } from '@types'
 import Logger from 'electron-log'
 
 import { MistralClientManager } from '../MistralClientManager'
@@ -10,14 +10,14 @@ import { BaseFileService } from './BaseFileService'
 export class MistralService extends BaseFileService {
   private readonly client: Mistral
 
-  constructor(apiKey: string) {
-    super(apiKey)
+  constructor(provider: Provider) {
+    super(provider)
     const clientManager = MistralClientManager.getInstance()
-    clientManager.initializeClient(apiKey)
+    clientManager.initializeClient(provider)
     this.client = clientManager.getClient()
   }
 
-  async uploadFile(file: LocalFileSource): Promise<FileUploadResponse> {
+  async uploadFile(file: FileMetadata): Promise<FileUploadResponse> {
     try {
       const fileBuffer = await fs.readFile(file.path)
       const response = await this.client.files.upload({
@@ -31,7 +31,11 @@ export class MistralService extends BaseFileService {
       return {
         fileId: response.id,
         displayName: file.origin_name,
-        status: 'success'
+        status: 'success',
+        originalFile: {
+          type: 'mistral',
+          file: response
+        }
       }
     } catch (error) {
       Logger.error('Error uploading file:', error)

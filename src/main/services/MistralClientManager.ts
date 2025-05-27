@@ -1,4 +1,5 @@
 import { Mistral } from '@mistralai/mistralai'
+import { Provider } from '@types'
 
 export class MistralClientManager {
   private static instance: MistralClientManager
@@ -14,10 +15,11 @@ export class MistralClientManager {
     return MistralClientManager.instance
   }
 
-  public initializeClient(apiKey: string): void {
+  public initializeClient(provider: Provider): void {
     if (!this.client) {
       this.client = new Mistral({
-        apiKey
+        apiKey: provider.apiKey,
+        serverURL: provider.apiHost
       })
     }
   }

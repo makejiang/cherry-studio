@@ -1,3 +1,5 @@
+import { Provider } from '@types'
+
 import { BaseFileService } from './BaseFileService'
 import { GeminiService } from './GeminiService'
 import { MistralService } from './MistralService'
@@ -16,16 +18,17 @@ export class FileServiceManager {
     return this.instance
   }
 
-  getService(type: string, apiKey: string): BaseFileService {
+  getService(provider: Provider): BaseFileService {
+    const type = provider.type
     let service = this.services.get(type)
 
     if (!service) {
       switch (type) {
         case 'gemini':
-          service = new GeminiService(apiKey)
+          service = new GeminiService(provider)
           break
         case 'mistral':
-          service = new MistralService(apiKey)
+          service = new MistralService(provider)
           break
         default:
           throw new Error(`Unsupported service type: ${type}`)
