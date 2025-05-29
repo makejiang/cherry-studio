@@ -1488,6 +1488,12 @@ const migrateConfig = {
             model: 'mistral-ocr-latest',
             apiKey: '',
             apiHost: 'https://api.mistral.ai'
+          },
+          {
+            id: 'mineru',
+            name: 'MinerU',
+            apiKey: '',
+            apiHost: 'https://mineru.net'
           }
         ]
       }
