@@ -1,4 +1,5 @@
-import Doc2xLogo from '@renderer/assets/images/ocr/doc2x.svg'
+import Doc2xLogo from '@renderer/assets/images/ocr/doc2x.png'
+import MinerULogo from '@renderer/assets/images/ocr/mineru.jpg'
 import MacOSLogo from '@renderer/assets/images/providers/macos.svg'
 import MistralLogo from '@renderer/assets/images/providers/mistral.png'
 
@@ -10,6 +11,8 @@ export function getOcrProviderLogo(providerId: string) {
       return MistralLogo
     case 'system':
       return MacOSLogo
+    case 'mineru':
+      return MinerULogo
     default:
       return undefined
   }
@@ -26,6 +29,12 @@ export const OCR_PROVIDER_CONFIG = {
     websites: {
       official: 'https://mistral.ai',
       apiKey: 'https://mistral.ai/api-keys'
+    }
+  },
+  mineru: {
+    websites: {
+      official: 'https://mineru.net/',
+      apiKey: 'https://mineru.net/apiManage'
     }
   }
 }

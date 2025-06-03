@@ -120,7 +120,7 @@ export default class MineruOcrProvider extends BaseOcrProvider {
       ...file,
       name: finalName,
       path: finalPath,
-      ext: path.extname(finalName),
+      ext: '.md',
       size: fs.existsSync(finalPath) ? fs.statSync(finalPath).size : 0
     }
   }
