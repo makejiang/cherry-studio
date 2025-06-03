@@ -2,15 +2,12 @@ import { isMac } from '@main/constant'
 import { FileMetadata, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import * as fs from 'fs'
-import PQueue from 'p-queue'
 import * as path from 'path'
 import { TextItem } from 'pdfjs-dist/types/src/display/api'
 
 import BaseOcrProvider from './BaseOcrProvider'
 
 export default class MacSysOcrProvider extends BaseOcrProvider {
-  private readonly BATCH_SIZE = 4
-  private readonly CONCURRENCY = 2
   private readonly MIN_TEXT_LENGTH = 1000
   private MacOCR: any
 
@@ -45,45 +42,27 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
     sourceId: string,
     writeStream: fs.WriteStream
   ): Promise<void> {
-    const queue = new PQueue({ concurrency: this.CONCURRENCY })
-    const batches: Promise<void>[] = []
     await this.initMacOCR()
+    for (let i = 0; i < totalPages; i++) {
+      // Convert pages to buffers
+      const pageNum = i + 1
+      const pageBuffer = await results.getPage(pageNum)
+      const croppedPageBuffer = await this.cropImage(pageBuffer)
 
-    // Create ordered batches
-    for (let startPage = 0; startPage < totalPages; startPage += this.BATCH_SIZE) {
-      const endPage = Math.min(startPage + this.BATCH_SIZE, totalPages)
-      const batchPromise = queue.add(async () => {
-        // Convert pages to buffers
-        const pageBuffers: Buffer[] = []
-        for (let i = startPage; i < endPage; i++) {
-          const pageNum = i + 1
-          const pageBuffer = await results.getPage(pageNum)
-          // const croppedPageBuffer = await this.cropImage(pageBuffer)
-          pageBuffers.push(pageBuffer)
+      // Process batch
+      const ocrResult = await this.MacOCR.recognizeFromBuffer(croppedPageBuffer, {
+        ocrOptions: {
+          recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),
+          minConfidence: this.provider.options?.minConfidence || 0.5
         }
-
-        // Process batch
-        const ocrResults = await this.MacOCR.recognizeBatchFromBuffer(pageBuffers, {
-          ocrOptions: {
-            recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),
-            minConfidence: this.provider.options?.minConfidence || 0.5,
-            languages: this.provider.options?.language || 'zh-Hans'
-          }
-        })
-
-        // Write results in order
-        for (const result of ocrResults) {
-          writeStream.write(result.text + '\n')
-        }
-
-        // Update progress
-        await this.sendOcrProgress(sourceId, (endPage / totalPages) * 100)
       })
-      batches.push(batchPromise)
-    }
 
-    // Wait for all batches to complete in order
-    await Promise.all(batches)
+      // Write results in order
+      writeStream.write(ocrResult.text + '\n')
+
+      // Update progress
+      await this.sendOcrProgress(sourceId, (pageNum / totalPages) * 100)
+    }
   }
 
   public async isScanPdf(buffer: Buffer): Promise<boolean> {
@@ -109,12 +88,9 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
       try {
         const { pdf } = await import('pdf-to-img')
         const pdfBuffer = await fs.promises.readFile(file.path)
-        const isScanPdf = await this.isScanPdf(pdfBuffer)
-        if (!isScanPdf) {
-          Logger.info('[OCR] PDF is not a scan version, skipping OCR')
-          return { processedFile: file }
-        }
-        const results = await pdf(pdfBuffer)
+        const results = await pdf(pdfBuffer, {
+          scale: 2
+        })
         const totalPages = results.length
 
         const baseDir = path.dirname(file.path)

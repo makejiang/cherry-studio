@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { FileType, OcrProvider } from '@types'
+import { FileMetadata, OcrProvider } from '@types'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 import Logger from 'electron-log'
@@ -44,7 +44,7 @@ export default class MineruOcrProvider extends BaseOcrProvider {
     super(provider)
   }
 
-  public async parseFile(sourceId: string, file: FileType): Promise<{ processedFile: FileType }> {
+  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     try {
       Logger.info(`MinerU OCR processing started: ${file.path}`)
       await this.validateFile(file.path)
@@ -86,7 +86,7 @@ export default class MineruOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private createProcessedFileInfo(file: FileType, outputPath: string): FileType {
+  private createProcessedFileInfo(file: FileMetadata, outputPath: string): FileMetadata {
     // 查找解压后的主要文件
     let finalPath = ''
     let finalName = file.origin_name.replace('.pdf', '.md')
@@ -159,7 +159,7 @@ export default class MineruOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private async uploadFile(file: FileType): Promise<string> {
+  private async uploadFile(file: FileMetadata): Promise<string> {
     try {
       // 步骤1: 获取上传URL
       const { batchId, fileUrls } = await this.getBatchUploadUrls(file)
@@ -177,7 +177,7 @@ export default class MineruOcrProvider extends BaseOcrProvider {
     }
   }
 
-  private async getBatchUploadUrls(file: FileType): Promise<{ batchId: string; fileUrls: string[] }> {
+  private async getBatchUploadUrls(file: FileMetadata): Promise<{ batchId: string; fileUrls: string[] }> {
     const endpoint = `${this.provider.apiHost}/api/v4/file-urls/batch`
 
     const payload = {
