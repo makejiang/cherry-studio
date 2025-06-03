@@ -295,6 +295,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
       const response = await axios.get(url, { responseType: 'arraybuffer' })
       fs.writeFileSync(zipPath, response.data)
 
+      // 确保提取目录存在
+      if (!fs.existsSync(extractPath)) {
+        fs.mkdirSync(extractPath, { recursive: true })
+      }
+
       // 解压文件
       const zip = new streamZip({ file: zipPath })
       zip.extract(null, extractPath, (err) => {

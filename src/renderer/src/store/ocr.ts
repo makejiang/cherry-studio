@@ -22,6 +22,12 @@ const initialState: OcrState = {
       apiHost: 'https://api.mistral.ai'
     },
     {
+      id: 'mineru',
+      name: 'MinerU',
+      apiKey: '',
+      apiHost: 'https://mineru.net'
+    },
+    {
       id: 'system',
       name: 'System(Mac Only)',
       options: {
