@@ -1467,6 +1467,14 @@ const migrateConfig = {
   },
   '109': (state: RootState) => {
     try {
+      state.settings.userTheme = settingsInitialState.userTheme
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '110': (state: RootState) => {
+    try {
       if (!state.ocr) {
         state.ocr = {
           defaultProvider: '',
