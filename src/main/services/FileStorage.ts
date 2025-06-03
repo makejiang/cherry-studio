@@ -278,7 +278,7 @@ class FileStorage {
     }
   }
 
-  public saveBase64Image = async (_: Electron.IpcMainInvokeEvent, base64Data: string): Promise<FileType> => {
+  public saveBase64Image = async (_: Electron.IpcMainInvokeEvent, base64Data: string): Promise<FileMetadata> => {
     try {
       if (!base64Data) {
         throw new Error('Base64 data is required')
@@ -304,7 +304,7 @@ class FileStorage {
 
       await fs.promises.writeFile(destPath, buffer)
 
-      const fileMetadata: FileType = {
+      const fileMetadata: FileMetadata = {
         id: uuid,
         origin_name: uuid + ext,
         name: uuid + ext,
