@@ -1,7 +1,6 @@
 import {
   Content,
   File,
-  FileState,
   FinishReason,
   FunctionCall,
   GenerateContentConfig,
@@ -11,7 +10,6 @@ import {
   HarmBlockThreshold,
   HarmCategory,
   Modality,
-  Pager,
   Part,
   PartUnion,
   SafetySetting,
@@ -31,7 +29,6 @@ import {
 import { getStoreSetting } from '@renderer/hooks/useSettings'
 import i18n from '@renderer/i18n'
 import { getAssistantSettings, getDefaultModel, getTopNamingModel } from '@renderer/services/AssistantService'
-import { CacheService } from '@renderer/services/CacheService'
 import { EVENT_NAMES } from '@renderer/services/EventService'
 import {
   filterContextMessages,
