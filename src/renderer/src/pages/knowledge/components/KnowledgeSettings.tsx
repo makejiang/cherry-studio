@@ -6,7 +6,6 @@ import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
 import { useOcrProviders } from '@renderer/hooks/useOcr'
 import { useProviders } from '@renderer/hooks/useProvider'
-import { SettingRowTitle } from '@renderer/pages/settings'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { KnowledgeBase, OcrProvider } from '@renderer/types'
 import { Alert, Input, InputNumber, Modal, Select, Slider, Switch, Tabs, TabsProps, Tooltip } from 'antd'
@@ -151,6 +150,23 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
           </SettingsItem>
 
           <SettingsItem>
+            <div className="settings-label">{t('settings.tool.ocr.provider')}</div>
+            <Select
+              value={selectedProvider?.id}
+              style={{ width: '100%' }}
+              onChange={(value: string) => {
+                const provider = ocrProviders.find((p) => p.id === value)
+                if (!provider) return
+                setSelectedProvider(provider)
+                setNewBase({ ...newBase, ocrProvider: provider })
+              }}
+              placeholder={t('settings.tool.ocr.provider_placeholder')}
+              options={ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
+              allowClear
+            />
+          </SettingsItem>
+
+          <SettingsItem>
             <div className="settings-label">
               {t('knowledge.document_count')}
               <Tooltip title={t('knowledge.document_count_help')}>
@@ -173,32 +189,6 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
     },
     {
       key: '2',
-      label: t('settings.tool.ocr.title'),
-      children: (
-        <SettingsPanel>
-          <SettingsItem>
-            <SettingRowTitle>{t('settings.tool.ocr.provider')}</SettingRowTitle>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <Select
-                value={selectedProvider?.id}
-                style={{ width: '200px' }}
-                onChange={(value: string) => {
-                  const provider = ocrProviders.find((p) => p.id === value)
-                  if (!provider) return
-                  setSelectedProvider(provider)
-                  setNewBase({ ...newBase, ocrProvider: provider })
-                }}
-                placeholder={t('settings.tool.ocr.provider_placeholder')}
-                options={ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
-              />
-            </div>
-          </SettingsItem>
-        </SettingsPanel>
-      ),
-      icon: <SettingOutlined />
-    },
-    {
-      key: '3',
       label: t('settings.advanced.title'),
       children: (
         <SettingsPanel>
