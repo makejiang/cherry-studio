@@ -3,9 +3,9 @@ import path from 'node:path'
 
 import { getFileDir } from '@main/utils/file'
 import { FileMetadata, OcrProvider } from '@types'
+import AdmZip from 'adm-zip'
 import axios, { AxiosRequestConfig } from 'axios'
 import Logger from 'electron-log'
-import streamZip from 'node-stream-zip'
 
 import BaseOcrProvider from './BaseOcrProvider'
 
@@ -281,11 +281,10 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     const dirPath = getFileDir(file.path)
     // 使用统一的存储路径：Data/Files/{file.id}/
     const extractPath = path.join(dirPath, file.id)
-    const tempDir = path.join(dirPath, 'temp')
-    const zipPath = path.join(tempDir, `${file.id}.zip`)
+    const zipPath = path.join(dirPath, `${file.id}.zip`)
 
     // 确保目录存在
-    fs.mkdirSync(tempDir, { recursive: true })
+    fs.mkdirSync(dirPath, { recursive: true })
     fs.mkdirSync(extractPath, { recursive: true })
 
     Logger.info(`Downloading to export path: ${zipPath}`)
@@ -301,12 +300,9 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
       }
 
       // 解压文件
-      const zip = new streamZip({ file: zipPath })
-      zip.extract(null, extractPath, (err) => {
-        if (err) {
-          throw new Error(`Failed to extract file: ${err}`)
-        }
-      })
+      const zip = new AdmZip(zipPath)
+      zip.extractAllTo(extractPath, true)
+      Logger.info(`Extracted files to: ${extractPath}`)
 
       // 删除临时ZIP文件
       fs.unlinkSync(zipPath)
