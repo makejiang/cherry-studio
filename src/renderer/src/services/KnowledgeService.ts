@@ -50,8 +50,8 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
     rerankModel: base.rerankModel?.id,
     rerankModelProvider: base.rerankModel?.provider,
     // topN: base.topN,
-    preprocessing: base.preprocessing,
-    ocrProvider: base.ocrProvider
+    // preprocessing: base.preprocessing,
+    preprocessProvider: base.preprocessProvider
   }
 }
 

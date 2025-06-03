@@ -2,12 +2,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { getFileDir } from '@main/utils/file'
-import { FileMetadata, OcrProvider } from '@types'
+import { FileMetadata, PreprocessProvider } from '@types'
 import AdmZip from 'adm-zip'
 import axios, { AxiosRequestConfig } from 'axios'
 import Logger from 'electron-log'
 
-import BaseOcrProvider from './BaseOcrProvider'
+import BasePreprocessProvider from './BasePreprocessProvider'
 
 type ApiResponse<T> = {
   code: string
@@ -30,8 +30,8 @@ type ParsedFileResponse = {
   url: string
 }
 
-export default class Doc2xOcrProvider extends BaseOcrProvider {
-  constructor(provider: OcrProvider) {
+export default class Doc2xPreprocessProvider extends BasePreprocessProvider {
+  constructor(provider: PreprocessProvider) {
     super(provider)
   }
 
@@ -53,11 +53,11 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
   public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     try {
-      Logger.info(`OCR processing started: ${file.path}`)
+      Logger.info(`Preprocess processing started: ${file.path}`)
 
       // 步骤1: 准备上传
       const { uid, url } = await this.preupload()
-      Logger.info(`OCR preupload completed: uid=${uid}`)
+      Logger.info(`Preprocess preupload completed: uid=${uid}`)
 
       await this.validateFile(file.path)
 
@@ -66,7 +66,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
 
       // 步骤3: 等待处理完成
       await this.waitForProcessing(sourceId, uid)
-      Logger.info(`OCR parsing completed successfully for: ${file.path}`)
+      Logger.info(`Preprocess parsing completed successfully for: ${file.path}`)
 
       // 步骤4: 导出文件
       const { path: outputPath } = await this.exportFile(file, uid)
@@ -76,7 +76,9 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
         processedFile: this.createProcessedFileInfo(file, outputPath)
       }
     } catch (error) {
-      Logger.error(`OCR processing failed for ${file.path}: ${error instanceof Error ? error.message : String(error)}`)
+      Logger.error(
+        `Preprocess processing failed for ${file.path}: ${error instanceof Error ? error.message : String(error)}`
+      )
       throw error
     }
   }
@@ -121,13 +123,13 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
     while (true) {
       await this.delay(1000)
       const { status, progress } = await this.getStatus(uid)
-      await this.sendOcrProgress(sourceId, progress)
-      Logger.info(`OCR processing status: ${status}, progress: ${progress}%`)
+      await this.sendPreprocessProgress(sourceId, progress)
+      Logger.info(`Preprocess processing status: ${status}, progress: ${progress}%`)
 
       if (status === 'success') {
         return
       } else if (status === 'failed') {
-        throw new Error('OCR processing failed')
+        throw new Error('Preprocess processing failed')
       }
     }
   }
@@ -211,7 +213,7 @@ export default class Doc2xOcrProvider extends BaseOcrProvider {
   }
 
   /**
-   * OCR文件
+   * Preprocess文件
    * @param uid 预上传响应的uid
    * @param filePath 文件路径
    */

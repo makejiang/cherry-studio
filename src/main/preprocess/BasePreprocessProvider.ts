@@ -3,47 +3,47 @@ import path from 'node:path'
 
 import { windowService } from '@main/services/WindowService'
 import { getFileExt } from '@main/utils/file'
-import { FileMetadata, OcrProvider } from '@types'
+import { FileMetadata, PreprocessProvider } from '@types'
 import { createCanvas, loadImage } from 'canvas'
 import { app } from 'electron'
 import { TypedArray } from 'pdfjs-dist/types/src/display/api'
 
-export default abstract class BaseOcrProvider {
-  protected provider: OcrProvider
+export default abstract class BasePreprocessProvider {
+  protected provider: PreprocessProvider
   private storageDir = path.join(app.getPath('userData'), 'Data', 'Files')
 
-  constructor(provider: OcrProvider) {
+  constructor(provider: PreprocessProvider) {
     if (!provider) {
-      throw new Error('Ocr provider is not set')
+      throw new Error('Preprocess provider is not set')
     }
     this.provider = provider
   }
   abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }>
 
   /**
-   * 检查文件是否已经被OCR处理过
-   * 统一检测方法：如果 Data/Files/{file.id} 是目录，说明已被OCR处理
+   * 检查文件是否已经被预处理过
+   * 统一检测方法：如果 Data/Files/{file.id} 是目录，说明已被预处理
    * @param file 文件信息
    * @returns 如果已处理返回处理后的文件信息，否则返回null
    */
   public async checkIfAlreadyProcessed(file: FileMetadata): Promise<FileMetadata | null> {
     try {
       // 检查 Data/Files/{file.id} 是否是目录
-      const ocrDirPath = path.join(this.storageDir, file.id)
+      const preprocessDirPath = path.join(this.storageDir, file.id)
 
-      if (fs.existsSync(ocrDirPath)) {
-        const stats = await fs.promises.stat(ocrDirPath)
+      if (fs.existsSync(preprocessDirPath)) {
+        const stats = await fs.promises.stat(preprocessDirPath)
 
-        // 如果是目录，说明已经被OCR处理过
+        // 如果是目录，说明已经被预处理过
         if (stats.isDirectory()) {
           // 查找目录中的处理结果文件
-          const files = await fs.promises.readdir(ocrDirPath)
+          const files = await fs.promises.readdir(preprocessDirPath)
 
           // 查找主要的处理结果文件（.md 或 .txt）
           const processedFile = files.find((fileName) => fileName.endsWith('.md') || fileName.endsWith('.txt'))
 
           if (processedFile) {
-            const processedFilePath = path.join(ocrDirPath, processedFile)
+            const processedFilePath = path.join(preprocessDirPath, processedFile)
             const processedStats = await fs.promises.stat(processedFilePath)
             const ext = getFileExt(processedFile)
 
@@ -87,9 +87,9 @@ export default abstract class BaseOcrProvider {
     return document
   }
 
-  public async sendOcrProgress(sourceId: string, progress: number): Promise<void> {
+  public async sendPreprocessProgress(sourceId: string, progress: number): Promise<void> {
     const mainWindow = windowService.getMainWindow()
-    mainWindow?.webContents.send('file-ocr-progress', {
+    mainWindow?.webContents.send('file-preprocess-progress', {
       itemId: sourceId,
       progress: progress
     })

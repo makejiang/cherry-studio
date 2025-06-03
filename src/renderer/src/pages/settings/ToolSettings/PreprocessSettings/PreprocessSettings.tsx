@@ -1,8 +1,8 @@
 import { ExportOutlined } from '@ant-design/icons'
-import { getOcrProviderLogo, OCR_PROVIDER_CONFIG } from '@renderer/config/ocrProviders'
-import { useOcrProvider } from '@renderer/hooks/useOcr'
+import { getPreprocessProviderLogo, PREPROCESS_PROVIDER_CONFIG } from '@renderer/config/preprocessProviders'
+import { usePreprocessProvider } from '@renderer/hooks/usePreprocess'
 import { formatApiKeys } from '@renderer/services/ApiService'
-import { OcrProvider } from '@renderer/types'
+import { PreprocessProvider } from '@renderer/types'
 import { hasObjectKey } from '@renderer/utils'
 import { Avatar, Divider, Flex, Input, InputNumber, Segmented } from 'antd'
 import Link from 'antd/es/typography/Link'
@@ -22,29 +22,29 @@ import {
 } from '../..'
 
 interface Props {
-  provider: OcrProvider
+  provider: PreprocessProvider
 }
 
-const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
-  const { provider: ocrProvider, updateOcrProvider } = useOcrProvider(_provider.id)
+const PreprocessProviderSettings: FC<Props> = ({ provider: _provider }) => {
+  const { provider: preprocessProvider, updatePreprocessProvider } = usePreprocessProvider(_provider.id)
   const { t } = useTranslation()
-  const [apiKey, setApiKey] = useState(ocrProvider.apiKey || '')
-  const [apiHost, setApiHost] = useState(ocrProvider.apiHost || '')
-  const [options, setOptions] = useState(ocrProvider.options || {})
+  const [apiKey, setApiKey] = useState(preprocessProvider.apiKey || '')
+  const [apiHost, setApiHost] = useState(preprocessProvider.apiHost || '')
+  const [options, setOptions] = useState(preprocessProvider.options || {})
 
-  const ocrProviderConfig = OCR_PROVIDER_CONFIG[ocrProvider.id]
-  const apiKeyWebsite = ocrProviderConfig?.websites?.apiKey
-  const officialWebsite = ocrProviderConfig?.websites?.official
+  const preprocessProviderConfig = PREPROCESS_PROVIDER_CONFIG[preprocessProvider.id]
+  const apiKeyWebsite = preprocessProviderConfig?.websites?.apiKey
+  const officialWebsite = preprocessProviderConfig?.websites?.official
 
   useEffect(() => {
-    setApiKey(ocrProvider.apiKey ?? '')
-    setApiHost(ocrProvider.apiHost ?? '')
-    setOptions(ocrProvider.options ?? {})
-  }, [ocrProvider.apiKey, ocrProvider.apiHost, ocrProvider.options])
+    setApiKey(preprocessProvider.apiKey ?? '')
+    setApiHost(preprocessProvider.apiHost ?? '')
+    setOptions(preprocessProvider.options ?? {})
+  }, [preprocessProvider.apiKey, preprocessProvider.apiHost, preprocessProvider.options])
 
   const onUpdateApiKey = () => {
-    if (apiKey !== ocrProvider.apiKey) {
-      updateOcrProvider({ ...ocrProvider, apiKey })
+    if (apiKey !== preprocessProvider.apiKey) {
+      updatePreprocessProvider({ ...preprocessProvider, apiKey })
     }
   }
 
@@ -53,35 +53,35 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
     if (trimmedHost.endsWith('/')) {
       trimmedHost = trimmedHost.slice(0, -1)
     }
-    if (trimmedHost !== ocrProvider.apiHost) {
-      updateOcrProvider({ ...ocrProvider, apiHost: trimmedHost })
+    if (trimmedHost !== preprocessProvider.apiHost) {
+      updatePreprocessProvider({ ...preprocessProvider, apiHost: trimmedHost })
     } else {
-      setApiHost(ocrProvider.apiHost || '')
+      setApiHost(preprocessProvider.apiHost || '')
     }
   }
 
   const onUpdateOptions = (key: string, value: any) => {
     const newOptions = { ...options, [key]: value }
     setOptions(newOptions)
-    updateOcrProvider({ ...ocrProvider, options: newOptions })
+    updatePreprocessProvider({ ...preprocessProvider, options: newOptions })
   }
 
   return (
     <>
       <SettingTitle>
         <Flex align="center" gap={8}>
-          <ProviderLogo shape="square" src={getOcrProviderLogo(ocrProvider.id)} size={16} />
+          <ProviderLogo shape="square" src={getPreprocessProviderLogo(preprocessProvider.id)} size={16} />
 
-          <ProviderName> {ocrProvider.name}</ProviderName>
-          {officialWebsite && ocrProviderConfig?.websites && (
-            <Link target="_blank" href={ocrProviderConfig.websites.official}>
+          <ProviderName> {preprocessProvider.name}</ProviderName>
+          {officialWebsite && preprocessProviderConfig?.websites && (
+            <Link target="_blank" href={preprocessProviderConfig.websites.official}>
               <ExportOutlined style={{ color: 'var(--color-text)', fontSize: '12px' }} />
             </Link>
           )}
         </Flex>
       </SettingTitle>
       <Divider style={{ width: '100%', margin: '10px 0' }} />
-      {hasObjectKey(ocrProvider, 'apiKey') && (
+      {hasObjectKey(preprocessProvider, 'apiKey') && (
         <>
           <SettingSubtitle style={{ marginTop: 5, marginBottom: 10 }}>{t('settings.provider.api_key')}</SettingSubtitle>
           <Flex gap={8}>
@@ -104,7 +104,7 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
         </>
       )}
 
-      {hasObjectKey(ocrProvider, 'apiHost') && (
+      {hasObjectKey(preprocessProvider, 'apiHost') && (
         <>
           <SettingSubtitle style={{ marginTop: 5, marginBottom: 10 }}>
             {t('settings.provider.api_host')}
@@ -120,7 +120,7 @@ const OcrProviderSetting: FC<Props> = ({ provider: _provider }) => {
         </>
       )}
 
-      {hasObjectKey(ocrProvider, 'options') && ocrProvider.id === 'system' && (
+      {hasObjectKey(preprocessProvider, 'options') && preprocessProvider.id === 'system' && (
         <>
           <SettingDivider style={{ marginTop: 15, marginBottom: 12 }} />
           <SettingRow>
@@ -165,4 +165,4 @@ const ProviderLogo = styled(Avatar)`
   border: 0.5px solid var(--color-border);
 `
 
-export default OcrProviderSetting
+export default PreprocessProviderSettings

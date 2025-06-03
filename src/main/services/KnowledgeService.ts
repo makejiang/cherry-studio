@@ -23,7 +23,7 @@ import { SitemapLoader } from '@cherrystudio/embedjs-loader-sitemap'
 import { WebLoader } from '@cherrystudio/embedjs-loader-web'
 import Embeddings from '@main/embeddings/Embeddings'
 import { addFileLoader } from '@main/loader'
-import OcrProvider from '@main/ocr/OcrProvider'
+import PreprocessProvider from '@main/preprocess/PreprocessProvider'
 import Reranker from '@main/reranker/Reranker'
 import { windowService } from '@main/services/WindowService'
 import { getAllFiles } from '@main/utils/file'
@@ -167,7 +167,7 @@ class KnowledgeService {
         {
           state: LoaderTaskItemState.PENDING,
           task: async () => {
-            // 添加OCR预处理逻辑
+            // 添加预处理逻辑
             const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
 
             // 使用处理后的文件进行加载
@@ -498,25 +498,25 @@ class KnowledgeService {
     item: KnowledgeItem
   ): Promise<FileMetadata> => {
     let fileToProcess: FileMetadata = file
-
-    if (base.preprocessing && base.ocrProvider && file.ext.toLowerCase() === '.pdf') {
+    console.warn(`Preprocessing file`, JSON.stringify(base, null, 2))
+    if (base.preprocessProvider && file.ext.toLowerCase() === '.pdf') {
       try {
-        const ocrProvider = new OcrProvider(base.ocrProvider)
+        const preprocessProvider = new PreprocessProvider(base.preprocessProvider)
 
-        // 首先检查文件是否已经被OCR处理过
-        const alreadyProcessed = await ocrProvider.checkIfAlreadyProcessed(file)
+        // 首先检查文件是否已经被预处理过
+        const alreadyProcessed = await preprocessProvider.checkIfAlreadyProcessed(file)
         if (alreadyProcessed) {
-          Logger.info(`File already OCR processed, using cached result: ${file.path}`)
+          Logger.info(`File already preprocess processed, using cached result: ${file.path}`)
           return alreadyProcessed
         }
 
-        // 执行OCR处理
-        Logger.info(`Starting OCR processing for scanned PDF: ${file.path}`)
-        const { processedFile } = await ocrProvider.parseFile(item.id, file)
+        // 执行预处理
+        Logger.info(`Starting preprocess processing for scanned PDF: ${file.path}`)
+        const { processedFile } = await preprocessProvider.parseFile(item.id, file)
         fileToProcess = processedFile
       } catch (err) {
-        Logger.error(`OCR processing failed: ${err}`)
-        // 如果OCR失败，使用原始文件
+        Logger.error(`Preprocess processing failed: ${err}`)
+        // 如果预处理失败，使用原始文件
         fileToProcess = file
       }
     }

@@ -1,19 +1,19 @@
-import { FileMetadata, OcrProvider as Provider } from '@types'
+import { FileMetadata, PreprocessProvider as Provider } from '@types'
 
-import BaseOcrProvider from './BaseOcrProvider'
-import OcrProviderFactory from './OcrProviderFactory'
+import BasePreprocessProvider from './BasePreprocessProvider'
+import PreprocessProviderFactory from './PreprocessProviderFactory'
 
-export default class OcrProvider {
-  private sdk: BaseOcrProvider
+export default class PreprocessProvider {
+  private sdk: BasePreprocessProvider
   constructor(provider: Provider) {
-    this.sdk = OcrProviderFactory.create(provider)
+    this.sdk = PreprocessProviderFactory.create(provider)
   }
   public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     return this.sdk.parseFile(sourceId, file)
   }
 
   /**
-   * 检查文件是否已经被OCR处理过
+   * 检查文件是否已经被预处理过
    * @param file 文件信息
    * @returns 如果已处理返回处理后的文件信息，否则返回null
    */

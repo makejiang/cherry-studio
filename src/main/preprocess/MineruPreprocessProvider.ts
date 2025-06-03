@@ -1,12 +1,12 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { FileMetadata, OcrProvider } from '@types'
+import { FileMetadata, PreprocessProvider } from '@types'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 import Logger from 'electron-log'
 
-import BaseOcrProvider from './BaseOcrProvider'
+import BasePreprocessProvider from './BasePreprocessProvider'
 
 type ApiResponse<T> = {
   code: number
@@ -39,14 +39,14 @@ type ExtractResultResponse = {
   extract_result: ExtractFileResult[]
 }
 
-export default class MineruOcrProvider extends BaseOcrProvider {
-  constructor(provider: OcrProvider) {
+export default class MineruPreprocessProvider extends BasePreprocessProvider {
+  constructor(provider: PreprocessProvider) {
     super(provider)
   }
 
   public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
     try {
-      Logger.info(`MinerU OCR processing started: ${file.path}`)
+      Logger.info(`MinerU preprocess processing started: ${file.path}`)
       await this.validateFile(file.path)
 
       // 1. 获取上传URL并上传文件
@@ -65,8 +65,8 @@ export default class MineruOcrProvider extends BaseOcrProvider {
         processedFile: this.createProcessedFileInfo(file, outputPath)
       }
     } catch (error: any) {
-      Logger.error(`MinerU OCR processing failed for ${file.path}: ${error.message}`)
-      throw new Error(`OCR processing failed: ${error.message}`)
+      Logger.error(`MinerU preprocess processing failed for ${file.path}: ${error.message}`)
+      throw new Error(`preprocess processing failed: ${error.message}`)
     }
   }
 
@@ -309,11 +309,11 @@ export default class MineruOcrProvider extends BaseOcrProvider {
             const progress = Math.round(
               (fileResult.extract_progress.extracted_pages / fileResult.extract_progress.total_pages) * 100
             )
-            await this.sendOcrProgress(sourceId, progress)
+            await this.sendPreprocessProgress(sourceId, progress)
             Logger.info(`File ${fileName} processing progress: ${progress}%`)
           } else {
             // 如果没有具体进度信息，发送一个通用进度
-            await this.sendOcrProgress(sourceId, 50)
+            await this.sendPreprocessProgress(sourceId, 50)
             Logger.info(`File ${fileName} is still processing...`)
           }
         }

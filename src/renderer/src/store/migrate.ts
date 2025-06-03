@@ -1475,15 +1475,15 @@ const migrateConfig = {
   },
   '110': (state: RootState) => {
     try {
-      if (!state.ocr) {
-        state.ocr = {
+      if (!state.preprocess) {
+        state.preprocess = {
           defaultProvider: '',
           providers: []
         }
       }
 
-      if (state.ocr.providers.length === 0) {
-        state.ocr.providers = [
+      if (state.preprocess.providers.length === 0) {
+        state.preprocess.providers = [
           {
             id: 'doc2x',
             name: 'Doc2x',
@@ -1505,8 +1505,8 @@ const migrateConfig = {
           }
         ]
       }
-      if (!state.ocr.providers.find((provider) => provider.id === 'system')) {
-        state.ocr.providers.push({
+      if (!state.preprocess.providers.find((provider) => provider.id === 'system')) {
+        state.preprocess.providers.push({
           id: 'system',
           name: 'System(Mac Only)',
           options: {

@@ -9,7 +9,7 @@ import {
   LayoutGrid,
   MonitorCog,
   Package,
-  PenTool,
+  PencilRuler,
   Rocket,
   Settings2,
   SquareTerminal,
@@ -66,7 +66,7 @@ const SettingsPage: FC = () => {
           </MenuItemLink>
           <MenuItemLink to="/settings/tool">
             <MenuItem className={isRoute('/settings/tool')}>
-              <PenTool size={18} />
+              <PencilRuler size={18} />
               {t('settings.tool.title')}
             </MenuItem>
           </MenuItemLink>

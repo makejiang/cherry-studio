@@ -381,8 +381,8 @@ export interface KnowledgeBase {
   threshold?: number
   rerankModel?: Model
   // topN?: number
-  preprocessing?: boolean
-  ocrProvider?: OcrProvider
+  // preprocessing?: boolean
+  preprocessProvider?: PreprocessProvider
 }
 
 export type KnowledgeBaseParams = {
@@ -399,11 +399,11 @@ export type KnowledgeBaseParams = {
   rerankModel?: string
   rerankModelProvider?: string
   documentCount?: number
-  preprocessing?: boolean
-  ocrProvider?: OcrProvider
+  // preprocessing?: boolean
+  preprocessProvider?: PreprocessProvider
 }
 
-export interface OcrProvider {
+export interface PreprocessProvider {
   id: string
   name: string
   apiKey?: string

@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { OcrProvider } from '@renderer/types'
+import { PreprocessProvider } from '@renderer/types'
 
-export interface OcrState {
-  providers: OcrProvider[]
+export interface PreprocessState {
+  providers: PreprocessProvider[]
   defaultProvider: string
 }
 
-const initialState: OcrState = {
+const initialState: PreprocessState = {
   providers: [
     {
       id: 'doc2x',
@@ -38,20 +38,20 @@ const initialState: OcrState = {
   ],
   defaultProvider: ''
 }
-const ocrSlice = createSlice({
-  name: 'ocr',
+const preprocessSlice = createSlice({
+  name: 'preprocess',
   initialState,
   reducers: {
-    setDefaultOcrProvider(state, action: PayloadAction<string>) {
+    setDefaultPreprocessProvider(state, action: PayloadAction<string>) {
       state.defaultProvider = action.payload
     },
-    setOcrProviders(state, action: PayloadAction<OcrProvider[]>) {
+    setPreprocessProviders(state, action: PayloadAction<PreprocessProvider[]>) {
       state.providers = action.payload
     },
-    updateOcrProviders(state, action: PayloadAction<OcrProvider[]>) {
+    updatePreprocessProviders(state, action: PayloadAction<PreprocessProvider[]>) {
       state.providers = action.payload
     },
-    updateOcrProvider(state, action: PayloadAction<OcrProvider>) {
+    updatePreprocessProvider(state, action: PayloadAction<PreprocessProvider>) {
       const index = state.providers.findIndex((provider) => provider.id === action.payload.id)
       if (index !== -1) {
         state.providers[index] = action.payload
@@ -60,6 +60,11 @@ const ocrSlice = createSlice({
   }
 })
 
-export const { updateOcrProviders, updateOcrProvider, setDefaultOcrProvider, setOcrProviders } = ocrSlice.actions
+export const {
+  updatePreprocessProviders,
+  updatePreprocessProvider,
+  setDefaultPreprocessProvider,
+  setPreprocessProviders
+} = preprocessSlice.actions
 
-export default ocrSlice.reducer
+export default preprocessSlice.reducer

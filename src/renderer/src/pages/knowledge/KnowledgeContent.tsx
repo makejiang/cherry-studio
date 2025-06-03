@@ -42,7 +42,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
 
   useEffect(() => {
     const handlers = [
-      window.electron.ipcRenderer.on('file-ocr-progress', (_, { itemId, progress }) => {
+      window.electron.ipcRenderer.on('file-preprocess-progress', (_, { itemId, progress }) => {
         setProgressMap((prev) => new Map(prev).set(itemId, progress))
       }),
 

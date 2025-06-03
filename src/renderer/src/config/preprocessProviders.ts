@@ -3,7 +3,7 @@ import MinerULogo from '@renderer/assets/images/ocr/mineru.jpg'
 import MacOSLogo from '@renderer/assets/images/providers/macos.svg'
 import MistralLogo from '@renderer/assets/images/providers/mistral.png'
 
-export function getOcrProviderLogo(providerId: string) {
+export function getPreprocessProviderLogo(providerId: string) {
   switch (providerId) {
     case 'doc2x':
       return Doc2xLogo
@@ -18,7 +18,7 @@ export function getOcrProviderLogo(providerId: string) {
   }
 }
 
-export const OCR_PROVIDER_CONFIG = {
+export const PREPROCESS_PROVIDER_CONFIG = {
   doc2x: {
     websites: {
       official: 'https://doc2x.noedgeai.com',

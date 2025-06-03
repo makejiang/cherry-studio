@@ -6,19 +6,19 @@ import { Mistral } from '@mistralai/mistralai'
 import { DocumentURLChunk } from '@mistralai/mistralai/models/components/documenturlchunk'
 import { ImageURLChunk } from '@mistralai/mistralai/models/components/imageurlchunk'
 import { OCRResponse } from '@mistralai/mistralai/models/components/ocrresponse'
-import { FileMetadata, FileTypes, OcrProvider, Provider } from '@types'
+import { FileMetadata, FileTypes, PreprocessProvider, Provider } from '@types'
 import Logger from 'electron-log'
 import path from 'path'
 
-import BaseOcrProvider from './BaseOcrProvider'
+import BasePreprocessProvider from './BasePreprocessProvider'
 
 type PreuploadResponse = DocumentURLChunk | ImageURLChunk
 
-export default class MistralOcrProvider extends BaseOcrProvider {
+export default class MistralPreprocessProvider extends BasePreprocessProvider {
   private sdk: Mistral
   private fileService: MistralService
 
-  constructor(provider: OcrProvider) {
+  constructor(provider: PreprocessProvider) {
     super(provider)
     const clientManager = MistralClientManager.getInstance()
     const aiProvider: Provider = {
@@ -36,7 +36,7 @@ export default class MistralOcrProvider extends BaseOcrProvider {
 
   private async preupload(file: FileMetadata): Promise<PreuploadResponse> {
     let document: PreuploadResponse
-    Logger.info(`OCR preupload started for local file: ${file.path}`)
+    Logger.info(`preprocess preupload started for local file: ${file.path}`)
 
     if (file.ext.toLowerCase() === '.pdf') {
       const uploadResponse = await this.fileService.uploadFile(file)
@@ -45,12 +45,12 @@ export default class MistralOcrProvider extends BaseOcrProvider {
         Logger.error('File upload failed:', uploadResponse)
         throw new Error('Failed to upload file: ' + uploadResponse.displayName)
       }
-      await this.sendOcrProgress(file.id, 15)
+      await this.sendPreprocessProgress(file.id, 15)
       const fileUrl = await this.sdk.files.getSignedUrl({
         fileId: uploadResponse.fileId
       })
       Logger.info('Got signed URL:', fileUrl)
-      await this.sendOcrProgress(file.id, 20)
+      await this.sendPreprocessProgress(file.id, 20)
       document = {
         type: 'document_url',
         documentUrl: fileUrl.url
@@ -78,16 +78,16 @@ export default class MistralOcrProvider extends BaseOcrProvider {
         includeImageBase64: true
       })
       if (result) {
-        await this.sendOcrProgress(sourceId, 100)
+        await this.sendPreprocessProgress(sourceId, 100)
         const processedFile = this.convertFile(result, file)
         return {
           processedFile
         }
       } else {
-        throw new Error('OCR processing failed: OCR response is empty')
+        throw new Error('preprocess processing failed: OCR response is empty')
       }
     } catch (error) {
-      throw new Error('OCR processing failed: ' + error)
+      throw new Error('preprocess processing failed: ' + error)
     }
   }
 

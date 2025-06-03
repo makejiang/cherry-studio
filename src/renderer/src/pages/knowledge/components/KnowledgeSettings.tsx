@@ -4,11 +4,11 @@ import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
-import { useOcrProviders } from '@renderer/hooks/useOcr'
+import { usePreprocessProviders } from '@renderer/hooks/usePreprocess'
 import { useProviders } from '@renderer/hooks/useProvider'
 import { getModelUniqId } from '@renderer/services/ModelService'
-import { KnowledgeBase, OcrProvider } from '@renderer/types'
-import { Alert, Input, InputNumber, Modal, Select, Slider, Switch, Tabs, TabsProps, Tooltip } from 'antd'
+import { KnowledgeBase, PreprocessProvider } from '@renderer/types'
+import { Alert, Input, InputNumber, Modal, Select, Slider, Tabs, TabsProps, Tooltip } from 'antd'
 import { sortBy } from 'lodash'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,8 +23,8 @@ interface Props extends ShowParams {
 }
 
 const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
-  const { ocrProviders } = useOcrProviders()
-  const [selectedProvider, setSelectedProvider] = useState<OcrProvider | undefined>(_base.ocrProvider)
+  const { preprocessProviders } = usePreprocessProviders()
+  const [selectedProvider, setSelectedProvider] = useState<PreprocessProvider | undefined>(_base.preprocessProvider)
 
   const [open, setOpen] = useState(true)
   const { t } = useTranslation()
@@ -98,18 +98,6 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
               onChange={(e) => setNewBase({ ...newBase, name: e.target.value })}
             />
           </SettingsItem>
-          <SettingsItem>
-            <div className="settings-label">
-              {t('knowledge.settings.preprocessing')}
-              <Tooltip title={t('knowledge.settings.preprocessing_tooltip')} placement="right">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
-            </div>
-            <Switch
-              defaultValue={base.preprocessing}
-              onChange={(checked: boolean) => setNewBase({ ...newBase, preprocessing: checked })}
-            />
-          </SettingsItem>
 
           <SettingsItem>
             <div className="settings-label">
@@ -150,18 +138,18 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
           </SettingsItem>
 
           <SettingsItem>
-            <div className="settings-label">{t('settings.tool.ocr.provider')}</div>
+            <div className="settings-label">{t('settings.tool.preprocess.title')}</div>
             <Select
               value={selectedProvider?.id}
               style={{ width: '100%' }}
               onChange={(value: string) => {
-                const provider = ocrProviders.find((p) => p.id === value)
+                const provider = preprocessProviders.find((p) => p.id === value)
                 if (!provider) return
                 setSelectedProvider(provider)
-                setNewBase({ ...newBase, ocrProvider: provider })
+                setNewBase({ ...newBase, preprocessProvider: provider })
               }}
-              placeholder={t('settings.tool.ocr.provider_placeholder')}
-              options={ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
+              placeholder={t('settings.tool.preprocess.provider_placeholder')}
+              options={preprocessProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
               allowClear
             />
           </SettingsItem>
