@@ -1,13 +1,11 @@
 import { GlobalOutlined } from '@ant-design/icons'
 import { HStack } from '@renderer/components/Layout'
 import ListItem from '@renderer/components/ListItem'
-import { theme } from 'antd'
 import { FileCode } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import { SettingContainer } from '..'
 import PreprocessSettings from './PreprocessSettings'
 import WebSearchSettings from './WebSearchSettings'
 
@@ -33,11 +31,9 @@ const ToolSettings: FC = () => {
           />
         ))}
       </MenuList>
-      <SettingContainer theme={theme} style={{ display: 'flex', flex: 1 }}>
-        {menu == 'web-search' && <WebSearchSettings />}
-        {menu == 'preprocess' && <PreprocessSettings />}
-        {/* {menu == 'ocr' && <OcrSettings />} */}
-      </SettingContainer>
+      {menu == 'web-search' && <WebSearchSettings />}
+      {menu == 'preprocess' && <PreprocessSettings />}
+      {/* {menu == 'ocr' && <OcrSettings />} */}
     </Container>
   )
 }
