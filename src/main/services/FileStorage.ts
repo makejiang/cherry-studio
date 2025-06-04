@@ -221,7 +221,6 @@ class FileStorage {
   }
 
   public deleteDir = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<void> => {
-    console.log('[FileStorage] Deleting directory:', path.join(this.storageDir, id))
     if (!fs.existsSync(path.join(this.storageDir, id))) {
       return
     }
