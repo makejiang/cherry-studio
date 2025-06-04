@@ -144,7 +144,6 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
               style={{ width: '100%' }}
               onChange={(value: string) => {
                 const provider = preprocessProviders.find((p) => p.id === value)
-                if (!provider) return
                 setSelectedProvider(provider)
                 setNewBase({ ...newBase, preprocessProvider: provider })
               }}
