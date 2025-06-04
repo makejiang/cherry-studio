@@ -9,6 +9,12 @@ export interface PreprocessState {
 const initialState: PreprocessState = {
   providers: [
     {
+      id: 'mineru',
+      name: 'MinerU',
+      apiKey: '',
+      apiHost: 'https://mineru.net'
+    },
+    {
       id: 'doc2x',
       name: 'Doc2x',
       apiKey: '',
@@ -22,12 +28,6 @@ const initialState: PreprocessState = {
       apiHost: 'https://api.mistral.ai'
     },
     {
-      id: 'mineru',
-      name: 'MinerU',
-      apiKey: '',
-      apiHost: 'https://mineru.net'
-    },
-    {
       id: 'system',
       name: 'System(Mac Only)',
       options: {
@@ -36,7 +36,7 @@ const initialState: PreprocessState = {
       }
     }
   ],
-  defaultProvider: ''
+  defaultProvider: 'mineru'
 }
 const preprocessSlice = createSlice({
   name: 'preprocess',
