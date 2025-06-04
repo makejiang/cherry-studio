@@ -1697,19 +1697,6 @@
       "title": "設定",
       "tool": {
         "title": "ツール設定",
-        "ocr": {
-          "title": "ナレッジベース設定",
-          "provider": "OCRプロバイダー",
-          "provider_placeholder": "OCRプロバイダーを選択する",
-          "mac_system_ocr_options": {
-            "mode": {
-              "title": "辨識モード",
-              "accurate": "正確な",
-              "fast": "速い"
-            },
-            "min_confidence": "最小信頼度"
-          }
-        },
         "websearch": {
           "blacklist": "ブラックリスト",
           "blacklist_description": "以下のウェブサイトの結果は検索結果に表示されません",
@@ -1745,6 +1732,19 @@
           "free": "無料",
           "content_limit": "コンテンツ制限",
           "content_limit_tooltip": "検索結果のコンテンツの長さを制限します。制限を超えるコンテンツは切り捨てられます。"
+        },
+        "preprocess": {
+          "title": "前処理",
+          "provider": "プレプロセスプロバイダー",
+          "provider_placeholder": "前処理プロバイダーを選択してください",
+          "mac_system_ocr_options": {
+            "mode": {
+              "title": "認識モード",
+              "accurate": "正確な",
+              "fast": "速い"
+            },
+            "min_confidence": "最小信頼度"
+          }
         }
       },
       "topic.position": "トピックの位置",

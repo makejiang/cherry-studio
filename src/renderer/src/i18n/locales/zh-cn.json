@@ -1759,13 +1759,12 @@
         "service_tier.default": "默认",
         "service_tier.flex": "灵活"
       },
-      "theme.auto": "自动",
       "tool": {
         "title": "工具设置",
-        "ocr": {
-          "title": "OCR",
-          "provider": "OCR 服务商",
-          "provider_placeholder": "选择一个 OCR 服务商",
+        "preprocess": {
+          "title": "文档预处理",
+          "provider": "文档预处理",
+          "provider_placeholder": "选择一个文档预处理服务商",
           "mac_system_ocr_options": {
             "mode": {
               "title": "识别模式",
@@ -1852,9 +1851,7 @@
       },
       "title": "翻译",
       "tooltip.newline": "换行",
-      "detected.language": "检测到的语言",
-      "scroll_sync.disable": "禁用滚动同步",
-      "scroll_sync.enable": "启用滚动同步"
+      "detected.language": "检测到的语言"
     },
     "tray": {
       "quit": "退出",

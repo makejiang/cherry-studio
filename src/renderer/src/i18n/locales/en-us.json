@@ -1715,19 +1715,6 @@
       "tray.title": "Tray",
       "tool": {
         "title": "Tools Settings",
-        "ocr": {
-          "title": "OCR",
-          "provider": "OCR Provider",
-          "provider_placeholder": "Choose an OCR provider",
-          "mac_system_ocr_options": {
-            "mode": {
-              "title": "Recognition Mode",
-              "accurate": "Accurate",
-              "fast": "Fast"
-            },
-            "min_confidence": "Minimum Confidence"
-          }
-        },
         "preprocess": {
           "title": "Pre Process",
           "provider": "Pre Process Provider",

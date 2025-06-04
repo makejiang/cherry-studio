@@ -132,15 +132,15 @@ const PreprocessProviderSettings: FC<Props> = ({ provider: _provider }) => {
         <>
           <SettingDivider style={{ marginTop: 15, marginBottom: 12 }} />
           <SettingRow>
-            <SettingRowTitle>{t('settings.tool.ocr.mac_system_ocr_options.mode.title')}</SettingRowTitle>
+            <SettingRowTitle>{t('settings.tool.preprocess.mac_system_ocr_options.mode.title')}</SettingRowTitle>
             <Segmented
               options={[
                 {
-                  label: t('settings.tool.ocr.mac_system_ocr_options.mode.accurate'),
+                  label: t('settings.tool.preprocess.mac_system_ocr_options.mode.accurate'),
                   value: 1
                 },
                 {
-                  label: t('settings.tool.ocr.mac_system_ocr_options.mode.fast'),
+                  label: t('settings.tool.preprocess.mac_system_ocr_options.mode.fast'),
                   value: 0
                 }
               ]}
@@ -150,7 +150,7 @@ const PreprocessProviderSettings: FC<Props> = ({ provider: _provider }) => {
           </SettingRow>
           <SettingDivider style={{ marginTop: 15, marginBottom: 12 }} />
           <SettingRow>
-            <SettingRowTitle>{t('settings.tool.ocr.mac_system_ocr_options.min_confidence')}</SettingRowTitle>
+            <SettingRowTitle>{t('settings.tool.preprocess.mac_system_ocr_options.min_confidence')}</SettingRowTitle>
             <InputNumber
               value={options.minConfidence}
               onChange={(value) => onUpdateOptions('minConfidence', value)}

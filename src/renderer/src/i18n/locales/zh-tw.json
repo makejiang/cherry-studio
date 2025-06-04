@@ -1700,19 +1700,6 @@
       "title": "設定",
       "tool": {
         "title": "工具設定",
-        "ocr": {
-          "title": "OCR",
-          "provider": "OCR 提供者",
-          "provider_placeholder": "選擇一個 OCR 提供者",
-          "mac_system_ocr_options": {
-            "mode": {
-              "title": "辨識模式",
-              "accurate": "精確",
-              "fast": "快速"
-            },
-            "min_confidence": "最小置信度"
-          }
-        },
         "websearch": {
           "blacklist": "黑名單",
           "blacklist_description": "以下網站不會出現在搜尋結果中",
@@ -1748,6 +1735,19 @@
           "free": "免費",
           "content_limit": "內容長度限制",
           "content_limit_tooltip": "限制搜尋結果的內容長度；超過限制的內容將被截斷。"
+        },
+        "preprocess": {
+          "title": "前置處理",
+          "provider": "前置處理供應商",
+          "provider_placeholder": "選擇一個預處理供應商",
+          "mac_system_ocr_options": {
+            "mode": {
+              "title": "辨識模式",
+              "accurate": "準確",
+              "fast": "快速"
+            },
+            "min_confidence": "最低置信度"
+          }
         }
       },
       "topic.pin_to_top": "固定話題置頂",
