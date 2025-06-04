@@ -382,7 +382,10 @@ export interface KnowledgeBase {
   rerankModel?: Model
   // topN?: number
   // preprocessing?: boolean
-  preprocessProvider?: PreprocessProvider
+  preprocessOrOcrProvider?: {
+    type: 'preprocess' | 'ocr'
+    provider: PreprocessProvider | OcrProvider
+  }
 }
 
 export type KnowledgeBaseParams = {
@@ -400,10 +403,22 @@ export type KnowledgeBaseParams = {
   rerankModelProvider?: string
   documentCount?: number
   // preprocessing?: boolean
-  preprocessProvider?: PreprocessProvider
+  preprocessOrOcrProvider?: {
+    type: 'preprocess' | 'ocr'
+    provider: PreprocessProvider | OcrProvider
+  }
 }
 
 export interface PreprocessProvider {
+  id: string
+  name: string
+  apiKey?: string
+  apiHost?: string
+  model?: string
+  options?: any
+}
+
+export interface OcrProvider {
   id: string
   name: string
   apiKey?: string

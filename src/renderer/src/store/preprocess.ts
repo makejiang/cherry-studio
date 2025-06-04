@@ -26,14 +26,6 @@ const initialState: PreprocessState = {
       model: 'mistral-ocr-latest',
       apiKey: '',
       apiHost: 'https://api.mistral.ai'
-    },
-    {
-      id: 'system',
-      name: 'System(Mac Only)',
-      options: {
-        recognitionLevel: 0,
-        minConfidence: 0.5
-      }
     }
   ],
   defaultProvider: 'mineru'

@@ -58,7 +58,7 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       Logger.info(`MinerU processing completed for batch: ${batchId}`)
 
       // 3. 下载并解压文件
-      const { path: outputPath } = await this.downloadAndExtractFile(extractResult.full_zip_url!, file.path)
+      const { path: outputPath } = await this.downloadAndExtractFile(extractResult.full_zip_url!, file)
 
       // 4. 创建处理后的文件信息
       return {
@@ -125,11 +125,11 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
     }
   }
 
-  private async downloadAndExtractFile(zipUrl: string, originalFilePath: string): Promise<{ path: string }> {
+  private async downloadAndExtractFile(zipUrl: string, file: FileMetadata): Promise<{ path: string }> {
     const dirPath = this.storageDir
-    const baseName = path.basename(originalFilePath, path.extname(originalFilePath))
-    const zipPath = path.join(dirPath, `${baseName}.zip`)
-    const extractPath = path.join(dirPath, `${baseName}`)
+
+    const zipPath = path.join(dirPath, `${file.id}.zip`)
+    const extractPath = path.join(dirPath, `${file.id}`)
 
     Logger.info(`Downloading MinerU result to: ${zipPath}`)
 

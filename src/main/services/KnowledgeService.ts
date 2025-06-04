@@ -23,6 +23,7 @@ import { SitemapLoader } from '@cherrystudio/embedjs-loader-sitemap'
 import { WebLoader } from '@cherrystudio/embedjs-loader-web'
 import Embeddings from '@main/embeddings/Embeddings'
 import { addFileLoader } from '@main/loader'
+import OcrProvider from '@main/ocr/OcrProvider'
 import PreprocessProvider from '@main/preprocess/PreprocessProvider'
 import Reranker from '@main/reranker/Reranker'
 import { windowService } from '@main/services/WindowService'
@@ -498,12 +499,16 @@ class KnowledgeService {
     item: KnowledgeItem
   ): Promise<FileMetadata> => {
     let fileToProcess: FileMetadata = file
-    if (base.preprocessProvider && file.ext.toLowerCase() === '.pdf') {
+    if (base.preprocessOrOcrProvider && file.ext.toLowerCase() === '.pdf') {
       try {
-        const preprocessProvider = new PreprocessProvider(base.preprocessProvider)
-
+        let provider: PreprocessProvider | OcrProvider
+        if (base.preprocessOrOcrProvider.type === 'preprocess') {
+          provider = new PreprocessProvider(base.preprocessOrOcrProvider.provider)
+        } else {
+          provider = new OcrProvider(base.preprocessOrOcrProvider.provider)
+        }
         // 首先检查文件是否已经被预处理过
-        const alreadyProcessed = await preprocessProvider.checkIfAlreadyProcessed(file)
+        const alreadyProcessed = await provider.checkIfAlreadyProcessed(file)
         if (alreadyProcessed) {
           Logger.info(`File already preprocess processed, using cached result: ${file.path}`)
           return alreadyProcessed
@@ -511,7 +516,7 @@ class KnowledgeService {
 
         // 执行预处理
         Logger.info(`Starting preprocess processing for scanned PDF: ${file.path}`)
-        const { processedFile } = await preprocessProvider.parseFile(item.id, file)
+        const { processedFile } = await provider.parseFile(item.id, file)
         fileToProcess = processedFile
       } catch (err) {
         Logger.error(`Preprocess processing failed: ${err}`)

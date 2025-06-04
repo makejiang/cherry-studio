@@ -6,12 +6,13 @@ import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { NOT_SUPPORTED_REANK_PROVIDERS } from '@renderer/config/providers'
 // import { SUPPORTED_REANK_PROVIDERS } from '@renderer/config/providers'
 import { useKnowledgeBases } from '@renderer/hooks/useKnowledge'
+import { useOcrProviders } from '@renderer/hooks/useOcr'
 import { usePreprocessProviders } from '@renderer/hooks/usePreprocess'
 import { useProviders } from '@renderer/hooks/useProvider'
 import AiProvider from '@renderer/providers/AiProvider'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { getModelUniqId } from '@renderer/services/ModelService'
-import { KnowledgeBase, Model, PreprocessProvider } from '@renderer/types'
+import { KnowledgeBase, Model, OcrProvider, PreprocessProvider } from '@renderer/types'
 import { getErrorMessage } from '@renderer/utils/error'
 import { Alert, Input, InputNumber, Modal, Select, Slider, Tabs, TabsProps, Tooltip } from 'antd'
 import { find, sortBy } from 'lodash'
@@ -37,7 +38,8 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
   const [newBase, setNewBase] = useState<KnowledgeBase>({} as KnowledgeBase)
 
   const { preprocessProviders } = usePreprocessProviders()
-  const [selectedProvider, setSelectedProvider] = useState<PreprocessProvider | undefined>(undefined)
+  const { ocrProviders } = useOcrProviders()
+  const [selectedProvider, setSelectedProvider] = useState<PreprocessProvider | OcrProvider | undefined>(undefined)
 
   const embeddingModels = useMemo(() => {
     return providers
@@ -88,6 +90,20 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
       }))
       .filter((group) => group.options.length > 0)
   }, [providers, t])
+
+  const preprocessOrOcrSelectOptions = useMemo(() => {
+    const preprocessOptions = {
+      label: t('settings.tool.preprocess.provider'),
+      title: t('settings.tool.preprocess.provider'),
+      options: preprocessProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
+    }
+    const ocrOptions = {
+      label: t('settings.tool.ocr.provider'),
+      title: t('settings.tool.ocr.provider'),
+      options: ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
+    }
+    return [preprocessOptions, ocrOptions]
+  }, [ocrProviders, preprocessProviders])
 
   const onOk = async () => {
     try {
@@ -169,6 +185,44 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
 
           <SettingsItem>
             <div className="settings-label">
+              {t('settings.tool.preprocess.title')}
+              <Tooltip title={t('settings.tool.preprocess.preprocess_tooltip')} placement="right">
+                <InfoCircleOutlined style={{ marginLeft: 8 }} />
+              </Tooltip>
+            </div>
+            <Select
+              value={selectedProvider?.id}
+              style={{ width: '100%' }}
+              onChange={(value: string) => {
+                const type = preprocessProviders.find((p) => p.id === value) ? 'preprocess' : 'ocr'
+                const provider = (type === 'preprocess' ? preprocessProviders : ocrProviders).find(
+                  (p) => p.id === value
+                )
+                if (!provider) {
+                  setSelectedProvider(undefined)
+                  setNewBase({
+                    ...newBase,
+                    preprocessOrOcrProvider: undefined
+                  })
+                  return
+                }
+                setSelectedProvider(provider)
+                setNewBase({
+                  ...newBase,
+                  preprocessOrOcrProvider: {
+                    type: type,
+                    provider: provider
+                  }
+                })
+              }}
+              placeholder={t('settings.tool.preprocess.provider_placeholder')}
+              options={preprocessOrOcrSelectOptions}
+              allowClear
+            />
+          </SettingsItem>
+
+          <SettingsItem>
+            <div className="settings-label">
               {t('models.embedding_model')}
               <Tooltip title={t('models.embedding_model_tooltip')} placement="right">
                 <InfoCircleOutlined style={{ marginLeft: 8 }} />
@@ -198,22 +252,6 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
                   : undefined
                 setNewBase({ ...newBase, rerankModel })
               }}
-              allowClear
-            />
-          </SettingsItem>
-
-          <SettingsItem>
-            <div className="settings-label">{t('settings.tool.preprocess.title')}</div>
-            <Select
-              value={selectedProvider?.id}
-              style={{ width: '100%' }}
-              onChange={(value: string) => {
-                const provider = preprocessProviders.find((p) => p.id === value)
-                setSelectedProvider(provider)
-                setNewBase({ ...newBase, preprocessProvider: provider })
-              }}
-              placeholder={t('settings.tool.preprocess.provider_placeholder')}
-              options={preprocessProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))}
               allowClear
             />
           </SettingsItem>

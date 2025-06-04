@@ -1,6 +1,5 @@
 import Doc2xLogo from '@renderer/assets/images/ocr/doc2x.png'
 import MinerULogo from '@renderer/assets/images/ocr/mineru.jpg'
-import MacOSLogo from '@renderer/assets/images/providers/macos.svg'
 import MistralLogo from '@renderer/assets/images/providers/mistral.png'
 
 export function getPreprocessProviderLogo(providerId: string) {
@@ -9,8 +8,6 @@ export function getPreprocessProviderLogo(providerId: string) {
       return Doc2xLogo
     case 'mistral':
       return MistralLogo
-    case 'system':
-      return MacOSLogo
     case 'mineru':
       return MinerULogo
     default:

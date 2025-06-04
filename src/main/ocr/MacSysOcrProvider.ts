@@ -1,13 +1,13 @@
 import { isMac } from '@main/constant'
-import { FileMetadata, PreprocessProvider } from '@types'
+import { FileMetadata, OcrProvider } from '@types'
 import Logger from 'electron-log'
 import * as fs from 'fs'
 import * as path from 'path'
 import { TextItem } from 'pdfjs-dist/types/src/display/api'
 
-import BasePreprocessProvider from './BasePreprocessProvider'
+import BaseOcrProvider from './BaseOcrProvider'
 
-export default class MacSysOcrProvider extends BasePreprocessProvider {
+export default class MacSysOcrProvider extends BaseOcrProvider {
   private readonly MIN_TEXT_LENGTH = 1000
   private MacOCR: any
 
@@ -32,7 +32,7 @@ export default class MacSysOcrProvider extends BasePreprocessProvider {
     return level === 0 ? this.MacOCR.RECOGNITION_LEVEL_FAST : this.MacOCR.RECOGNITION_LEVEL_ACCURATE
   }
 
-  constructor(provider: PreprocessProvider) {
+  constructor(provider: OcrProvider) {
     super(provider)
   }
 
@@ -61,7 +61,7 @@ export default class MacSysOcrProvider extends BasePreprocessProvider {
       writeStream.write(ocrResult.text + '\n')
 
       // Update progress
-      await this.sendPreprocessProgress(sourceId, (pageNum / totalPages) * 100)
+      await this.sendOcrProgress(sourceId, (pageNum / totalPages) * 100)
     }
   }
 
