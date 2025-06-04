@@ -1,7 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { getFileDir } from '@main/utils/file'
 import { FileMetadata, PreprocessProvider } from '@types'
 import AdmZip from 'adm-zip'
 import axios, { AxiosRequestConfig } from 'axios'
@@ -84,7 +83,7 @@ export default class Doc2xPreprocessProvider extends BasePreprocessProvider {
   }
 
   private createProcessedFileInfo(file: FileMetadata, outputPath: string): FileMetadata {
-    const outputFilePath = `${outputPath}/${file.id}.md`
+    const outputFilePath = `${outputPath}/${file.name.split('.').slice(0, -1).join('.')}.md`
     return {
       ...file,
       name: file.name.replace('.pdf', '.md'),
@@ -280,7 +279,7 @@ export default class Doc2xPreprocessProvider extends BasePreprocessProvider {
    * @returns 下载文件的路径
    */
   private async downloadFile(url: string, file: FileMetadata): Promise<{ path: string }> {
-    const dirPath = getFileDir(file.path)
+    const dirPath = this.storageDir
     // 使用统一的存储路径：Data/Files/{file.id}/
     const extractPath = path.join(dirPath, file.id)
     const zipPath = path.join(dirPath, `${file.id}.zip`)

@@ -94,7 +94,8 @@ export default class MistralPreprocessProvider extends BasePreprocessProvider {
   private convertFile(result: OCRResponse, file: FileMetadata): FileMetadata {
     // 使用统一的存储路径：Data/Files/{file.id}/
     const conversionId = file.id
-    const outputPath = path.join(path.dirname(file.path), file.id)
+    const outputPath = path.join(this.storageDir, file.id)
+    // const outputPath = this.storageDir
     const outputFileName = path.basename(file.path, path.extname(file.path))
     fs.mkdirSync(outputPath, { recursive: true })
 

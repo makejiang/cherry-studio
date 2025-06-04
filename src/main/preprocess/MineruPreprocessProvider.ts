@@ -126,7 +126,7 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
   }
 
   private async downloadAndExtractFile(zipUrl: string, originalFilePath: string): Promise<{ path: string }> {
-    const dirPath = path.dirname(originalFilePath)
+    const dirPath = this.storageDir
     const baseName = path.basename(originalFilePath, path.extname(originalFilePath))
     const zipPath = path.join(dirPath, `${baseName}.zip`)
     const extractPath = path.join(dirPath, `${baseName}`)

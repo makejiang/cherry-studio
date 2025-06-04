@@ -10,7 +10,7 @@ import { useKnowledge } from '@renderer/hooks/useKnowledge'
 import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { FileMetadata, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
-import { formatFileSize } from '@renderer/utils'
+import { formatFileSize, uuid } from '@renderer/utils'
 import { bookExts, documentExts, textExts, thirdPartyApplicationExts } from '@shared/config/constant'
 import { Alert, Button, Dropdown, Empty, message, Tag, Tooltip, Upload } from 'antd'
 import dayjs from 'dayjs'
@@ -102,23 +102,36 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     if (disabled) {
       return
     }
-
     if (files) {
       const _files: FileMetadata[] = files
-        .map((file) => ({
-          id: file.name,
-          name: file.name,
-          path: window.api.file.getPathForFile(file),
-          size: file.size,
-          ext: `.${file.name.split('.').pop()}`.toLowerCase(),
-          count: 1,
-          origin_name: file.name,
-          type: file.type as FileTypes,
-          created_at: new Date().toISOString()
-        }))
+        .map((file) => {
+          // 这个路径 filePath 很可能是在文件选择时的原始路径。
+          const filePath = window.api.file.getPathForFile(file)
+          let nameFromPath = filePath
+          const lastSlash = filePath.lastIndexOf('/')
+          const lastBackslash = filePath.lastIndexOf('\\')
+          if (lastSlash !== -1 || lastBackslash !== -1) {
+            nameFromPath = filePath.substring(Math.max(lastSlash, lastBackslash) + 1)
+          }
+
+          // 从派生的文件名中获取扩展名
+          const extFromPath = nameFromPath.includes('.') ? `.${nameFromPath.split('.').pop()}` : ''
+
+          return {
+            id: uuid(),
+            name: nameFromPath, // 使用从路径派生的文件名
+            path: filePath,
+            size: file.size,
+            ext: extFromPath.toLowerCase(),
+            count: 1,
+            origin_name: file.name, // 保存 File 对象中原始的文件名
+            type: file.type as FileTypes,
+            created_at: new Date().toISOString()
+          }
+        })
         .filter(({ ext }) => fileTypes.includes(ext))
-      const uploadedFiles = await FileManager.uploadFiles(_files)
-      addFiles(uploadedFiles)
+      // const uploadedFiles = await FileManager.uploadFiles(_files)
+      addFiles(_files)
     }
   }
 

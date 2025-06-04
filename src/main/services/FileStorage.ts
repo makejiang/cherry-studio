@@ -53,6 +53,7 @@ class FileStorage {
 
   findDuplicateFile = async (filePath: string): Promise<FileMetadata | null> => {
     const stats = fs.statSync(filePath)
+    console.log('stats', stats, filePath)
     const fileSize = stats.size
 
     const files = await fs.promises.readdir(this.storageDir)
@@ -220,6 +221,7 @@ class FileStorage {
   }
 
   public deleteDir = async (_: Electron.IpcMainInvokeEvent, id: string): Promise<void> => {
+    console.log('[FileStorage] Deleting directory:', path.join(this.storageDir, id))
     if (!fs.existsSync(path.join(this.storageDir, id))) {
       return
     }

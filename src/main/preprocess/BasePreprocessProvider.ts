@@ -10,7 +10,7 @@ import { TypedArray } from 'pdfjs-dist/types/src/display/api'
 
 export default abstract class BasePreprocessProvider {
   protected provider: PreprocessProvider
-  private storageDir = path.join(app.getPath('userData'), 'Data', 'Files')
+  public storageDir = path.join(app.getPath('userData'), 'Data', 'Files')
 
   constructor(provider: PreprocessProvider) {
     if (!provider) {

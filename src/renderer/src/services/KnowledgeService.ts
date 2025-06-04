@@ -56,6 +56,7 @@ export const getKnowledgeBaseParams = (base: KnowledgeBase): KnowledgeBaseParams
 }
 
 export const getFileFromUrl = async (url: string): Promise<FileMetadata | null> => {
+  console.log('getFileFromUrl', url)
   let fileName = ''
 
   if (url && url.includes('CherryStudio')) {
@@ -67,7 +68,7 @@ export const getFileFromUrl = async (url: string): Promise<FileMetadata | null> 
       fileName = url.split('\\Data\\Files\\')[1]
     }
   }
-
+  console.log('fileName', fileName)
   if (fileName) {
     const actualFileName = fileName.split(/[/\\]/).pop() || fileName
     console.log('actualFileName', actualFileName)
@@ -129,6 +130,7 @@ export const searchKnowledgeBase = async (
     return await Promise.all(
       limitedResults.map(async (item) => {
         const file = await getFileFromUrl(item.metadata.source)
+        console.log('Knowledge search item:', item, 'File:', file)
         return { ...item, file }
       })
     )

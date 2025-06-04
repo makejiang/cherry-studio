@@ -59,6 +59,7 @@ class FileManager {
     Logger.log(`[FileManager] Uploading file: ${JSON.stringify(file)}`)
 
     const uploadFile = await window.api.file.upload(file)
+    console.log('[FileManager] Uploaded file:', uploadFile)
     const fileRecord = await db.files.get(uploadFile.id)
 
     if (fileRecord) {

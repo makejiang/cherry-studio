@@ -1,6 +1,5 @@
 import { db } from '@renderer/databases'
 import KnowledgeQueue from '@renderer/queue/KnowledgeQueue'
-import FileManager from '@renderer/services/FileManager'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { RootState } from '@renderer/store'
 import {
@@ -54,6 +53,7 @@ export const useKnowledge = (baseId: string) => {
       processingError: '',
       retryCount: 0
     }))
+    console.log('Adding files:', filesItems)
     dispatch(addFilesAction({ baseId, items: filesItems }))
     setTimeout(() => KnowledgeQueue.checkAllBases(), 0)
   }
@@ -145,8 +145,11 @@ export const useKnowledge = (baseId: string) => {
       }
     }
     if (item.type === 'file' && typeof item.content === 'object') {
-      await FileManager.deleteFile(item.content.id)
-      await window.api.file.deleteDir(item.content.id)
+      // await FileManager.deleteFile(item.content.id)
+      // file name 1.xxx.pdf
+      // get 1.xxx
+      // remove .pdf ext
+      await window.api.file.deleteDir(item.content.name.split('.').slice(0, -1).join('.'))
     }
   }
   // 刷新项目

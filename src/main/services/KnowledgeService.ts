@@ -170,6 +170,8 @@ class KnowledgeService {
             // 添加预处理逻辑
             const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
 
+            console.log('fileToProcess', fileToProcess)
+
             // 使用处理后的文件进行加载
             return addFileLoader(ragApplication, fileToProcess, base, forceReload)
               .then((result) => {
