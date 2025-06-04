@@ -1722,17 +1722,16 @@
       "tray.title": "Tray",
       "tool": {
         "title": "Tools Settings",
+        "preprocessOrOcr.tooltip": "In Settings -> Tools, set a document preprocessing service provider or OCR. Document preprocessing can effectively improve the retrieval performance of complex format documents and scanned documents. OCR can only recognize text within images in documents or scanned PDF text.",
         "preprocess": {
           "title": "Pre Process",
           "provider": "Pre Process Provider",
-          "provider_placeholder": "Choose a Pre Process provider",
-          "preprocess_tooltip": "Setting the document preprocessing service provider in Settings -> Tools can effectively improve the retrieval performance for complex document formats."
+          "provider_placeholder": "Choose a Pre Process provider"
         },
         "ocr": {
           "title": "OCR",
           "provider": "OCR Provider",
           "provider_placeholder": "Choose an OCR provider",
-          "ocr_tooltip": "Setting the OCR service provider in Settings -> Tools can effectively improve the text recognition performance for images and documents.",
           "mac_system_ocr_options": {
             "mode": {
               "title": "Recognition Mode",

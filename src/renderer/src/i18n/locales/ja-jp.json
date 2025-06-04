@@ -1743,11 +1743,17 @@
         "preprocess": {
           "title": "前処理",
           "provider": "プレプロセスプロバイダー",
-          "provider_placeholder": "前処理プロバイダーを選択してください",
+          "provider_placeholder": "前処理プロバイダーを選択してください"
+        },
+        "preprocessOrOcr.tooltip": "設定 → ツールで、ドキュメント前処理サービスプロバイダーまたはOCRを設定します。ドキュメント前処理は、複雑な形式のドキュメントやスキャンされたドキュメントの検索性能を効果的に向上させます。OCRは、ドキュメント内の画像内のテキストまたはスキャンされたPDFテキストのみを認識できます。",
+        "ocr": {
+          "title": "OCR（オーシーアール）",
+          "provider": "OCRプロバイダー",
+          "provider_placeholder": "OCRプロバイダーを選択",
           "mac_system_ocr_options": {
             "mode": {
               "title": "認識モード",
-              "accurate": "正確な",
+              "accurate": "正確",
               "fast": "速い"
             },
             "min_confidence": "最小信頼度"

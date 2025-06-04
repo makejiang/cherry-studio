@@ -1771,14 +1771,12 @@
         "preprocess": {
           "title": "文档预处理",
           "provider": "文档预处理",
-          "provider_placeholder": "选择一个文档预处理服务商",
-          "preprocess_tooltip": "在设置 -> 工具中设置文档预处理服务商，可以有效提升复杂文档格式的检索效果"
+          "provider_placeholder": "选择一个文档预处理服务商"
         },
         "ocr": {
           "title": "OCR 设置",
           "provider": "OCR 服务商",
           "provider_placeholder": "选择一个 OCR 服务商",
-          "ocr_tooltip": "在设置 -> 工具中设置 OCR 服务商，可以有效提升图片文字识别效果",
           "mac_system_ocr_options": {
             "mode": {
               "title": "识别模式",
@@ -1823,7 +1821,8 @@
           "free": "免费",
           "content_limit": "内容长度限制",
           "content_limit_tooltip": "限制搜索结果的内容长度, 超过限制的内容将被截断"
-        }
+        },
+        "preprocessOrOcr.tooltip": "在设置 -> 工具中设置文档预处理服务商或OCR，文档预处理可以有效提升复杂格式文档与扫描版文档的检索效果，OCR仅可识别文档内图片或扫描版PDF的文本"
       }
     },
     "translate": {
