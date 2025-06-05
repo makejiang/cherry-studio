@@ -1770,11 +1770,11 @@
         "title": "工具设置",
         "preprocess": {
           "title": "文档预处理",
-          "provider": "文档预处理",
+          "provider": "文档预处理服务商",
           "provider_placeholder": "选择一个文档预处理服务商"
         },
         "ocr": {
-          "title": "OCR 设置",
+          "title": "OCR",
           "provider": "OCR 服务商",
           "provider_placeholder": "选择一个 OCR 服务商",
           "mac_system_ocr_options": {

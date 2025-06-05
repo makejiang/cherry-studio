@@ -185,7 +185,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
 
           <SettingsItem>
             <div className="settings-label">
-              {t('settings.tool.preprocess.title')}
+              {t('settings.tool.preprocess.title')} / {t('settings.tool.ocr.title')}
               <Tooltip title={t('settings.tool.preprocessOrOcr.tooltip')} placement="right">
                 <InfoCircleOutlined style={{ marginLeft: 8 }} />
               </Tooltip>
