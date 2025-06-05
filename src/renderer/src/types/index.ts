@@ -363,6 +363,7 @@ export type KnowledgeItem = {
   processingProgress?: number
   processingError?: string
   retryCount?: number
+  isPreprocessed?: boolean
 }
 
 export interface KnowledgeBase {

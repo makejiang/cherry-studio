@@ -3,7 +3,12 @@ import db from '@renderer/databases'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { NotificationService } from '@renderer/services/NotificationService'
 import store from '@renderer/store'
-import { clearCompletedProcessing, updateBaseItemUniqueId, updateItemProcessingStatus } from '@renderer/store/knowledge'
+import {
+  clearCompletedProcessing,
+  updateBaseItemIsPreprocessed,
+  updateBaseItemUniqueId,
+  updateItemProcessingStatus
+} from '@renderer/store/knowledge'
 import { KnowledgeItem } from '@renderer/types'
 import { uuid } from '@renderer/utils'
 import type { LoaderReturn } from '@shared/config/types'
@@ -180,6 +185,13 @@ class KnowledgeQueue {
             itemId: item.id,
             uniqueId: result.uniqueId,
             uniqueIds: result.uniqueIds
+          })
+        )
+        store.dispatch(
+          updateBaseItemIsPreprocessed({
+            baseId,
+            itemId: item.id,
+            isPreprocessed: base.preprocessOrOcrProvider ? true : false
           })
         )
       }

@@ -565,6 +565,11 @@ class KnowledgeService {
         Logger.info(`Starting preprocess processing for scanned PDF: ${file.path}`)
         const { processedFile } = await provider.parseFile(item.id, file)
         fileToProcess = processedFile
+        console.warn('base', base, 'item', item, 'file', file)
+        const mainWindow = windowService.getMainWindow()
+        mainWindow?.webContents.send('file-preprocess-finished', {
+          itemId: item.id
+        })
       } catch (err) {
         Logger.error(`Preprocess processing failed: ${err}`)
         // 如果预处理失败，使用原始文件
