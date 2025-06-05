@@ -95,7 +95,10 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
     const preprocessOptions = {
       label: t('settings.tool.preprocess.provider'),
       title: t('settings.tool.preprocess.provider'),
-      options: preprocessProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
+      options: preprocessProviders
+        // todo: 免费期结束后删除
+        .filter((p) => p.apiKey !== '' || p.id === 'mineru')
+        .map((p) => ({ value: p.id, label: p.name }))
     }
     const ocrOptions = {
       label: t('settings.tool.ocr.provider'),

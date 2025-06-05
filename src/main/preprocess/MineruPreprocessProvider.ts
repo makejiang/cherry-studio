@@ -42,6 +42,8 @@ type ExtractResultResponse = {
 export default class MineruPreprocessProvider extends BasePreprocessProvider {
   constructor(provider: PreprocessProvider) {
     super(provider)
+    // todo：免费期结束后删除
+    this.provider.apiKey = this.provider.apiKey || import.meta.env.VITE_MINERU_API_KEY
   }
 
   public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
