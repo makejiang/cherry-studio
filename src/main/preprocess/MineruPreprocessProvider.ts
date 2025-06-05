@@ -66,7 +66,7 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       }
     } catch (error: any) {
       Logger.error(`MinerU preprocess processing failed for ${file.path}: ${error.message}`)
-      throw new Error(`preprocess processing failed: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 
@@ -153,9 +153,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       fs.unlinkSync(zipPath)
 
       return { path: extractPath }
-    } catch (error) {
-      Logger.error(`Failed to download and extract file: ${error instanceof Error ? error.message : String(error)}`)
-      throw new Error('Failed to download and extract file')
+    } catch (error: any) {
+      Logger.error(`Failed to download and extract file: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 
@@ -171,9 +171,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       Logger.info(`File uploaded successfully: ${file.path}`)
 
       return batchId
-    } catch (error) {
-      Logger.error(`Failed to upload file ${file.path}: ${error instanceof Error ? error.message : String(error)}`)
-      throw new Error('Failed to upload file')
+    } catch (error: any) {
+      Logger.error(`Failed to upload file ${file.path}: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 
@@ -217,9 +217,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-    } catch (error) {
-      Logger.error(`Failed to get batch upload URLs: ${error instanceof Error ? error.message : String(error)}`)
-      throw new Error('Failed to get upload URLs')
+    } catch (error: any) {
+      Logger.error(`Failed to get batch upload URLs: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 
@@ -240,11 +240,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       }
 
       Logger.info(`File uploaded successfully to: ${uploadUrl}`)
-    } catch (error) {
-      Logger.error(
-        `Failed to upload file to URL ${uploadUrl}: ${error instanceof Error ? error.message : String(error)}`
-      )
-      throw new Error('Failed to upload file to provided URL')
+    } catch (error: any) {
+      Logger.error(`Failed to upload file to URL ${uploadUrl}: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 
@@ -270,11 +268,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-    } catch (error) {
-      Logger.error(
-        `Failed to get extract results for batch ${batchId}: ${error instanceof Error ? error.message : String(error)}`
-      )
-      throw new Error('Failed to get extract results')
+    } catch (error: any) {
+      Logger.error(`Failed to get extract results for batch ${batchId}: ${error.message}`)
+      throw new Error(error.message)
     }
   }
 

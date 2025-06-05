@@ -557,7 +557,11 @@
       "source": "Source",
       "status": "Status",
       "status_completed": "Completed",
+      "status_embedding_completed": "Embedding Completed",
+      "status_preprocess_completed": "Preprocessing Completed",
       "status_failed": "Failed",
+      "status_embedding_failed": "Embedding Failed",
+      "status_preprocess_failed": "Preprocessing Failed",
       "status_new": "Added",
       "status_pending": "Pending",
       "status_processing": "Processing",
@@ -819,7 +823,7 @@
     "notification": {
       "assistant": "Assistant Response",
       "knowledge.success": "Successfully added {{type}} to the knowledge base",
-      "knowledge.error": "Failed to add {{type}} to knowledge base: {{error}}"
+      "knowledge.error": "{{error}}"
     },
     "ollama": {
       "keep_alive_time.description": "The time in minutes to keep the connection alive, default is 5 minutes.",

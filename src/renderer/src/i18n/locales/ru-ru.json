@@ -576,7 +576,11 @@
       "dimensions": "векторное пространство",
       "dimensions_size_tooltip": "Размерность вложения, чем больше значение, тем больше размерность вложения, но и потребляемых токенов также становится больше.",
       "dimensions_size_placeholder": "Значение по умолчанию (не рекомендуется изменять)",
-      "dimensions_size_too_large": "Размерность вложения не может превышать ограничение контекста модели ({{max_context}})"
+      "dimensions_size_too_large": "Размерность вложения не может превышать ограничение контекста модели ({{max_context}})",
+      "status_embedding_completed": "Вложение завершено",
+      "status_preprocess_completed": "Предварительная обработка завершена",
+      "status_embedding_failed": "Не удалось встроить",
+      "status_preprocess_failed": "Предварительная обработка не удалась"
     },
     "languages": {
       "arabic": "Арабский",
@@ -819,7 +823,7 @@
     "notification": {
       "assistant": "Ответ ассистента",
       "knowledge.success": "Успешно добавлено {{type}} в базу знаний",
-      "knowledge.error": "Не удалось добавить {{type}} в базу знаний: {{error}}"
+      "knowledge.error": "{{error}}"
     },
     "ollama": {
       "keep_alive_time.description": "Время в минутах, в течение которого модель остается активной, по умолчанию 5 минут.",

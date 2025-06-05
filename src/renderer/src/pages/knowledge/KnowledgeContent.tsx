@@ -718,12 +718,11 @@ const ClickableSpan = styled.span`
 `
 
 const StatusIconWrapper = styled.div`
-  width: 36px;
-  height: 36px;
+  width: auto;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 2px;
 `
 
 const RefreshIcon = styled(RedoOutlined)`

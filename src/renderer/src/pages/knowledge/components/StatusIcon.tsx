@@ -23,8 +23,20 @@ const StatusIcon: FC<StatusIconProps> = ({ sourceId, base, getProcessingStatus, 
   const statusDisplay = useMemo(() => {
     if (!status) {
       if (item?.uniqueId) {
+        if (base.preprocessOrOcrProvider && item.type === 'file') {
+          return (
+            <div style={{ gap: '8px', width: 'fit-content', height: '32px', display: 'flex' }}>
+              <Tooltip title={t('knowledge.status_preprocess_completed')} placement="left">
+                <CheckCircleOutlined style={{ color: '#52c41a' }} />
+              </Tooltip>
+              <Tooltip title={t('knowledge.status_embedding_completed')} placement="left">
+                <CheckCircleOutlined style={{ color: '#52c41a' }} />
+              </Tooltip>
+            </div>
+          )
+        }
         return (
-          <Tooltip title={t('knowledge.status_completed')} placement="left">
+          <Tooltip title={t('knowledge.status_embedding_completed')} placement="left">
             <CheckCircleOutlined style={{ color: '#52c41a' }} />
           </Tooltip>
         )

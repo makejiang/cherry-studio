@@ -97,7 +97,13 @@ class KnowledgeService {
   private knowledgeItemProcessingQueueMappingPromise: Map<LoaderTaskOfSet, () => void> = new Map()
   private static MAXIMUM_WORKLOAD = 80 * MB
   private static MAXIMUM_PROCESSING_ITEM_COUNT = 30
-  private static ERROR_LOADER_RETURN: LoaderReturn = { entriesAdded: 0, uniqueId: '', uniqueIds: [''], loaderType: '' }
+  private static ERROR_LOADER_RETURN: LoaderReturn = {
+    entriesAdded: 0,
+    uniqueId: '',
+    uniqueIds: [''],
+    loaderType: '',
+    status: 'failed'
+  }
 
   constructor() {
     this.initStorageDir()
@@ -168,19 +174,36 @@ class KnowledgeService {
         {
           state: LoaderTaskItemState.PENDING,
           task: async () => {
-            // 添加预处理逻辑
-            const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
+            try {
+              // 添加预处理逻辑
+              const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
 
-            // 使用处理后的文件进行加载
-            return addFileLoader(ragApplication, fileToProcess, base, forceReload)
-              .then((result) => {
-                loaderTask.loaderDoneReturn = result
-                return result
-              })
-              .catch((err) => {
-                Logger.error(err)
-                return KnowledgeService.ERROR_LOADER_RETURN
-              })
+              // 使用处理后的文件进行加载
+              return addFileLoader(ragApplication, fileToProcess, base, forceReload)
+                .then((result) => {
+                  loaderTask.loaderDoneReturn = result
+                  return result
+                })
+                .catch((e) => {
+                  Logger.error(`Error in addFileLoader for ${file.name}: ${e}`)
+                  const errorResult: LoaderReturn = {
+                    ...KnowledgeService.ERROR_LOADER_RETURN,
+                    message: e.message,
+                    messageSource: 'embedding'
+                  }
+                  loaderTask.loaderDoneReturn = errorResult
+                  return errorResult
+                })
+            } catch (e: any) {
+              Logger.error(`Preprocessing failed for ${file.name}: ${e}`)
+              const errorResult: LoaderReturn = {
+                ...KnowledgeService.ERROR_LOADER_RETURN,
+                message: e.message,
+                messageSource: 'preprocess'
+              }
+              loaderTask.loaderDoneReturn = errorResult
+              return errorResult
+            }
           },
           evaluateTaskWorkload: { workload: file.size }
         }
@@ -229,7 +252,11 @@ class KnowledgeService {
             })
             .catch((err) => {
               Logger.error(err)
-              return KnowledgeService.ERROR_LOADER_RETURN
+              return {
+                ...KnowledgeService.ERROR_LOADER_RETURN,
+                message: `Failed to add dir loader: ${err.message}`,
+                messageSource: 'embedding'
+              }
             }),
         evaluateTaskWorkload: { workload: file.size }
       })
@@ -275,7 +302,11 @@ class KnowledgeService {
               })
               .catch((err) => {
                 Logger.error(err)
-                return KnowledgeService.ERROR_LOADER_RETURN
+                return {
+                  ...KnowledgeService.ERROR_LOADER_RETURN,
+                  message: `Failed to add url loader: ${err.message}`,
+                  messageSource: 'embedding'
+                }
               })
           },
           evaluateTaskWorkload: { workload: 2 * MB }
@@ -315,7 +346,11 @@ class KnowledgeService {
               })
               .catch((err) => {
                 Logger.error(err)
-                return KnowledgeService.ERROR_LOADER_RETURN
+                return {
+                  ...KnowledgeService.ERROR_LOADER_RETURN,
+                  message: `Failed to add sitemap loader: ${err.message}`,
+                  messageSource: 'embedding'
+                }
               }),
           evaluateTaskWorkload: { workload: 20 * MB }
         }
@@ -355,7 +390,11 @@ class KnowledgeService {
               })
               .catch((err) => {
                 Logger.error(err)
-                return KnowledgeService.ERROR_LOADER_RETURN
+                return {
+                  ...KnowledgeService.ERROR_LOADER_RETURN,
+                  message: `Failed to add note loader: ${err.message}`,
+                  messageSource: 'embedding'
+                }
               })
           },
           evaluateTaskWorkload: { workload: contentBytes.length }
@@ -450,12 +489,20 @@ class KnowledgeService {
             })
             this.processingQueueHandle()
           } else {
-            resolve(KnowledgeService.ERROR_LOADER_RETURN)
+            resolve({
+              ...KnowledgeService.ERROR_LOADER_RETURN,
+              message: 'Unsupported item type',
+              messageSource: 'embedding'
+            })
           }
         })
         .catch((err) => {
           Logger.error(err)
-          resolve(KnowledgeService.ERROR_LOADER_RETURN)
+          resolve({
+            ...KnowledgeService.ERROR_LOADER_RETURN,
+            message: `Failed to add item: ${err.message}`,
+            messageSource: 'embedding'
+          })
         })
     })
   }
@@ -521,7 +568,8 @@ class KnowledgeService {
       } catch (err) {
         Logger.error(`Preprocess processing failed: ${err}`)
         // 如果预处理失败，使用原始文件
-        fileToProcess = file
+        // fileToProcess = file
+        throw new Error(`Preprocess processing failed: ${err}`)
       }
     }
 

@@ -136,16 +136,33 @@ class KnowledgeQueue {
           break
       }
 
+      if (!result) {
+        throw new Error(`[KnowledgeQueue] Backend processing returned null for item ${item.id}`)
+      }
+
+      if (result.status === 'failed') {
+        Logger.error(`[KnowledgeQueue] Backend processing error for item ${item.id}: ${result.message}`)
+
+        const errorPrefix =
+          result.messageSource === 'embedding'
+            ? t('knowledge.status_embedding_failed')
+            : t('knowledge.status_preprocess_failed')
+
+        throw new Error(
+          result.message ? `${errorPrefix}: ${result.message}` : `Backend processing failed for item ${item.id}`
+        )
+      }
+
       Logger.log(`[KnowledgeQueue] Successfully completed processing item ${item.id}`)
 
       notificationService.send({
         id: uuid(),
         type: 'success',
-        title: t('knowledge.status_completed"'),
+        title: t('knowledge.status_completed'),
         message: t('notification.knowledge.success', { type: item.type }),
         silent: false,
         timestamp: Date.now(),
-        source: 'knowledgeEmbed'
+        source: 'knowledge'
       })
 
       store.dispatch(
@@ -174,14 +191,13 @@ class KnowledgeQueue {
       notificationService.send({
         id: uuid(),
         type: 'error',
-        title: t('common.knowledge'),
+        title: t('common.knowledge_base'),
         message: t('notification.knowledge.error', {
-          type: item.type,
           error: error instanceof Error ? error.message : 'Unkown error'
         }),
         silent: false,
         timestamp: Date.now(),
-        source: 'knowledgeEmbed'
+        source: 'knowledge'
       })
 
       store.dispatch(

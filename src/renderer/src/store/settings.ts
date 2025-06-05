@@ -173,7 +173,7 @@ export interface SettingsState {
   notification: {
     assistant: boolean
     backup: boolean
-    knowledgeEmbed: boolean
+    knowledge: boolean
   }
   defaultPaintingProvider: PaintingProvider
 }
@@ -310,7 +310,7 @@ export const initialState: SettingsState = {
   notification: {
     assistant: false,
     backup: false,
-    knowledgeEmbed: false
+    knowledge: false
   },
   defaultPaintingProvider: 'aihubmix'
 }

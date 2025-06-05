@@ -576,7 +576,11 @@
       "topN_tooltip": "返回的匹配结果数量，数值越大，匹配结果越多，但消耗的 Token 也越多",
       "url_added": "网址已添加",
       "url_placeholder": "请输入网址, 多个网址用回车分隔",
-      "urls": "网址"
+      "urls": "网址",
+      "status_embedding_completed": "嵌入完成",
+      "status_preprocess_completed": "预处理完成",
+      "status_embedding_failed": "嵌入失败",
+      "status_preprocess_failed": "预处理失败"
     },
     "languages": {
       "arabic": "阿拉伯文",
@@ -819,7 +823,7 @@
     "notification": {
       "assistant": "助手响应",
       "knowledge.success": "成功添加 {{type}} 到知识库",
-      "knowledge.error": "添加 {{type}} 到知识库失败: {{error}}"
+      "knowledge.error": "{{error}}"
     },
     "ollama": {
       "keep_alive_time.description": "对话后模型在内存中保持的时间（默认：5分钟）",
@@ -1582,7 +1586,7 @@
         "title": "通知设置",
         "assistant": "助手消息",
         "backup": "备份",
-        "knowledge_embed": "知识嵌入"
+        "knowledge_embed": "知识库"
       },
       "provider": {
         "add.name": "提供商名称",
