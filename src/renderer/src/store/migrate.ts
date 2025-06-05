@@ -1521,6 +1521,7 @@ const migrateConfig = {
           provider.type = 'mistral'
         }
       })
+      state.settings.showTokens = true
       return state
     } catch (error) {
       return state
