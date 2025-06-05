@@ -1490,8 +1490,8 @@ const migrateConfig = {
     }
   },
   '111': (state: RootState) => {
-    try{
-       if (!state.preprocess) {
+    try {
+      if (!state.preprocess) {
         state.preprocess = {
           defaultProvider: '',
           providers: []
@@ -1532,7 +1532,7 @@ const migrateConfig = {
         })
       }
       return state
-    }catch(error) {
+    } catch (error) {
       console.error(error)
       return state
     }
