@@ -63,7 +63,7 @@ export class WindowService {
       titleBarOverlay: nativeTheme.shouldUseDarkColors ? titleBarOverlayDark : titleBarOverlayLight,
       backgroundColor: isMac ? undefined : nativeTheme.shouldUseDarkColors ? '#181818' : '#FFFFFF',
       darkTheme: nativeTheme.shouldUseDarkColors,
-      trafficLightPosition: { x: 15, y: 12 },
+      trafficLightPosition: { x: 12, y: 12 },
       ...(isLinux ? { icon } : {}),
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),

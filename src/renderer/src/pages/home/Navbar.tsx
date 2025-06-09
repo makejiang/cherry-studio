@@ -163,7 +163,7 @@ const NavbarContainer = styled.div<{ $isFullscreen: boolean; $showSidebar: boole
   max-height: var(--navbar-height);
   min-height: var(--navbar-height);
   justify-content: space-between;
-  padding-left: ${({ $showSidebar }) => (isMac && !$showSidebar ? '70px' : '10px')};
+  padding-left: ${({ $showSidebar }) => (isMac && !$showSidebar ? '70px' : '20px')};
   font-weight: bold;
   color: var(--color-text-1);
   padding-right: ${({ $isFullscreen }) => ($isFullscreen ? '12px' : isWindows ? '140px' : isLinux ? '120px' : '12px')};
