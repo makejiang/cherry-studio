@@ -1,4 +1,3 @@
-import tailwindcssPlugin from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve } from 'path'
@@ -41,7 +40,7 @@ export default defineConfig({
   },
   renderer: {
     plugins: [
-      tailwindcssPlugin(),
+      (async () => (await import('@tailwindcss/vite')).default())(),
       react({
         plugins: [
           [
