@@ -1,6 +1,5 @@
 import { Navbar } from '@renderer/components/app/Navbar'
 import { HStack } from '@renderer/components/Layout'
-import FloatingSidebar from '@renderer/components/Popups/FloatingSidebar'
 import MinAppsPopover from '@renderer/components/Popups/MinAppsPopover'
 import SearchPopup from '@renderer/components/Popups/SearchPopup'
 import { isLinux, isMac, isWindows } from '@renderer/config/constant'
@@ -13,11 +12,11 @@ import { useShowAssistants, useShowTopics } from '@renderer/hooks/useStore'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { useAppDispatch } from '@renderer/store'
 import { setNarrowMode } from '@renderer/store/settings'
-import { Assistant, Topic } from '@renderer/types'
+import { Assistant } from '@renderer/types'
 import { Tooltip } from 'antd'
 import { t } from 'i18next'
-import { LayoutGrid, PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
-import { FC, useCallback, useState } from 'react'
+import { LayoutGrid, PanelLeft, PanelRight, Search } from 'lucide-react'
+import { FC, useCallback } from 'react'
 import styled from 'styled-components'
 
 import SelectModelButton from './components/SelectModelButton'
@@ -25,27 +24,22 @@ import UpdateAppButton from './components/UpdateAppButton'
 
 interface Props {
   activeAssistant: Assistant
-  activeTopic: Topic
-  setActiveTopic: (topic: Topic) => void
-  setActiveAssistant: (assistant: Assistant) => void
   position: 'left' | 'right'
 }
 
-const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTopic, setActiveTopic }) => {
+const ChatNavbar: FC<Props> = ({ activeAssistant }) => {
   const { assistant } = useAssistant(activeAssistant.id)
   const { showAssistants, toggleShowAssistants } = useShowAssistants()
   const isFullscreen = useFullscreen()
   const { topicPosition, sidebarIcons, narrowMode } = useSettings()
-  const { showTopics, toggleShowTopics } = useShowTopics()
+  const { toggleShowTopics } = useShowTopics()
   const dispatch = useAppDispatch()
-  const [sidebarHideCooldown, setSidebarHideCooldown] = useState(false)
 
   // Function to toggle assistants with cooldown
   const handleToggleShowAssistants = useCallback(() => {
     if (showAssistants) {
       // When hiding sidebar, set cooldown
       toggleShowAssistants()
-      setSidebarHideCooldown(true)
       // setTimeout(() => {
       //   setSidebarHideCooldown(false)
       // }, 10000) // 10 seconds cooldown
@@ -54,20 +48,6 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
       toggleShowAssistants()
     }
   }, [showAssistants, toggleShowAssistants])
-
-  const handleToggleShowTopics = useCallback(() => {
-    if (showTopics) {
-      // When hiding sidebar, set cooldown
-      toggleShowTopics()
-      setSidebarHideCooldown(true)
-      // setTimeout(() => {
-      //   setSidebarHideCooldown(false)
-      // }, 10000) // 10 seconds cooldown
-    } else {
-      // When showing sidebar, no cooldown needed
-      toggleShowTopics()
-    }
-  }, [showTopics, toggleShowTopics])
 
   useShortcut('toggle_show_assistants', handleToggleShowAssistants)
 
@@ -95,17 +75,19 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
           <NavbarIcon
             onClick={() => toggleShowAssistants()}
             style={{ marginRight: 8, marginLeft: isMac && !isFullscreen ? 4 : -12 }}>
-            {showAssistants ? <PanelLeftClose size={18} /> : <PanelRightClose size={18} />}
+            {showAssistants ? <PanelLeft size={18} /> : <PanelRight size={18} />}
           </NavbarIcon>
           <SelectModelButton assistant={assistant} />
         </HStack>
         <HStack alignItems="center" gap={8}>
           <UpdateAppButton />
-          <Tooltip title={t('chat.assistant.search.placeholder')} mouseEnterDelay={0.8}>
-            <NarrowIcon onClick={() => SearchPopup.show()}>
-              <Search size={18} />
-            </NarrowIcon>
-          </Tooltip>
+          {isMac && (
+            <Tooltip title={t('chat.assistant.search.placeholder')} mouseEnterDelay={0.8}>
+              <NarrowIcon onClick={() => SearchPopup.show()}>
+                <Search size={18} />
+              </NarrowIcon>
+            </Tooltip>
+          )}
           <Tooltip title={t('navbar.expand')} mouseEnterDelay={0.8}>
             <NarrowIcon onClick={handleNarrowModeToggle}>
               <i className="iconfont icon-icon-adaptive-width"></i>
@@ -119,34 +101,6 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
                 </NarrowIcon>
               </Tooltip>
             </MinAppsPopover>
-          )}
-          {topicPosition === 'right' && !showTopics && !sidebarHideCooldown && (
-            <FloatingSidebar
-              activeAssistant={assistant}
-              setActiveAssistant={setActiveAssistant}
-              activeTopic={activeTopic}
-              setActiveTopic={setActiveTopic}
-              position={'right'}>
-              <Tooltip title={t('navbar.show_sidebar')} mouseEnterDelay={2}>
-                <NavbarIcon onClick={() => toggleShowTopics()}>
-                  <PanelLeftClose size={18} />
-                </NavbarIcon>
-              </Tooltip>
-            </FloatingSidebar>
-          )}
-          {topicPosition === 'right' && !showTopics && sidebarHideCooldown && (
-            <Tooltip title={t('navbar.show_sidebar')} mouseEnterDelay={2}>
-              <NavbarIcon onClick={() => toggleShowTopics()} onMouseOut={() => setSidebarHideCooldown(false)}>
-                <PanelLeftClose size={18} />
-              </NavbarIcon>
-            </Tooltip>
-          )}
-          {topicPosition === 'right' && showTopics && (
-            <Tooltip title={t('navbar.hide_sidebar')} mouseEnterDelay={2}>
-              <NavbarIcon onClick={() => handleToggleShowTopics()}>
-                <PanelRightClose size={18} />
-              </NavbarIcon>
-            </Tooltip>
           )}
         </HStack>
       </NavbarContainer>
@@ -163,7 +117,7 @@ const NavbarContainer = styled.div<{ $isFullscreen: boolean; $showSidebar: boole
   max-height: var(--navbar-height);
   min-height: var(--navbar-height);
   justify-content: space-between;
-  padding-left: ${({ $showSidebar }) => (isMac && !$showSidebar ? '70px' : '20px')};
+  padding-left: ${({ $showSidebar }) => (isMac ? ($showSidebar ? '10px' : '75px') : '15px')};
   font-weight: bold;
   color: var(--color-text-1);
   padding-right: ${({ $isFullscreen }) => ($isFullscreen ? '12px' : isWindows ? '140px' : isLinux ? '120px' : '12px')};
@@ -210,4 +164,4 @@ const NarrowIcon = styled(NavbarIcon)`
   }
 `
 
-export default HeaderNavbar
+export default ChatNavbar
