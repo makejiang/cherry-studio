@@ -4,7 +4,10 @@ export enum CherryStoreType {
   KNOWLEDGE = 'Knowledge',
   MCP_SERVER = 'MCP-Server',
   MODEL_PROVIDER = 'Model-Provider',
-  AGENT = 'Agent'
+  AGENT = 'Agent',
+  TRANSLATE = 'Translate',
+  PAINTINGS = 'Paintings',
+  FILES = 'Files'
 }
 export interface CherryStoreBaseItem {
   id: string

@@ -1,10 +1,9 @@
 import { Category } from '@renderer/types/cherryStore'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 // 实际的 AgentsPage 组件 - 请确保路径正确
-import AgentsPage from '../../agents/AgentsPage'
-import AppsPage from '../../apps/AppsPage'
+import { discoverRouters } from '../routers'
 // import AssistantDetailsPage from '../../agents/AssistantDetailsPage'; // 示例详情页
 
 // 其他分类的页面组件 (如果需要)
@@ -32,14 +31,16 @@ const DiscoverContent: React.FC<DiscoverContentProps> = ({ activeTabId, currentC
   }
 
   return (
-    <Routes>
-      {/* Path for Assistant category */}
-      <Route path="assistant" element={<AgentsPage />} />
-      {/* Path for Mini-App category */}
-      <Route path="mini-app" element={<AppsPage />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        {discoverRouters.map((_Route) => {
+          if (!_Route.component) return null
+          return <Route key={_Route.path} path={`/${_Route.path}`} element={<_Route.component />} />
+        })}
 
-      <Route path="*" element={<div>Discover Feature Not Found at {location.pathname}</div>} />
-    </Routes>
+        <Route path="*" element={<div>Discover Feature Not Found at {location.pathname}</div>} />
+      </Routes>
+    </Suspense>
   )
 }
 

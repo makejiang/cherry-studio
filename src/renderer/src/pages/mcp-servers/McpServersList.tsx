@@ -36,7 +36,7 @@ const McpServersList: FC = () => {
       isActive: false
     }
     addMCPServer(newServer)
-    navigate(`/mcp-servers/settings`, { state: { server: newServer } })
+    navigate(`settings`, { state: { server: newServer } })
     window.message.success({ content: t('settings.mcp.addSuccess'), key: 'mcp-list' })
   }, [addMCPServer, navigate, t])
 
@@ -119,7 +119,7 @@ const McpServersList: FC = () => {
       </ListHeader>
       <DragableList style={{ width: '100%' }} list={mcpServers} onUpdate={updateMcpServers}>
         {(server: MCPServer) => (
-          <ServerCard key={server.id} onClick={() => navigate(`/mcp-servers/settings`, { state: { server } })}>
+          <ServerCard key={server.id} onClick={() => navigate(`settings`, { state: { server } })}>
             <ServerHeader>
               <ServerName>
                 {server.logoUrl && <ServerLogo src={server.logoUrl} alt={`${server.name} logo`} />}
@@ -148,7 +148,7 @@ const McpServersList: FC = () => {
                 <Button
                   icon={<Settings2 size={16} />}
                   type="text"
-                  onClick={() => navigate(`/mcp-servers/settings`, { state: { server } })}
+                  onClick={() => navigate(`settings`, { state: { server } })}
                 />
               </StatusIndicator>
             </ServerHeader>

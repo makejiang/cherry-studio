@@ -81,7 +81,7 @@ const InstallNpxUv: FC<Props> = ({ mini = false }) => {
         icon={installed ? <CheckCircleOutlined /> : <WarningOutlined />}
         className="nodrag"
         color={installed ? 'green' : 'danger'}
-        onClick={() => navigate('/mcp-servers/mcp-install')}
+        onClick={() => navigate('mcp-install')}
       />
     )
   }

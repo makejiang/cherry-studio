@@ -1,5 +1,4 @@
 import { CheckOutlined, DeleteOutlined, HistoryOutlined, SendOutlined } from '@ant-design/icons'
-import { NavbarCenter, NavbarMain } from '@renderer/components/app/Navbar'
 import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel } from '@renderer/config/models'
@@ -431,19 +430,19 @@ const TranslatePage: FC = () => {
 
   return (
     <Container id="translate-page">
-      <NavbarMain>
-        <NavbarCenter>
-          {t('translate.title')}
-          <Button
-            className="nodrag"
-            color="default"
-            variant={historyDrawerVisible ? 'filled' : 'text'}
-            type="text"
-            icon={<HistoryOutlined />}
-            onClick={() => setHistoryDrawerVisible(!historyDrawerVisible)}
-          />
-        </NavbarCenter>
-      </NavbarMain>
+      {/* <NavbarMain> */}
+      {/* <NavbarCenter> */}
+      {/* {t('translate.title')} */}
+      <Button
+        className="nodrag"
+        color="default"
+        variant={historyDrawerVisible ? 'filled' : 'text'}
+        type="text"
+        icon={<HistoryOutlined />}
+        onClick={() => setHistoryDrawerVisible(!historyDrawerVisible)}
+      />
+      {/* </NavbarCenter> */}
+      {/* </NavbarMain> */}
       <ContentContainer id="content-container" ref={contentContainerRef} $historyDrawerVisible={historyDrawerVisible}>
         <HistoryContainner $historyDrawerVisible={historyDrawerVisible}>
           <OperationBar>

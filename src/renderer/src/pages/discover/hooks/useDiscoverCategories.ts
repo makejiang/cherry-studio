@@ -1,6 +1,8 @@
-import { Category, CherryStoreType } from '@renderer/types/cherryStore'
+import { Category } from '@renderer/types/cherryStore'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+
+import { discoverRouters } from '../routers'
 
 // Extended Category type for internal use in hook, including path and sidebar flag
 // Export this interface so other files can import it
@@ -10,23 +12,14 @@ export interface InternalCategory extends Category {
 }
 
 // Initial category data with path and hasSidebar
-const initialCategories: InternalCategory[] = [
-  {
-    id: CherryStoreType.ASSISTANT,
-    title: 'Assistants',
-    path: 'assistant',
-    hasSidebar: false,
-    items: []
-  },
-  {
-    id: CherryStoreType.MINI_APP,
-    title: 'Mini Apps',
-    path: 'mini-app',
-    hasSidebar: false,
-    items: []
-  }
-  // Add more categories as needed
-]
+const initialCategories: InternalCategory[] = discoverRouters.map((router) => ({
+  id: router.id,
+  title: router.title,
+  path: router.path,
+  hasSidebar: !router.component,
+  // 目前没有需要二级分类的分类
+  items: []
+}))
 
 // Helper to find category by path
 const findCategoryByPath = (path: string | undefined): InternalCategory | undefined =>

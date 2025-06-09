@@ -75,7 +75,7 @@ export const McpSettingsNavbar = () => {
       <Button
         size="small"
         type="text"
-        onClick={() => navigate('/mcp-servers/npx-search')}
+        onClick={() => navigate('npx-search')}
         icon={<Search size={14} />}
         className="nodrag"
         style={{ fontSize: 13, height: 28, borderRadius: 20 }}>

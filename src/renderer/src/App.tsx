@@ -14,13 +14,8 @@ import StyleSheetManager from './context/StyleSheetManager'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
 import DiscoverPage from './pages/discover'
-import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
-import KnowledgePage from './pages/knowledge/KnowledgePage'
-import McpServersPage from './pages/mcp-servers'
-import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
 import SettingsPage from './pages/settings/SettingsPage'
-import TranslatePage from './pages/translate/TranslatePage'
 
 function App(): React.ReactElement {
   return (
@@ -38,12 +33,12 @@ function App(): React.ReactElement {
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         {/* <Route path="/agents" element={<AgentsPage />} /> */}
-                        <Route path="/paintings/*" element={<PaintingsRoutePage />} />
-                        <Route path="/translate" element={<TranslatePage />} />
-                        <Route path="/files" element={<FilesPage />} />
-                        <Route path="/knowledge" element={<KnowledgePage />} />
+                        {/* <Route path="/paintings/*" element={<PaintingsRoutePage />} /> */}
+                        {/* <Route path="/translate" element={<TranslatePage />} /> */}
+                        {/* <Route path="/files" element={<FilesPage />} /> */}
+                        {/* <Route path="/knowledge" element={<KnowledgePage />} /> */}
                         {/* <Route path="/apps" element={<AppsPage />} /> */}
-                        <Route path="/mcp-servers/*" element={<McpServersPage />} />
+                        {/* <Route path="/mcp-servers/*" element={<McpServersPage />} /> */}
                         <Route path="/settings/*" element={<SettingsPage />} />
                         <Route path="/discover/*" element={<DiscoverPage />} />
                       </Routes>
