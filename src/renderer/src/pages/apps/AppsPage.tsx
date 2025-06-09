@@ -1,6 +1,6 @@
 import { useMinapps } from '@renderer/hooks/useMinapps'
 import { Button, Input } from 'antd'
-import { Search, SettingsIcon } from 'lucide-react'
+import { Search, SettingsIcon, X } from 'lucide-react'
 import React, { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
