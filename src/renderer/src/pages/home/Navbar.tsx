@@ -1,9 +1,9 @@
-import { Navbar, NavbarLeft, NavbarRight } from '@renderer/components/app/Navbar'
+import { Navbar } from '@renderer/components/app/Navbar'
 import { HStack } from '@renderer/components/Layout'
 import FloatingSidebar from '@renderer/components/Popups/FloatingSidebar'
 import MinAppsPopover from '@renderer/components/Popups/MinAppsPopover'
 import SearchPopup from '@renderer/components/Popups/SearchPopup'
-import { isMac } from '@renderer/config/constant'
+import { isLinux, isMac, isWindows } from '@renderer/config/constant'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { useFullscreen } from '@renderer/hooks/useFullscreen'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
@@ -16,7 +16,7 @@ import { setNarrowMode } from '@renderer/store/settings'
 import { Assistant, Topic } from '@renderer/types'
 import { Tooltip } from 'antd'
 import { t } from 'i18next'
-import { LayoutGrid, MessageSquareDiff, PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
+import { LayoutGrid, PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
 import { FC, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
@@ -54,6 +54,7 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
       toggleShowAssistants()
     }
   }, [showAssistants, toggleShowAssistants])
+
   const handleToggleShowTopics = useCallback(() => {
     if (showTopics) {
       // When hiding sidebar, set cooldown
@@ -89,48 +90,13 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
 
   return (
     <Navbar className="home-navbar">
-      {showAssistants && (
-        <NavbarLeft style={{ justifyContent: 'space-between', borderRight: 'none', padding: 0 }}>
-          <Tooltip title={t('navbar.hide_sidebar')} mouseEnterDelay={0.8}>
-            <NavbarIcon onClick={handleToggleShowAssistants} style={{ marginLeft: isMac && !isFullscreen ? 16 : 0 }}>
-              <PanelLeftClose size={18} />
-            </NavbarIcon>
-          </Tooltip>
-          <Tooltip title={t('settings.shortcuts.new_topic')} mouseEnterDelay={0.8}>
-            <NavbarIcon onClick={() => EventEmitter.emit(EVENT_NAMES.ADD_NEW_TOPIC)} style={{ marginRight: 5 }}>
-              <MessageSquareDiff size={18} />
-            </NavbarIcon>
-          </Tooltip>
-        </NavbarLeft>
-      )}
-      <NavbarRight style={{ justifyContent: 'space-between', flex: 1 }} className="home-navbar-right">
+      <NavbarContainer $isFullscreen={isFullscreen} $showSidebar={showAssistants} className="home-navbar-right">
         <HStack alignItems="center">
-          {!showAssistants && !sidebarHideCooldown && (
-            <FloatingSidebar
-              activeAssistant={assistant}
-              setActiveAssistant={setActiveAssistant}
-              activeTopic={activeTopic}
-              setActiveTopic={setActiveTopic}
-              position={'left'}>
-              <Tooltip title={t('navbar.show_sidebar')} mouseEnterDelay={2}>
-                <NavbarIcon
-                  onClick={() => toggleShowAssistants()}
-                  style={{ marginRight: 8, marginLeft: isMac && !isFullscreen ? 4 : -12 }}>
-                  <PanelRightClose size={18} />
-                </NavbarIcon>
-              </Tooltip>
-            </FloatingSidebar>
-          )}
-          {!showAssistants && sidebarHideCooldown && (
-            <Tooltip title={t('navbar.show_sidebar')} mouseEnterDelay={0.8}>
-              <NavbarIcon
-                onClick={() => toggleShowAssistants()}
-                style={{ marginRight: 8, marginLeft: isMac && !isFullscreen ? 4 : -12 }}
-                onMouseOut={() => setSidebarHideCooldown(false)}>
-                <PanelRightClose size={18} />
-              </NavbarIcon>
-            </Tooltip>
-          )}
+          <NavbarIcon
+            onClick={() => toggleShowAssistants()}
+            style={{ marginRight: 8, marginLeft: isMac && !isFullscreen ? 4 : -12 }}>
+            {showAssistants ? <PanelLeftClose size={18} /> : <PanelRightClose size={18} />}
+          </NavbarIcon>
           <SelectModelButton assistant={assistant} />
         </HStack>
         <HStack alignItems="center" gap={8}>
@@ -183,10 +149,26 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
             </Tooltip>
           )}
         </HStack>
-      </NavbarRight>
+      </NavbarContainer>
     </Navbar>
   )
 }
+
+const NavbarContainer = styled.div<{ $isFullscreen: boolean; $showSidebar: boolean }>`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: var(--navbar-height);
+  max-height: var(--navbar-height);
+  min-height: var(--navbar-height);
+  justify-content: space-between;
+  padding-left: ${({ $showSidebar }) => (isMac && !$showSidebar ? '70px' : '10px')};
+  font-weight: bold;
+  color: var(--color-text-1);
+  padding-right: ${({ $isFullscreen }) => ($isFullscreen ? '12px' : isWindows ? '140px' : isLinux ? '120px' : '12px')};
+  -webkit-app-region: drag;
+`
 
 export const NavbarIcon = styled.div`
   -webkit-app-region: none;

@@ -421,7 +421,9 @@
         "pinyin.asc": "按拼音升序",
         "pinyin.desc": "按拼音降序"
       },
-      "no_results": "无结果"
+      "no_results": "无结果",
+      "apps": "应用",
+      "mcp": "工具"
     },
     "docs": {
       "title": "帮助文档"

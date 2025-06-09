@@ -1,5 +1,5 @@
 import { ImportOutlined, PlusOutlined } from '@ant-design/icons'
-import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { NavbarCenter, NavbarMain } from '@renderer/components/app/Navbar'
 import CustomTag from '@renderer/components/CustomTag'
 import ListItem from '@renderer/components/ListItem'
 import Scrollbar from '@renderer/components/Scrollbar'
@@ -152,7 +152,7 @@ const AgentsPage: FC = () => {
 
   return (
     <Container>
-      <Navbar>
+      <NavbarMain>
         <NavbarCenter style={{ borderRight: 'none', justifyContent: 'space-between' }}>
           {t('agents.title')}
           <Input
@@ -171,7 +171,7 @@ const AgentsPage: FC = () => {
           />
           <div style={{ width: 80 }} />
         </NavbarCenter>
-      </Navbar>
+      </NavbarMain>
 
       <Main id="content-container">
         <AgentsGroupList>
