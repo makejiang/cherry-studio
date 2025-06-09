@@ -66,9 +66,9 @@
   --settings-width: 250px;
   --scrollbar-width: 5px;
 
-  --chat-background: #111111;
-  --chat-background-user: #28b561;
-  --chat-background-assistant: #2c2c2c;
+  --chat-background: transparent;
+  --chat-background-user: #232325;
+  --chat-background-assistant: transparent;
   --chat-text-user: var(--color-black);
 
   --list-item-border-radius: 8px;
@@ -133,9 +133,9 @@
   --navbar-background-mac: rgba(255, 255, 255, 0.55);
   --navbar-background: rgba(244, 244, 244);
 
-  --chat-background: #f3f3f3;
-  --chat-background-user: #95ec69;
-  --chat-background-assistant: #ffffff;
+  --chat-background: transparent;
+  --chat-background-user: #f3f3f3;
+  --chat-background-assistant: transparent;
   --chat-text-user: var(--color-text);
 
   --border-width: 0.5px;

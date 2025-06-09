@@ -68,15 +68,13 @@ const HomePage: FC = () => {
 }
 
 const Container = styled.div`
+  min-width: 0;
   display: flex;
   flex: 1;
   flex-direction: column;
 `
 
 const ContentContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: row;
   overflow: hidden;
 `
 

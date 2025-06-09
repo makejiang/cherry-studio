@@ -104,7 +104,7 @@ const GroupMenuBar = styled.div<{ $layout: MultiModelMessageStyle }>`
   margin: 0 20px;
   padding: 6px 10px;
   border-radius: 6px;
-  margin-top: 10px;
+  margin-top: 6px;
   justify-content: space-between;
   overflow: hidden;
   border: 0.5px solid var(--color-border);

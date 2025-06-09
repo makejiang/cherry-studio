@@ -168,7 +168,9 @@ const MessageGroup = ({ messages, topic, registerMessageElement }: Props) => {
         topic,
         index: message.index,
         style: {
-          paddingTop: isGrouped && ['horizontal', 'grid'].includes(multiModelMessageStyle) ? 0 : 15
+          ...(isGrouped && ['horizontal', 'grid'].includes(multiModelMessageStyle)
+            ? { padding: 0 }
+            : { paddingTop: 15 })
         }
       }
 
@@ -202,7 +204,10 @@ const MessageGroup = ({ messages, topic, registerMessageElement }: Props) => {
               </MessageWrapper>
             }
             trigger={gridPopoverTrigger}
-            styles={{ root: { maxWidth: '60vw', minWidth: '550px', overflowY: 'auto', zIndex: 1000 } }}>
+            styles={{
+              root: { maxWidth: '60vw', minWidth: '550px', overflowY: 'auto', zIndex: 1000 },
+              body: { padding: 2 }
+            }}>
             <div style={{ cursor: 'pointer' }}>{messageContent}</div>
           </Popover>
         )
@@ -259,7 +264,7 @@ const GroupContainer = styled.div<{ $isGrouped: boolean; $layout: MultiModelMess
   padding-top: ${({ $isGrouped, $layout }) => ($isGrouped && 'horizontal' === $layout ? '15px' : '0')};
   &.group-container.horizontal,
   &.group-container.grid {
-    padding: 0 20px;
+    padding: 0 24px;
     .message {
       padding: 0;
     }
@@ -317,10 +322,10 @@ const MessageWrapper = styled(Scrollbar)<MessageWrapperProps>`
   width: 100%;
 
   &.horizontal {
-    display: inline-block;
+    height: 100%;
   }
   &.grid {
-    display: inline-block;
+    height: 100%;
   }
   &.fold {
     display: none;
@@ -333,10 +338,9 @@ const MessageWrapper = styled(Scrollbar)<MessageWrapperProps>`
     if ($layout === 'horizontal' && $isGrouped) {
       return css`
         border: 0.5px solid var(--color-border);
-        padding: 10px;
+        padding: 10px 10px 0 10px;
         border-radius: 6px;
         max-height: 600px;
-        margin-bottom: 10px;
       `
     }
     return ''

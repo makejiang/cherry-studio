@@ -217,7 +217,7 @@ const MessageContainer = styled.div`
   flex-direction: column;
   position: relative;
   transition: background-color 0.3s ease;
-  padding: 0 20px;
+  padding: 0 24px;
   transform: translateZ(0);
   will-change: transform;
   &.message-highlight {

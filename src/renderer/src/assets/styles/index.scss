@@ -119,32 +119,21 @@ ul {
   #messages {
     background-color: var(--chat-background);
   }
-  #inputbar {
-    margin: -5px 15px 15px 15px;
-    background: var(--color-background);
-  }
   .system-prompt {
     background-color: var(--chat-background-assistant);
   }
   .message-content-container {
     margin: 5px 0;
     border-radius: 8px;
-    padding: 10px 15px 0 15px;
   }
   .message-thought-container {
     margin-top: 8px;
   }
   .message-user {
-    color: var(--chat-text-user);
-    .markdown,
-    .anticon,
-    .iconfont,
-    .lucide,
-    .message-tokens {
-      color: var(--chat-text-user) !important;
-    }
-    .message-action-button:hover {
-      background-color: var(--color-white-soft);
+    .message-content-container {
+      margin: 5px 0;
+      border-radius: 8px 0 8px 8px;
+      padding: 10px 15px 0 15px;
     }
   }
   .group-grid-container.horizontal,

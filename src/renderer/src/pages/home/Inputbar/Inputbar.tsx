@@ -912,7 +912,7 @@ const InputBarContainer = styled.div`
   border: 0.5px solid var(--color-border);
   transition: all 0.2s ease;
   position: relative;
-  margin: 14px 20px;
+  margin: 16px 16px;
   margin-top: 0;
   border-radius: 15px;
   padding-top: 6px; // 为拖动手柄留出空间
