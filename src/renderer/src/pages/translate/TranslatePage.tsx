@@ -1,5 +1,5 @@
 import { CheckOutlined, DeleteOutlined, HistoryOutlined, SendOutlined } from '@ant-design/icons'
-import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { NavbarCenter, NavbarMain } from '@renderer/components/app/Navbar'
 import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel } from '@renderer/config/models'
@@ -431,8 +431,8 @@ const TranslatePage: FC = () => {
 
   return (
     <Container id="translate-page">
-      <Navbar>
-        <NavbarCenter style={{ borderRight: 'none', gap: 10 }}>
+      <NavbarMain>
+        <NavbarCenter>
           {t('translate.title')}
           <Button
             className="nodrag"
@@ -443,7 +443,7 @@ const TranslatePage: FC = () => {
             onClick={() => setHistoryDrawerVisible(!historyDrawerVisible)}
           />
         </NavbarCenter>
-      </Navbar>
+      </NavbarMain>
       <ContentContainer id="content-container" ref={contentContainerRef} $historyDrawerVisible={historyDrawerVisible}>
         <HistoryContainner $historyDrawerVisible={historyDrawerVisible}>
           <OperationBar>
@@ -606,7 +606,7 @@ const InputContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  border: 1px solid var(--color-border-soft);
+  border: 0.5px solid var(--color-border);
   border-radius: 10px;
   padding-bottom: 5px;
   padding-right: 2px;
@@ -675,7 +675,7 @@ const HistoryContainner = styled.div<{ $historyDrawerVisible: boolean }>`
   transition:
     width 0.2s,
     opacity 0.2s;
-  border: 1px solid var(--color-border-soft);
+  border: 0.5px solid var(--color-border);
   border-radius: 10px;
   margin-right: 15px;
   display: flex;

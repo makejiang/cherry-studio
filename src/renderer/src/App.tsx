@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
 
-import Sidebar from './components/app/Sidebar'
+import MainSidebar from './components/app/MainSidebar'
 import TopViewContainer from './components/TopView'
 import AntdProvider from './context/AntdProvider'
 import { CodeStyleProvider } from './context/CodeStyleProvider'
@@ -17,6 +17,7 @@ import DiscoverPage from './pages/discover'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
+import McpServersPage from './pages/mcp-servers'
 import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
 import SettingsPage from './pages/settings/SettingsPage'
 import TranslatePage from './pages/translate/TranslatePage'
@@ -33,7 +34,7 @@ function App(): React.ReactElement {
                   <TopViewContainer>
                     <HashRouter>
                       <NavigationHandler />
-                      <Sidebar />
+                      <MainSidebar />
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         {/* <Route path="/agents" element={<AgentsPage />} /> */}
@@ -42,6 +43,7 @@ function App(): React.ReactElement {
                         <Route path="/files" element={<FilesPage />} />
                         <Route path="/knowledge" element={<KnowledgePage />} />
                         {/* <Route path="/apps" element={<AppsPage />} /> */}
+                        <Route path="/mcp-servers/*" element={<McpServersPage />} />
                         <Route path="/settings/*" element={<SettingsPage />} />
                         <Route path="/discover/*" element={<DiscoverPage />} />
                       </Routes>
