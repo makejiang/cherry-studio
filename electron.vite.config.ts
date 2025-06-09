@@ -41,6 +41,7 @@ export default defineConfig({
   },
   renderer: {
     plugins: [
+      tailwindcssPlugin(),
       react({
         plugins: [
           [
@@ -54,7 +55,6 @@ export default defineConfig({
           ]
         ]
       }),
-      tailwindcssPlugin(),
       ...visualizerPlugin('renderer')
     ],
     resolve: {
