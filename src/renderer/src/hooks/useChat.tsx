@@ -7,11 +7,13 @@ import { Topic } from '@renderer/types'
 import { useEffect } from 'react'
 
 import { useAssistants } from './useAssistant'
+import { useSettings } from './useSettings'
 
 export const useChat = () => {
   const { assistants } = useAssistants()
   const activeAssistant = useAppSelector((state) => state.runtime.chat.activeAssistant) || assistants[0]
   const activeTopic = useAppSelector((state) => state.runtime.chat.activeTopic) || activeAssistant?.topics[0]!
+  const { clickAssistantToShowTopic } = useSettings()
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -25,6 +27,12 @@ export const useChat = () => {
     const firstTopic = activeAssistant.topics[0]
     firstTopic && dispatch(setActiveTopic(firstTopic))
   }, [activeAssistant, dispatch])
+
+  useEffect(() => {
+    if (clickAssistantToShowTopic) {
+      EventEmitter.emit(EVENT_NAMES.SHOW_TOPIC_SIDEBAR)
+    }
+  }, [clickAssistantToShowTopic, activeAssistant])
 
   return {
     activeAssistant,
