@@ -52,6 +52,7 @@ import InputbarTools, { InputbarToolsRef } from './InputbarTools'
 import KnowledgeBaseInput from './KnowledgeBaseInput'
 import MentionModelsInput from './MentionModelsInput'
 import SendMessageButton from './SendMessageButton'
+import SettingButton from './SettingButton'
 import TokenCount from './TokenCount'
 
 interface Props {
@@ -856,6 +857,7 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
                 ToolbarButton={ToolbarButton}
                 onClick={onNewContext}
               />
+              <SettingButton assistant={assistant} ToolbarButton={ToolbarButton} />
               <TranslateButton text={text} onTranslated={onTranslated} isLoading={isTranslating} />
               {loading && (
                 <Tooltip placement="top" title={t('chat.input.pause')} arrow>
