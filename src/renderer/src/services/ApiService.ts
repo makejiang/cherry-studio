@@ -1,3 +1,4 @@
+import Logger from '@renderer/config/logger'
 import { getOpenAIWebSearchParams, isOpenAIWebSearch } from '@renderer/config/models'
 import {
   SEARCH_SUMMARY_PROMPT,
@@ -125,6 +126,8 @@ async function fetchExternalTool(
       return
     }
 
+    if (extractResults.websearch.question[0] === 'not_needed') return
+
     // Add check for assistant.model before using it
     if (!assistant.model) {
       console.warn('searchTheWeb called without assistant.model')
@@ -198,7 +201,7 @@ async function fetchExternalTool(
     // 根据配置决定是否需要提取
     if (shouldWebSearch || hasKnowledgeBase) {
       extractResults = await extract()
-      console.log('Extraction results:', extractResults)
+      Logger.log('[fetchExternalTool] Extraction results:', extractResults)
     }
 
     let webSearchResponseFromSearch: WebSearchResponse | undefined
@@ -280,6 +283,8 @@ export async function fetchChatCompletion({
   // TODO
   // onChunkStatus: (status: 'searching' | 'processing' | 'success' | 'error') => void
 }) {
+  console.log('fetchChatCompletion', messages, assistant)
+
   const provider = getAssistantProvider(assistant)
   const AI = new AiProvider(provider)
 
@@ -466,7 +471,7 @@ export function checkApiProvider(provider: Provider): {
   }
 }
 
-export async function checkApi(provider: Provider, model: Model) {
+export async function checkApi(provider: Provider, model: Model): Promise<{ valid: boolean; error: Error | null }> {
   const validation = checkApiProvider(provider)
   if (!validation.valid) {
     return {
@@ -475,12 +480,20 @@ export async function checkApi(provider: Provider, model: Model) {
     }
   }
 
-  const AI = new AiProvider(provider)
+  const ai = new AiProvider(provider)
 
-  const { valid, error } = await AI.check(model)
+  // Try streaming check first
+  const result = await ai.check(model, true)
 
-  return {
-    valid,
-    error
+  if (result.valid && !result.error) {
+    return result
+  }
+
+  // 不应该假设错误由流式引发。多次发起检测请求可能触发429，掩盖了真正的问题。
+  // 但这里错误类型做的很粗糙，暂时先这样
+  if (result.error && result.error.message.includes('stream')) {
+    return ai.check(model, false)
+  } else {
+    return result
   }
 }

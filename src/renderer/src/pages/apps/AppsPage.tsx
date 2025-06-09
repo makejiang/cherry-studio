@@ -1,17 +1,22 @@
-import { Center } from '@renderer/components/Layout'
+import { Navbar, NavbarMain } from '@renderer/components/app/Navbar'
 import { useMinapps } from '@renderer/hooks/useMinapps'
-import { Empty } from 'antd'
-import { isEmpty } from 'lodash'
-import React, { FC, useState } from 'react'
+import { Button, Input } from 'antd'
+import { Search, SettingsIcon, X } from 'lucide-react'
+import React, { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router'
 import styled from 'styled-components'
 
 import App from './App'
+import MiniAppSettings from './MiniappSettings/MiniAppSettings'
+import NewAppButton from './NewAppButton'
 
 const AppsPage: FC = () => {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const { minapps } = useMinapps()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const location = useLocation()
 
   const filteredApps = search
     ? minapps.filter(
@@ -21,7 +26,7 @@ const AppsPage: FC = () => {
 
   // Calculate the required number of lines
   const itemsPerRow = Math.floor(930 / 115) // Maximum width divided by the width of each item (including spacing)
-  const rowCount = Math.ceil(filteredApps.length / itemsPerRow)
+  const rowCount = Math.ceil((filteredApps.length + 1) / itemsPerRow) // +1 for the add button
   // Each line height is 85px (60px icon + 5px margin + 12px text + spacing)
   const containerHeight = rowCount * 85 + (rowCount - 1) * 25 // 25px is the line spacing.
 
@@ -30,34 +35,49 @@ const AppsPage: FC = () => {
     e.preventDefault()
   }
 
+  useEffect(() => {
+    setIsSettingsOpen(false)
+  }, [location.key])
+
   return (
     <Container onContextMenu={handleContextMenu}>
-      {/* <Navbar>
-        <NavbarCenter style={{ borderRight: 'none', justifyContent: 'space-between' }}>
+      <Navbar>
+        <NavbarMain>
           {t('minapp.title')}
           <Input
             placeholder={t('common.search')}
             className="nodrag"
-            style={{ width: '30%', height: 28, borderRadius: 15 }}
+            style={{
+              width: '30%',
+              height: 28,
+              borderRadius: 15,
+              position: 'absolute',
+              left: '50vw',
+              transform: 'translateX(-50%)'
+            }}
             size="small"
             variant="filled"
             suffix={<Search size={18} />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            disabled={isSettingsOpen}
           />
-          <div style={{ width: 80 }} />
-        </NavbarCenter>
-      </Navbar> */}
+          <Button
+            type="text"
+            className="nodrag"
+            icon={isSettingsOpen ? <X size={18} /> : <SettingsIcon size={18} color="var(--color-text-2)" />}
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          />
+        </NavbarMain>
+      </Navbar>
       <ContentContainer id="content-container">
-        {isEmpty(filteredApps) ? (
-          <Center>
-            <Empty />
-          </Center>
-        ) : (
+        {isSettingsOpen && <MiniAppSettings />}
+        {!isSettingsOpen && (
           <AppsContainer style={{ height: containerHeight }}>
             {filteredApps.map((app) => (
               <App key={app.id} app={app} />
             ))}
+            <NewAppButton />
           </AppsContainer>
         )}
       </ContentContainer>

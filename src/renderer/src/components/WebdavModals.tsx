@@ -76,7 +76,9 @@ export function WebdavBackupModal({
       open={isModalVisible}
       onOk={handleBackup}
       onCancel={handleCancel}
-      okButtonProps={{ loading: backuping }}>
+      okButtonProps={{ loading: backuping }}
+      transitionName="animation-move-down"
+      centered>
       <Input
         value={customFileName}
         onChange={(e) => setCustomFileName(e.target.value)}
@@ -121,7 +123,7 @@ export function useWebdavRestoreModal({
   const [backupFiles, setBackupFiles] = useState<BackupFile[]>([])
 
   const showRestoreModal = useCallback(async () => {
-    if (!webdavHost || !webdavUser || !webdavPass || !webdavPath) {
+    if (!webdavHost) {
       window.message.error({ content: t('message.error.invalid.webdav'), key: 'webdav-error' })
       return
     }
@@ -144,7 +146,7 @@ export function useWebdavRestoreModal({
   }, [webdavHost, webdavUser, webdavPass, webdavPath, t])
 
   const handleRestore = useCallback(async () => {
-    if (!selectedFile || !webdavHost || !webdavUser || !webdavPass || !webdavPath) {
+    if (!selectedFile || !webdavHost) {
       window.message.error({
         content: !selectedFile ? t('message.error.no.file.selected') : t('message.error.invalid.webdav'),
         key: 'restore-error'
@@ -168,7 +170,7 @@ export function useWebdavRestoreModal({
         }
       }
     })
-  }, [selectedFile, webdavHost, webdavUser, webdavPass, webdavPath, t, restoreMethod])
+  }, [selectedFile, webdavHost, t, restoreMethod])
 
   const handleCancel = () => {
     setIsRestoreModalVisible(false)
@@ -206,7 +208,9 @@ export function WebdavRestoreModal({
       onOk={handleRestore}
       onCancel={handleCancel}
       okButtonProps={{ loading: restoring }}
-      width={600}>
+      width={600}
+      transitionName="animation-move-down"
+      centered>
       <div style={{ position: 'relative' }}>
         <Select
           style={{ width: '100%' }}

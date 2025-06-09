@@ -1,6 +1,6 @@
 import { isOpenAILLMModel } from '@renderer/config/models'
 import { getDefaultModel } from '@renderer/services/AssistantService'
-import { Assistant, Model, Provider, Suggestion } from '@renderer/types'
+import { Assistant, MCPCallToolResponse, MCPTool, MCPToolResponse, Model, Provider, Suggestion } from '@renderer/types'
 import { Message } from '@renderer/types/newMessage'
 import OpenAI from 'openai'
 
@@ -8,8 +8,8 @@ import { CompletionsParams } from '.'
 import AnthropicProvider from './AnthropicProvider'
 import BaseProvider from './BaseProvider'
 import GeminiProvider from './GeminiProvider'
-import OpenAICompatibleProvider from './OpenAICompatibleProvider'
 import OpenAIProvider from './OpenAIProvider'
+import OpenAIResponseProvider from './OpenAIResponseProvider'
 
 /**
  * AihubmixProvider - 根据模型类型自动选择合适的提供商
@@ -18,6 +18,7 @@ import OpenAIProvider from './OpenAIProvider'
 export default class AihubmixProvider extends BaseProvider {
   private providers: Map<string, BaseProvider> = new Map()
   private defaultProvider: BaseProvider
+  private currentProvider: BaseProvider
 
   constructor(provider: Provider) {
     super(provider)
@@ -25,11 +26,12 @@ export default class AihubmixProvider extends BaseProvider {
     // 初始化各个提供商
     this.providers.set('claude', new AnthropicProvider(provider))
     this.providers.set('gemini', new GeminiProvider({ ...provider, apiHost: 'https://aihubmix.com/gemini' }))
-    this.providers.set('openai', new OpenAIProvider(provider))
-    this.providers.set('default', new OpenAICompatibleProvider(provider))
+    this.providers.set('openai', new OpenAIResponseProvider(provider))
+    this.providers.set('default', new OpenAIProvider(provider))
 
     // 设置默认提供商
     this.defaultProvider = this.providers.get('default')!
+    this.currentProvider = this.defaultProvider
   }
 
   /**
@@ -37,11 +39,12 @@ export default class AihubmixProvider extends BaseProvider {
    */
   private getProvider(model: Model): BaseProvider {
     const id = model.id.toLowerCase()
-
-    if (id.includes('claude')) {
+    // claude开头
+    if (id.startsWith('claude')) {
       return this.providers.get('claude')!
     }
-    if (id.includes('gemini')) {
+    // gemini开头 或 imagen开头 且不以-nothink、-search结尾
+    if ((id.startsWith('gemini') || id.startsWith('imagen')) && !id.endsWith('-nothink') && !id.endsWith('-search')) {
       return this.providers.get('gemini')!
     }
     if (isOpenAILLMModel(model)) {
@@ -61,7 +64,9 @@ export default class AihubmixProvider extends BaseProvider {
   }
 
   public async generateImage(params: any): Promise<string[]> {
-    return this.defaultProvider.generateImage(params)
+    return this.getProvider({
+      id: params.model
+    } as unknown as Model).generateImage(params)
   }
 
   public async generateImageByChat(params: any): Promise<void> {
@@ -70,7 +75,8 @@ export default class AihubmixProvider extends BaseProvider {
 
   public async completions(params: CompletionsParams): Promise<void> {
     const model = params.assistant.model
-    return this.getProvider(model!).completions(params)
+    this.currentProvider = this.getProvider(model!)
+    return this.currentProvider.completions(params)
   }
 
   public async translate(
@@ -99,5 +105,13 @@ export default class AihubmixProvider extends BaseProvider {
 
   public async getEmbeddingDimensions(model: Model): Promise<number> {
     return this.getProvider(model).getEmbeddingDimensions(model)
+  }
+
+  public convertMcpTools<T>(mcpTools: MCPTool[]) {
+    return this.currentProvider.convertMcpTools(mcpTools) as T[]
+  }
+
+  public mcpToolCallResponseToMessage(mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) {
+    return this.currentProvider.mcpToolCallResponseToMessage(mcpToolResponse, resp, model)
   }
 }

@@ -1,9 +1,11 @@
+import ContextMenu from '@renderer/components/ContextMenu'
 import Favicon from '@renderer/components/Icons/FallbackFavicon'
 import { HStack } from '@renderer/components/Layout'
 import { fetchWebContent } from '@renderer/utils/fetch'
+import { cleanMarkdownContent } from '@renderer/utils/formats'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Button, Drawer } from 'antd'
-import { FileSearch } from 'lucide-react'
+import { Button, Drawer, message, Skeleton } from 'antd'
+import { Check, Copy, FileSearch } from 'lucide-react'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -16,6 +18,7 @@ export interface Citation {
   content?: string
   showFavicon?: boolean
   type?: string
+  metadata?: Record<string, any>
 }
 
 interface CitationsListProps {
@@ -41,21 +44,6 @@ const queryClient = new QueryClient({
 const truncateText = (text: string, maxLength = 100) => {
   if (!text) return ''
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
-}
-
-/**
- * 清理Markdown内容
- * @param text
- */
-const cleanMarkdownContent = (text: string): string => {
-  if (!text) return ''
-  let cleaned = text.replace(/!\[.*?]\(.*?\)/g, '')
-  cleaned = cleaned.replace(/\[(.*?)]\(.*?\)/g, '$1')
-  cleaned = cleaned.replace(/https?:\/\/\S+/g, '')
-  cleaned = cleaned.replace(/[-—–_=+]{3,}/g, ' ')
-  cleaned = cleaned.replace(/[￥$€£¥%@#&*^()[\]{}<>~`'"\\|/_.]+/g, '')
-  cleaned = cleaned.replace(/\s+/g, ' ').trim()
-  return cleaned
 }
 
 const CitationsList: React.FC<CitationsListProps> = ({ citations }) => {
@@ -90,6 +78,7 @@ const CitationsList: React.FC<CitationsListProps> = ({ citations }) => {
           onClose={() => setOpen(false)}
           open={open}
           width={680}
+          styles={{ header: { border: 'none' }, body: { paddingTop: 0 } }}
           destroyOnClose={false}>
           {open &&
             citations.map((citation) => (
@@ -113,9 +102,28 @@ const handleLinkClick = (url: string, event: React.MouseEvent) => {
   else window.api.file.openPath(url)
 }
 
-const WebSearchCitation: React.FC<{ citation: Citation }> = ({ citation }) => {
+const CopyButton: React.FC<{ content: string }> = ({ content }) => {
+  const [copied, setCopied] = useState(false)
   const { t } = useTranslation()
 
+  const handleCopy = () => {
+    if (!content) return
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        setCopied(true)
+        message.success(t('common.copied'))
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => {
+        message.error(t('message.copy.failed'))
+      })
+  }
+
+  return <CopyIconWrapper onClick={handleCopy}>{copied ? <Check size={14} /> : <Copy size={14} />}</CopyIconWrapper>
+}
+
+const WebSearchCitation: React.FC<{ citation: Citation }> = ({ citation }) => {
   const { data: fetchedContent, isLoading } = useQuery({
     queryKey: ['webContent', citation.url],
     queryFn: async () => {
@@ -129,44 +137,59 @@ const WebSearchCitation: React.FC<{ citation: Citation }> = ({ citation }) => {
 
   return (
     <WebSearchCard>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        {citation.showFavicon && citation.url && (
-          <Favicon hostname={new URL(citation.url).hostname} alt={citation.title || citation.hostname || ''} />
+      <ContextMenu>
+        <WebSearchCardHeader>
+          {citation.showFavicon && citation.url && (
+            <Favicon hostname={new URL(citation.url).hostname} alt={citation.title || citation.hostname || ''} />
+          )}
+          <CitationLink className="text-nowrap" href={citation.url} onClick={(e) => handleLinkClick(citation.url, e)}>
+            {citation.title || <span className="hostname">{citation.hostname}</span>}
+          </CitationLink>
+          {fetchedContent && <CopyButton content={fetchedContent} />}
+        </WebSearchCardHeader>
+        {isLoading ? (
+          <Skeleton active paragraph={{ rows: 1 }} title={false} />
+        ) : (
+          <WebSearchCardContent className="selectable-text">{fetchedContent}</WebSearchCardContent>
         )}
-        <CitationLink href={citation.url} onClick={(e) => handleLinkClick(citation.url, e)}>
-          {citation.title || <span className="hostname">{citation.hostname}</span>}
-        </CitationLink>
-      </div>
-      {isLoading ? <div>{t('common.loading')}</div> : fetchedContent}
+      </ContextMenu>
     </WebSearchCard>
   )
 }
 
-const KnowledgeCitation: React.FC<{ citation: Citation }> = ({ citation }) => (
-  <WebSearchCard>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-      {citation.showFavicon && <FileSearch width={16} />}
-      <CitationLink href={citation.url} onClick={(e) => handleLinkClick(citation.url, e)}>
-        {citation.title}
-      </CitationLink>
-    </div>
-    {citation.content && truncateText(citation.content, 100)}
-  </WebSearchCard>
-)
+const KnowledgeCitation: React.FC<{ citation: Citation }> = ({ citation }) => {
+  return (
+    <WebSearchCard>
+      <ContextMenu>
+        <WebSearchCardHeader>
+          {citation.showFavicon && <FileSearch width={16} />}
+          <CitationLink className="text-nowrap" href={citation.url} onClick={(e) => handleLinkClick(citation.url, e)}>
+            {citation.title}
+          </CitationLink>
+          {citation.content && <CopyButton content={citation.content} />}
+        </WebSearchCardHeader>
+        <WebSearchCardContent className="selectable-text">
+          {citation.content && truncateText(citation.content, 100)}
+        </WebSearchCardContent>
+      </ContextMenu>
+    </WebSearchCard>
+  )
+}
 
 const OpenButton = styled(Button)`
   display: flex;
   align-items: center;
-  padding: 2px 6px;
+  padding: 3px 8px;
   margin-bottom: 8px;
   align-self: flex-start;
   font-size: 12px;
+  background-color: var(--color-background-soft);
+  border-radius: var(--list-item-border-radius);
 `
 
 const PreviewIcons = styled.div`
   display: flex;
   align-items: center;
-  margin-right: 8px;
 `
 
 const PreviewIcon = styled.div`
@@ -193,12 +216,25 @@ const CitationLink = styled.a`
   color: var(--color-text-1);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
-  }
-
   .hostname {
     color: var(--color-link);
+  }
+`
+
+const CopyIconWrapper = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-2);
+  opacity: 0.6;
+  margin-left: auto;
+  padding: 4px;
+  border-radius: 4px;
+
+  &:hover {
+    opacity: 1;
+    background-color: var(--color-background-soft);
   }
 `
 
@@ -207,17 +243,33 @@ const WebSearchCard = styled.div`
   flex-direction: column;
   width: 100%;
   padding: 12px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
+  border-radius: var(--list-item-border-radius);
   background-color: var(--color-background);
   transition: all 0.3s ease;
+  position: relative;
+`
 
-  &:hover {
-    box-shadow: 0 4px 12px var(--color-border-soft);
-    background-color: var(--color-hover);
-    border-color: var(--color-primary-soft);
-    transform: translateY(-2px);
+const WebSearchCardHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  width: 100%;
+`
+
+const WebSearchCardContent = styled.div`
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-2);
+  user-select: text;
+  cursor: text;
+
+  &.selectable-text {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 `
 

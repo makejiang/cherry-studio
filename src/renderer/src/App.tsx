@@ -8,11 +8,11 @@ import { PersistGate } from 'redux-persist/integration/react'
 import Sidebar from './components/app/Sidebar'
 import TopViewContainer from './components/TopView'
 import AntdProvider from './context/AntdProvider'
+import { CodeStyleProvider } from './context/CodeStyleProvider'
+import { NotificationProvider } from './context/NotificationProvider'
 import StyleSheetManager from './context/StyleSheetManager'
-import { SyntaxHighlighterProvider } from './context/SyntaxHighlighterProvider'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
-import AppsPage from './pages/apps/AppsPage'
 import DiscoverPage from './pages/discover'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
@@ -27,26 +27,29 @@ function App(): React.ReactElement {
       <StyleSheetManager>
         <ThemeProvider>
           <AntdProvider>
-            <SyntaxHighlighterProvider>
-              <PersistGate loading={null} persistor={persistor}>
-                <TopViewContainer>
-                  <HashRouter>
-                    <NavigationHandler />
-                    <Sidebar />
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/paintings/*" element={<PaintingsRoutePage />} />
-                      <Route path="/translate" element={<TranslatePage />} />
-                      <Route path="/files" element={<FilesPage />} />
-                      <Route path="/knowledge" element={<KnowledgePage />} />
-                      <Route path="/apps" element={<AppsPage />} />
-                      <Route path="/settings/*" element={<SettingsPage />} />
-                      <Route path="/discover/*" element={<DiscoverPage />} />
-                    </Routes>
-                  </HashRouter>
-                </TopViewContainer>
-              </PersistGate>
-            </SyntaxHighlighterProvider>
+            <NotificationProvider>
+              <CodeStyleProvider>
+                <PersistGate loading={null} persistor={persistor}>
+                  <TopViewContainer>
+                    <HashRouter>
+                      <NavigationHandler />
+                      <Sidebar />
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        {/* <Route path="/agents" element={<AgentsPage />} /> */}
+                        <Route path="/paintings/*" element={<PaintingsRoutePage />} />
+                        <Route path="/translate" element={<TranslatePage />} />
+                        <Route path="/files" element={<FilesPage />} />
+                        <Route path="/knowledge" element={<KnowledgePage />} />
+                        {/* <Route path="/apps" element={<AppsPage />} /> */}
+                        <Route path="/settings/*" element={<SettingsPage />} />
+                        <Route path="/discover/*" element={<DiscoverPage />} />
+                      </Routes>
+                    </HashRouter>
+                  </TopViewContainer>
+                </PersistGate>
+              </CodeStyleProvider>
+            </NotificationProvider>
           </AntdProvider>
         </ThemeProvider>
       </StyleSheetManager>

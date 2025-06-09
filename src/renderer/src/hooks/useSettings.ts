@@ -4,9 +4,12 @@ import {
   SendMessageShortcut,
   setAssistantIconType,
   setAutoCheckUpdate as _setAutoCheckUpdate,
+  setEarlyAccess as _setEarlyAccess,
   setLaunchOnBoot,
   setLaunchToTray,
+  setPinTopicsToTop,
   setSendMessageShortcut as _setSendMessageShortcut,
+  setShowTokens,
   setSidebarIcons,
   setTargetLanguage,
   setTheme,
@@ -14,10 +17,10 @@ import {
   setTopicPosition,
   setTray as _setTray,
   setTrayOnClose,
-  setWindowStyle,
-  setZoomFactor
+  setWindowStyle
 } from '@renderer/store/settings'
 import { SidebarIcon, ThemeMode, TranslateLanguageVarious } from '@renderer/types'
+import { FeedUrl } from '@shared/config/constant'
 
 export function useSettings() {
   const settings = useAppSelector((state) => state.settings)
@@ -57,6 +60,11 @@ export function useSettings() {
       window.api.setAutoUpdate(isAutoUpdate)
     },
 
+    setEarlyAccess(isEarlyAccess: boolean) {
+      dispatch(_setEarlyAccess(isEarlyAccess))
+      window.api.setFeedUrl(isEarlyAccess ? FeedUrl.EARLY_ACCESS : FeedUrl.PRODUCTION)
+    },
+
     setTheme(theme: ThemeMode) {
       dispatch(setTheme(theme))
     },
@@ -68,6 +76,9 @@ export function useSettings() {
     },
     setTopicPosition(topicPosition: 'left' | 'right') {
       dispatch(setTopicPosition(topicPosition))
+    },
+    setPinTopicsToTop(pinTopicsToTop: boolean) {
+      dispatch(setPinTopicsToTop(pinTopicsToTop))
     },
     updateSidebarIcons(icons: { visible: SidebarIcon[]; disabled: SidebarIcon[] }) {
       dispatch(setSidebarIcons(icons))
@@ -81,9 +92,8 @@ export function useSettings() {
     setAssistantIconType(assistantIconType: AssistantIconType) {
       dispatch(setAssistantIconType(assistantIconType))
     },
-    setZoomFactor(factor: number) {
-      dispatch(setZoomFactor(factor))
-      window.api.setZoomFactor(factor)
+    setShowTokens(showTokens: boolean) {
+      dispatch(setShowTokens(showTokens))
     }
   }
 }
