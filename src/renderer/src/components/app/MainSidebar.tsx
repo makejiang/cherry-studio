@@ -15,14 +15,13 @@ import {
   Bot,
   ChevronDown,
   ChevronRight,
+  Compass,
   FileSearch,
   Folder,
   Languages,
-  LayoutGrid,
   MessageSquare,
   Moon,
   Palette,
-  Sparkle,
   SquareTerminal,
   Sun,
   SunMoon
@@ -98,14 +97,15 @@ const MainSidebar: FC = () => {
   }
 
   const appMenuItems = [
-    { icon: <Sparkle size={18} className="icon" />, text: t('agents.title'), path: '/agents' },
+    // { icon: <Sparkle size={18} className="icon" />, text: t('agents.title'), path: '/agents' },
+    { icon: <Compass size={18} className="icon" />, text: t('discover.title'), path: '/discover' },
     { icon: <Languages size={18} className="icon" />, text: t('translate.title'), path: '/translate' },
     {
       icon: <Palette size={18} className="icon" />,
       text: t('paintings.title'),
       path: `/paintings/${defaultPaintingProvider}`
     },
-    { icon: <LayoutGrid size={18} className="icon" />, text: t('minapp.title'), path: '/apps' },
+    // { icon: <LayoutGrid size={18} className="icon" />, text: t('minapp.title'), path: '/apps' },
     { icon: <FileSearch size={18} className="icon" />, text: t('knowledge.title'), path: '/knowledge' },
     { icon: <SquareTerminal size={18} className="icon" />, text: t('common.mcp'), path: '/mcp-servers' },
     { icon: <Folder size={18} className="icon" />, text: t('files.title'), path: '/files' }

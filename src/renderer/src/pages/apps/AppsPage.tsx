@@ -1,7 +1,6 @@
-import { NavbarCenter, NavbarMain } from '@renderer/components/app/Navbar'
 import { useMinapps } from '@renderer/hooks/useMinapps'
 import { Button, Input } from 'antd'
-import { Search, SettingsIcon } from 'lucide-react'
+import { Search, SettingsIcon, X } from 'lucide-react'
 import React, { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
@@ -41,32 +40,37 @@ const AppsPage: FC = () => {
 
   return (
     <Container onContextMenu={handleContextMenu}>
-      <NavbarMain>
-        <NavbarCenter>
-          {t('minapp.title')}
-          <Input
-            placeholder={t('common.search')}
-            className="nodrag"
-            style={{
-              width: '30%',
-              height: 28,
-              borderRadius: 15
-            }}
-            size="small"
-            variant="filled"
-            suffix={<Search size={18} />}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            disabled={isSettingsOpen}
-          />
-          <Button
-            type="text"
-            className="nodrag"
-            icon={<SettingsIcon size={18} color={isSettingsOpen ? 'var(--color-primary)' : 'var(--color-text-2)'} />}
-            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-          />
-        </NavbarCenter>
-      </NavbarMain>
+      {/* <Navbar> */}
+      {/* <NavbarMain> */}
+      {/* {t('minapp.title')} */}
+      <div className="p-2">
+        <Input
+          placeholder={t('common.search')}
+          className="nodrag"
+          style={{
+            width: '30%',
+            height: 28,
+            borderRadius: 15,
+            position: 'absolute',
+            left: '50vw',
+            transform: 'translateX(-50%)'
+          }}
+          size="small"
+          variant="filled"
+          suffix={<Search size={18} />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          disabled={isSettingsOpen}
+        />
+        <Button
+          type="text"
+          className="nodrag"
+          icon={isSettingsOpen ? <X size={18} /> : <SettingsIcon size={18} color="var(--color-text-2)" />}
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+        />
+      </div>
+      {/* </NavbarMain> */}
+      {/* </Navbar> */}
       <ContentContainer id="content-container">
         {isSettingsOpen && <MiniAppSettings />}
         {!isSettingsOpen && (
