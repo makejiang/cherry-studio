@@ -16,20 +16,14 @@ const initialCategories: InternalCategory[] = [
     title: 'Assistants',
     path: 'assistant',
     hasSidebar: false,
-    items: [
-      { id: 'all', name: 'All Assistants' },
-      { id: 'gpt3', name: 'GPT-3' }
-    ]
+    items: []
   },
   {
     id: CherryStoreType.MINI_APP,
     title: 'Mini Apps',
     path: 'mini-app',
     hasSidebar: false,
-    items: [
-      { id: 'all', name: 'All Mini Apps' }
-      // Add other mini_app subcategories here if any
-    ]
+    items: []
   }
   // Add more categories as needed
 ]
@@ -58,12 +52,15 @@ export function useDiscoverCategories() {
 
     const categoryFromPath = findCategoryByPath(currentCategoryPath)
 
+    // Synchronize active tab with the category determined from the URL path.
+    // If a category is found from the path, update the active tab to match its ID.
     if (categoryFromPath) {
       if (activeTab !== categoryFromPath.id) {
         setActiveTab(categoryFromPath.id)
       }
     } else if (location.pathname === '/discover' || location.pathname === '/discover/') {
-      // If URL is exactly /discover or /discover/ and no specific category path is matched
+      // Handle the case where the URL is the base /discover path.
+      // Redirect to the first category's path to ensure a category is always selected.
       if (categories.length > 0) {
         const firstCategory = categories[0]
         if (firstCategory?.path) {
@@ -71,7 +68,9 @@ export function useDiscoverCategories() {
         }
       }
     } else if (!currentCategoryPath && categories.length > 0 && !activeTab) {
-      // Fallback if no category path in URL and no active tab set yet (e.g. initial load to a bad /discover/xxx url)
+      // Fallback for invalid or unmatched /discover/xxx URLs.
+      // If the URL contains a path segment that doesn't correspond to a known category,
+      // and no tab is active, redirect to the first valid category.
       const firstCategory = categories[0]
       if (firstCategory?.path) {
         navigate(`/discover/${firstCategory.path}?subcategory=all`, { replace: true })
