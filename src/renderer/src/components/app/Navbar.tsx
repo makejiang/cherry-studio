@@ -1,7 +1,7 @@
 import { isLinux, isMac, isWindows } from '@renderer/config/constant'
 import { useFullscreen } from '@renderer/hooks/useFullscreen'
 import { Button } from 'antd'
-import { X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import type { FC, PropsWithChildren } from 'react'
 import type { HTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -28,13 +28,43 @@ export const NavbarRight: FC<Props> = ({ children, ...props }) => {
 
 export const NavbarMain: FC<Props> = ({ children, ...props }) => {
   const isFullscreen = useFullscreen()
-  const navigate = useNavigate()
 
   return (
     <NavbarMainContainer {...props} $isFullscreen={isFullscreen}>
+      <CloseIconWindows />
       {children}
-      <Button type="text" icon={<X size={18} />} onClick={() => navigate('/')} className="nodrag"></Button>
+      <CloseIconMac />
     </NavbarMainContainer>
+  )
+}
+
+const CloseIconMac = () => {
+  const navigate = useNavigate()
+
+  if (!isMac) {
+    return null
+  }
+
+  return <Button type="text" icon={<X size={18} />} onClick={() => navigate('/')} className="nodrag" />
+}
+
+const CloseIconWindows = () => {
+  const navigate = useNavigate()
+
+  if (isMac) {
+    return null
+  }
+
+  return (
+    <Button
+      size="small"
+      type="default"
+      shape="circle"
+      icon={<ChevronDown size={16} />}
+      onClick={() => navigate('/')}
+      className="nodrag"
+      style={{ marginRight: 5 }}
+    />
   )
 }
 

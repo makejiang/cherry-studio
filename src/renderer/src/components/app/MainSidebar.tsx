@@ -15,14 +15,13 @@ import {
   Bot,
   ChevronDown,
   ChevronRight,
+  Compass,
   FileSearch,
   Folder,
   Languages,
-  LayoutGrid,
   MessageSquare,
   Moon,
   Palette,
-  Sparkle,
   SquareTerminal,
   Sun,
   SunMoon
@@ -48,7 +47,6 @@ const MainSidebar: FC = () => {
   const [isAppMenuExpanded, setIsAppMenuExpanded] = useState(false)
 
   const location = useLocation()
-  const state = location.state
   const { pathname } = location
 
   const { activeAssistant, activeTopic, setActiveAssistant, setActiveTopic } = useChat()
@@ -59,10 +57,9 @@ const MainSidebar: FC = () => {
   }, [navigate])
 
   useEffect(() => {
-    state?.assistant && setActiveAssistant(state?.assistant)
-    state?.topic && setActiveTopic(state?.topic)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state])
+    const unsubscribe = EventEmitter.on(EVENT_NAMES.SHOW_TOPIC_SIDEBAR, () => setTab('topic'))
+    return () => unsubscribe()
+  }, [])
 
   useEffect(() => {
     const unsubscribe = EventEmitter.on(EVENT_NAMES.SWITCH_ASSISTANT, (assistantId: string) => {
@@ -78,13 +75,17 @@ const MainSidebar: FC = () => {
   }, [assistants, setActiveAssistant])
 
   useEffect(() => {
-    const canMinimize = topicPosition == 'left' ? !showAssistants : !showAssistants && !showTopics
+    const canMinimize = !showAssistants && !showTopics
     window.api.window.setMinimumSize(canMinimize ? 520 : 1080, 600)
 
     return () => {
       window.api.window.resetMinimumSize()
     }
   }, [showAssistants, showTopics, topicPosition])
+
+  useEffect(() => {
+    setIsAppMenuExpanded(false)
+  }, [activeAssistant.id, activeTopic.id])
 
   const onAvatarClick = () => {
     navigate('/settings/provider')
@@ -96,14 +97,15 @@ const MainSidebar: FC = () => {
   }
 
   const appMenuItems = [
-    { icon: <Sparkle size={18} className="icon" />, text: t('agents.title'), path: '/agents' },
+    // { icon: <Sparkle size={18} className="icon" />, text: t('agents.title'), path: '/agents' },
+    { icon: <Compass size={18} className="icon" />, text: t('discover.title'), path: '/discover' },
     { icon: <Languages size={18} className="icon" />, text: t('translate.title'), path: '/translate' },
     {
       icon: <Palette size={18} className="icon" />,
       text: t('paintings.title'),
       path: `/paintings/${defaultPaintingProvider}`
     },
-    { icon: <LayoutGrid size={18} className="icon" />, text: t('minapp.title'), path: '/apps' },
+    // { icon: <LayoutGrid size={18} className="icon" />, text: t('minapp.title'), path: '/apps' },
     { icon: <FileSearch size={18} className="icon" />, text: t('knowledge.title'), path: '/knowledge' },
     { icon: <SquareTerminal size={18} className="icon" />, text: t('common.mcp'), path: '/mcp-servers' },
     { icon: <Folder size={18} className="icon" />, text: t('files.title'), path: '/files' }
@@ -111,16 +113,16 @@ const MainSidebar: FC = () => {
 
   const isRoutes = (path: string): boolean => pathname.startsWith(path)
 
-  if (location.pathname !== '/') {
-    return null
-  }
-
   const onChageTab = (tab: Tab) => {
     setTab(tab)
     setIsAppMenuExpanded(false)
   }
 
   if (!showAssistants) {
+    return null
+  }
+
+  if (location.pathname !== '/') {
     return null
   }
 
@@ -187,7 +189,6 @@ const MainSidebar: FC = () => {
         activeTopic={activeTopic}
         setActiveAssistant={setActiveAssistant}
         setActiveTopic={setActiveTopic}
-        position="left"
       />
       <UserMenu onClick={onAvatarClick}>
         <UserMenuLeft>

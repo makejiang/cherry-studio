@@ -80,7 +80,7 @@ const Assistants: FC<AssistantsTabProps> = ({
   if (assistantsTabSortType === 'tags') {
     return (
       <Container className="assistants-tab" ref={containerRef}>
-        <div style={{ marginBottom: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 4, gap: 10 }}>
           {getGroupedAssistants.map((group) => (
             <TagsContainer key={group.tag}>
               {group.tag !== t('assistants.tags.untagged') && (
@@ -197,12 +197,7 @@ const AssistantAddItem = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: var(--color-background-soft);
-  }
-
-  &.active {
-    background-color: var(--color-background-soft);
-    border: 0.5px solid var(--color-border);
+    background-color: var(--color-list-item-hover);
   }
 `
 
@@ -228,7 +223,7 @@ const GroupTitleName = styled.div`
   color: var(--color-text);
   font-size: 13px;
   line-height: 24px;
-  margin-right: 2px;
+  margin-right: 5px;
   display: flex;
 `
 

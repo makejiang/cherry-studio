@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 import Chat from './Chat'
-import Navbar from './Navbar'
+import ChatNavbar from './ChatNavbar'
 
 const HomePage: FC = () => {
   const { assistants } = useAssistants()
@@ -54,13 +54,7 @@ const HomePage: FC = () => {
 
   return (
     <Container id="home-page">
-      <Navbar
-        activeAssistant={activeAssistant}
-        activeTopic={activeTopic}
-        setActiveTopic={setActiveTopic}
-        setActiveAssistant={setActiveAssistant}
-        position="left"
-      />
+      <ChatNavbar activeAssistant={activeAssistant} position="left" />
       <ContentContainer id="content-container">
         <Chat
           assistant={activeAssistant}

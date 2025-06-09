@@ -1,4 +1,4 @@
-import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { NavbarCenter, NavbarMain } from '@renderer/components/app/Navbar'
 // import { useRuntime } from '@renderer/hooks/useRuntime' // No longer needed if resourcesPath is not used
 import { Tabs as VercelTabs } from '@renderer/ui/vercel-tabs'
 import { useEffect } from 'react'
@@ -45,9 +45,9 @@ export default function DiscoverPage() {
   return (
     <div className="h-full w-full">
       <div className="flex h-full w-full flex-col overflow-hidden">
-        <Navbar className="h-auto flex-shrink-0">
+        <NavbarMain className="h-auto flex-shrink-0">
           <NavbarCenter>{t('discover.title')}</NavbarCenter>
-        </Navbar>
+        </NavbarMain>
 
         {categories.length > 0 && (
           <div className="px-4 py-2">
