@@ -87,7 +87,9 @@ const Tabs = ({
           {tabs.map((tab, index) => (
             <div
               key={tab.id}
-              ref={(el) => (tabRefs.current[index] = el)}
+              ref={(el) => {
+                tabRefs.current[index] = el
+              }}
               className={cn(
                 'h-[30px] cursor-pointer px-3 py-2 transition-colors duration-300',
                 index === activeIndex ? 'text-[#0e0e10] dark:text-white' : 'text-[#0e0f1199] dark:text-[#ffffff99]'

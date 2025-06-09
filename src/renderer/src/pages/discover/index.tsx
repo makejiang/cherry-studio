@@ -6,8 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 
 // Import Context and the main Dialog Manager component
-import { DialogManagerProvider } from './components/dialog/DialogManagerContext'
-import Dialogs from './components/dialog/index'
 import DiscoverContent from './components/DiscoverContent' // Removed DiscoverContent import
 import DiscoverSidebar from './components/DiscoverSidebar'
 import { InternalCategory, useDiscoverCategories } from './hooks/useDiscoverCategories'
@@ -45,7 +43,7 @@ export default function DiscoverPage() {
   const vercelTabsData = adaptCategoriesForVercelTabs(categories)
 
   return (
-    <DialogManagerProvider>
+    <div>
       <div className="flex h-full w-full flex-col overflow-hidden">
         <Navbar className="h-auto flex-shrink-0">
           <NavbarCenter>{t('discover.title')}</NavbarCenter>
@@ -79,8 +77,7 @@ export default function DiscoverPage() {
             />
           </main>
         </div>
-        <Dialogs />
       </div>
-    </DialogManagerProvider>
+    </div>
   )
 }
