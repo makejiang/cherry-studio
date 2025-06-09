@@ -58,6 +58,11 @@ const MainSidebar: FC = () => {
   }, [navigate])
 
   useEffect(() => {
+    const unsubscribe = EventEmitter.on(EVENT_NAMES.SHOW_TOPIC_SIDEBAR, () => setTab('topic'))
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
     const unsubscribe = EventEmitter.on(EVENT_NAMES.SWITCH_ASSISTANT, (assistantId: string) => {
       const newAssistant = assistants.find((a) => a.id === assistantId)
       if (newAssistant) {
@@ -184,7 +189,6 @@ const MainSidebar: FC = () => {
         activeTopic={activeTopic}
         setActiveAssistant={setActiveAssistant}
         setActiveTopic={setActiveTopic}
-        position="left"
       />
       <UserMenu onClick={onAvatarClick}>
         <UserMenuLeft>
