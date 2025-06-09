@@ -43,7 +43,7 @@ export default function DiscoverPage() {
   const vercelTabsData = adaptCategoriesForVercelTabs(categories)
 
   return (
-    <div>
+    <div className="h-full w-full">
       <div className="flex h-full w-full flex-col overflow-hidden">
         <Navbar className="h-auto flex-shrink-0">
           <NavbarCenter>{t('discover.title')}</NavbarCenter>

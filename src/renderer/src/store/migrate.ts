@@ -1515,13 +1515,18 @@ const migrateConfig = {
   },
   '112': (state: RootState) => {
     try {
+      const visibleIcons = state.settings.sidebarIcons.visible
+      if (visibleIcons.includes('discover')) {
+        return state
+      }
+      const filteredIcons = visibleIcons.filter((icon) => icon !== 'agents' && icon !== 'minapp')
       return {
         ...state,
         settings: {
           ...state.settings,
           sidebarIcons: {
             ...state.settings.sidebarIcons,
-            visible: [...state.settings.sidebarIcons.visible, 'discover']
+            visible: [...filteredIcons, 'discover']
           }
         }
       }
