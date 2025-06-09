@@ -48,7 +48,6 @@ const MainSidebar: FC = () => {
   const [isAppMenuExpanded, setIsAppMenuExpanded] = useState(false)
 
   const location = useLocation()
-  const state = location.state
   const { pathname } = location
 
   const { activeAssistant, activeTopic, setActiveAssistant, setActiveTopic } = useChat()
@@ -57,12 +56,6 @@ const MainSidebar: FC = () => {
   useEffect(() => {
     NavigationService.setNavigate(navigate)
   }, [navigate])
-
-  useEffect(() => {
-    state?.assistant && setActiveAssistant(state?.assistant)
-    state?.topic && setActiveTopic(state?.topic)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state])
 
   useEffect(() => {
     const unsubscribe = EventEmitter.on(EVENT_NAMES.SWITCH_ASSISTANT, (assistantId: string) => {
@@ -78,13 +71,17 @@ const MainSidebar: FC = () => {
   }, [assistants, setActiveAssistant])
 
   useEffect(() => {
-    const canMinimize = topicPosition == 'left' ? !showAssistants : !showAssistants && !showTopics
+    const canMinimize = !showAssistants && !showTopics
     window.api.window.setMinimumSize(canMinimize ? 520 : 1080, 600)
 
     return () => {
       window.api.window.resetMinimumSize()
     }
   }, [showAssistants, showTopics, topicPosition])
+
+  useEffect(() => {
+    setIsAppMenuExpanded(false)
+  }, [activeAssistant.id, activeTopic.id])
 
   const onAvatarClick = () => {
     navigate('/settings/provider')
@@ -111,16 +108,16 @@ const MainSidebar: FC = () => {
 
   const isRoutes = (path: string): boolean => pathname.startsWith(path)
 
-  if (location.pathname !== '/') {
-    return null
-  }
-
   const onChageTab = (tab: Tab) => {
     setTab(tab)
     setIsAppMenuExpanded(false)
   }
 
   if (!showAssistants) {
+    return null
+  }
+
+  if (location.pathname !== '/') {
     return null
   }
 

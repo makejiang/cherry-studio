@@ -4,7 +4,6 @@ import { setActiveAssistant, setActiveTopic } from '@renderer/store/runtime'
 import { loadTopicMessagesThunk } from '@renderer/store/thunk/messageThunk'
 import { Assistant } from '@renderer/types'
 import { Topic } from '@renderer/types'
-import { find } from 'lodash'
 import { useEffect } from 'react'
 
 import { useAssistants } from './useAssistant'
@@ -23,11 +22,9 @@ export const useChat = () => {
   }, [activeTopic, dispatch])
 
   useEffect(() => {
-    // activeTopic not in assistant.topics
-    if (activeAssistant && !find(activeAssistant.topics, { id: activeTopic?.id })) {
-      dispatch(setActiveTopic(activeAssistant.topics[0]))
-    }
-  }, [activeTopic?.id, activeAssistant, dispatch])
+    const firstTopic = activeAssistant.topics[0]
+    firstTopic && dispatch(setActiveTopic(firstTopic))
+  }, [activeAssistant, dispatch])
 
   return {
     activeAssistant,
