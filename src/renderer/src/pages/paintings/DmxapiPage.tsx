@@ -70,7 +70,7 @@ const DmxapiPage: FC<{ Options: string[] }> = ({ Options }) => {
   const location = useLocation()
 
   interface FileMapType {
-    imageFiles?: FileType[]
+    imageFiles?: FileMetadata[]
     paths?: string[]
   }
 
@@ -195,19 +195,19 @@ const DmxapiPage: FC<{ Options: string[] }> = ({ Options }) => {
       const currentFiles = prevFileMap.imageFiles || []
       const currentPaths = prevFileMap.paths || []
 
-      let newFiles: FileType[]
+      let newFiles: FileMetadata[]
       let newPaths: string[]
 
       if (index !== undefined) {
         // 替换指定索引的图片
         newFiles = [...currentFiles]
-        newFiles[index] = file as FileType
+        newFiles[index] = file as FileMetadata
 
         newPaths = [...currentPaths]
         newPaths[index] = path
       } else {
         // 添加新图片到最后
-        newFiles = [...currentFiles, file as FileType]
+        newFiles = [...currentFiles, file as FileMetadata]
         newPaths = [...currentPaths, path]
       }
 

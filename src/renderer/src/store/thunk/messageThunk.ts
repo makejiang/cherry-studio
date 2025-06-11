@@ -201,7 +201,7 @@ export const cleanupMultipleBlocks = (dispatch: AppDispatch, blockIds: string[])
     return isEmpty(files) ? [] : files
   }
 
-  const cleanupFiles = async (files: FileType[]) => {
+  const cleanupFiles = async (files: FileMetadata[]) => {
     await Promise.all(files.map((file) => FileManager.deleteFile(file.id, false)))
   }
 

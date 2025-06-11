@@ -1563,7 +1563,7 @@ const migrateConfig = {
       return state
     }
   },
-  '111': (state: RootState) => {
+  '112': (state: RootState) => {
     try {
       if (!state.preprocess) {
         state.preprocess = {
