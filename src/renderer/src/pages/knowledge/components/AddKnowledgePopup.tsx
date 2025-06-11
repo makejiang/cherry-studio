@@ -14,7 +14,7 @@ import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { KnowledgeBase, Model, OcrProvider, PreprocessProvider } from '@renderer/types'
 import { getErrorMessage } from '@renderer/utils/error'
-import { Alert, Input, InputNumber, Modal, Select, Slider, Tabs, TabsProps, Tooltip } from 'antd'
+import { Alert, Input, InputNumber, Modal, Select, Slider, Switch, Tabs, TabsProps, Tooltip } from 'antd'
 import { find, sortBy } from 'lodash'
 import { nanoid } from 'nanoid'
 import { useMemo, useRef, useState } from 'react'
@@ -32,10 +32,12 @@ interface Props extends ShowParams {
 const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
   const [open, setOpen] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [autoDims, setAutoDims] = useState(true)
   const { t } = useTranslation()
   const { providers } = useProviders()
   const { addKnowledgeBase } = useKnowledgeBases()
   const [newBase, setNewBase] = useState<KnowledgeBase>({} as KnowledgeBase)
+  const [dimensions, setDimensions] = useState<number | undefined>(undefined)
 
   const { preprocessProviders } = usePreprocessProviders()
   const { ocrProviders } = useOcrProviders()
@@ -68,7 +70,8 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           .map((m) => ({
             label: m.name,
             value: getModelUniqId(m),
-            key: `${p.id}-${m.id}`
+            providerId: p.id,
+            modelId: m.id
           }))
       }))
       .filter((group) => group.options.length > 0)
@@ -122,17 +125,22 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
         if (!provider) {
           return
         }
+        let finalDimensions: number // 用于存储最终确定的维度值
 
-        const aiProvider = new AiProvider(provider)
-        let dimensions = 0
+        if (autoDims || dimensions === undefined) {
+          try {
+            const aiProvider = new AiProvider(provider)
+            finalDimensions = await aiProvider.getEmbeddingDimensions(selectedEmbeddingModel)
 
-        try {
-          dimensions = await aiProvider.getEmbeddingDimensions(selectedEmbeddingModel)
-        } catch (error) {
-          console.error('Error getting embedding dimensions:', error)
-          window.message.error(t('message.error.get_embedding_dimensions') + '\n' + getErrorMessage(error))
-          setLoading(false)
-          return
+            setDimensions(finalDimensions)
+          } catch (error) {
+            console.error('获取嵌入维度时出错:', error)
+            window.message.error(t('message.error.get_embedding_dimensions') + '\n' + getErrorMessage(error))
+            setLoading(false)
+            return
+          }
+        } else {
+          finalDimensions = dimensions
         }
 
         const _newBase = {
@@ -141,7 +149,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           name: newBase.name,
           model: selectedEmbeddingModel,
           rerankModel: selectedRerankModel,
-          dimensions,
+          dimensions: finalDimensions,
           documentCount: newBase.documentCount || DEFAULT_KNOWLEDGE_DOCUMENT_COUNT,
           items: [],
           created_at: Date.now(),
@@ -276,6 +284,49 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
               onChange={(value) => setNewBase({ ...newBase, documentCount: value })}
             />
           </SettingsItem>
+
+          {/* dimensions */}
+          <SettingsItem>
+            <div
+              className="settings-label"
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <span>
+                {t('knowledge.dimensions_auto_set')}
+                <Tooltip title={t('knowledge.dimensions_default')} placement="right">
+                  <InfoCircleOutlined style={{ marginLeft: 8 }} />
+                </Tooltip>
+              </span>
+              <Switch
+                checked={autoDims}
+                onChange={(checked) => {
+                  setAutoDims(checked)
+                  if (checked) {
+                    setDimensions(undefined)
+                  }
+                }}
+              />
+            </div>
+          </SettingsItem>
+
+          {!autoDims && (
+            <SettingsItem>
+              <div className="settings-label">
+                {t('knowledge.dimensions')}
+                <Tooltip title={t('knowledge.dimensions_size_tooltip')} placement="right">
+                  <InfoCircleOutlined style={{ marginLeft: 8 }} />
+                </Tooltip>
+              </div>
+              <InputNumber
+                min={1}
+                style={{ width: '100%' }}
+                placeholder={t('knowledge.dimensions_size_placeholder')}
+                value={newBase.dimensions}
+                onChange={(value) => {
+                  setDimensions(value === null ? undefined : value)
+                }}
+              />
+            </SettingsItem>
+          )}
         </SettingsPanel>
       ),
       icon: <SettingOutlined />

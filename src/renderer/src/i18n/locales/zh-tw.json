@@ -8,7 +8,10 @@
       "add.name.placeholder": "輸入名稱",
       "add.prompt": "提示詞",
       "add.prompt.placeholder": "輸入提示詞",
-      "add.prompt.variables.tip": "可用的變數：{{date}}, {{time}}, {{datetime}}, {{system}}, {{arch}}, {{language}}, {{model_name}}",
+      "add.prompt.variables.tip": {
+        "title": "可用的變數",
+        "content": "{{date}}:\t日期\n{{time}}:\t時間\n{{datetime}}:\t日期和時間\n{{system}}:\t作業系統\n{{arch}}:\tCPU架構\n{{language}}:\t語言\n{{model_name}}:\t模型名稱"
+      },
       "add.title": "建立智慧代理人",
       "import": {
         "title": "從外部導入",
@@ -30,16 +33,7 @@
         "agent": "匯出智慧代理人"
       },
       "delete.popup.content": "確定要刪除此智慧代理人嗎？",
-      "edit.message.add.title": "新增",
-      "edit.message.assistant.placeholder": "輸入助手訊息",
-      "edit.message.assistant.title": "助手",
-      "edit.message.empty.content": "會話輸入內容不能為空",
-      "edit.message.group.title": "訊息分組",
-      "edit.message.title": "預設訊息",
-      "edit.message.user.placeholder": "輸入使用者訊息",
-      "edit.message.user.title": "使用者",
       "edit.model.select.title": "選擇模型",
-      "edit.settings.hide_preset_messages": "隱藏預設訊息",
       "edit.title": "編輯智慧代理人",
       "manage.title": "管理智慧代理人",
       "my_agents": "我的智慧代理人",
@@ -76,7 +70,6 @@
       "settings.default_model": "預設模型",
       "settings.knowledge_base": "知識庫設定",
       "settings.model": "模型設定",
-      "settings.preset_messages": "預設訊息",
       "settings.prompt": "提示詞設定",
       "settings.reasoning_effort": "思維鏈長度",
       "settings.reasoning_effort.off": "關閉",
@@ -268,6 +261,7 @@
       "topics.clear.title": "清空訊息",
       "topics.copy.image": "複製為圖片",
       "topics.copy.md": "複製為 Markdown",
+      "topics.copy.plain_text": "複製為純文字（移除 Markdown）",
       "topics.copy.title": "複製",
       "topics.delete.shortcut": "按住 {{key}} 可直接刪除",
       "topics.edit.placeholder": "輸入新名稱",
@@ -576,12 +570,16 @@
       "urls": "網址",
       "dimensions": "嵌入維度",
       "dimensions_size_tooltip": "嵌入維度大小，數值越大，嵌入維度越大，但消耗的 Token 也越多",
-      "dimensions_size_placeholder": "預設值（不建議修改）",
-      "dimensions_size_too_large": "嵌入維度不能超過模型上下文限制（{{max_context}}）",
       "status_embedding_completed": "嵌入完成",
       "status_preprocess_completed": "預處理完成",
       "status_embedding_failed": "嵌入失敗",
-      "status_preprocess_failed": "預處理失敗"
+      "status_preprocess_failed": "預處理失敗",
+      "dimensions_size_placeholder": " 嵌入維度大小，例如 1024",
+      "dimensions_auto_set": "自動設定嵌入維度",
+      "dimensions_error_invalid": "請輸入嵌入維度大小",
+      "dimensions_size_too_large": "嵌入維度不能超過模型上下文限制（{{max_context}}）",
+      "dimensions_set_right": "⚠️ 請確保模型支援所設置的嵌入維度大小",
+      "dimensions_default": "模型將使用預設嵌入維度"
     },
     "languages": {
       "arabic": "阿拉伯文",
@@ -958,7 +956,10 @@
       },
       "rendering_speed": "渲染速度",
       "text_desc_required": "請先輸入圖片描述",
+      "image_handle_required": "請先上傳圖片。",
       "req_error_text": "运行失败，请重试。提示词避免“版权词”和”敏感词”哦。",
+      "req_error_token": "請檢查令牌的有效性",
+      "req_error_no_balance": "請檢查令牌的有效性",
       "auto_create_paint": "自動新增圖片",
       "auto_create_paint_tip": "圖片生成後，會自動新增圖片",
       "select_model": "選擇模型",
@@ -1521,6 +1522,7 @@
       "messages.prompt": "提示詞顯示",
       "messages.tokens": "Token用量顯示",
       "messages.divider": "訊息間顯示分隔線",
+      "messages.divider.tooltip": "不適用於氣泡樣式消息",
       "messages.grid_columns": "訊息網格展示列數",
       "messages.grid_popover_trigger": "網格詳細資訊觸發",
       "messages.grid_popover_trigger.click": "點選顯示",
@@ -1554,6 +1556,7 @@
       "models.add.model_id.tooltip": "例如 gpt-3.5-turbo",
       "models.add.model_name": "模型名稱",
       "models.add.model_name.placeholder": "選填，例如 GPT-4",
+      "models.add.model_name.tooltip": "例如 GPT-4",
       "models.check.all": "所有",
       "models.check.all_models_passed": "所有模型檢查通過",
       "models.check.button_caption": "健康檢查",
@@ -1697,6 +1700,8 @@
         "copy_last_message": "複製上一則訊息",
         "key": "按鍵",
         "mini_window": "快捷助手",
+        "selection_assistant_toggle": "開關劃詞助手",
+        "selection_assistant_select_text": "劃詞助手：取词",
         "new_topic": "新增話題",
         "press_shortcut": "按下快捷鍵",
         "reset_defaults": "重設預設快捷鍵",
@@ -1706,7 +1711,7 @@
         "search_message_in_chat": "在當前對話中搜尋訊息",
         "show_app": "顯示/隱藏應用程式",
         "show_settings": "開啟設定",
-        "title": "快速方式",
+        "title": "快捷鍵",
         "toggle_new_context": "清除上下文",
         "toggle_show_assistants": "切換助手顯示",
         "toggle_show_topics": "切換話題顯示",
@@ -1790,7 +1795,45 @@
       "tray.onclose": "關閉時最小化到系统匣",
       "tray.show": "顯示系统匣圖示",
       "tray.title": "系统匣",
-      "general.auto_check_update.title": "啟用自動更新",
+      "websearch": {
+        "check_success": "驗證成功",
+        "get_api_key": "點選這裡取得金鑰",
+        "search_with_time": "搜尋包含日期",
+        "tavily": {
+          "api_key": "Tavily API 金鑰",
+          "api_key.placeholder": "請輸入 Tavily API 金鑰",
+          "description": "Tavily 是一個為 AI 代理量身訂製的搜尋引擎，提供即時、準確的結果、智慧查詢建議和深入的研究能力",
+          "title": "Tavily"
+        },
+        "blacklist": "黑名單",
+        "blacklist_description": "以下網站不會出現在搜索結果中",
+        "search_max_result": "搜尋結果個數",
+        "search_result_default": "預設",
+        "check": "檢查",
+        "search_provider": "搜尋服務商",
+        "search_provider_placeholder": "選擇一個搜尋服務商",
+        "no_provider_selected": "請選擇搜索服務商後再檢查",
+        "check_failed": "驗證失敗",
+        "blacklist_tooltip": "匹配模式: *://*.example.com/*\n正则表达式: /example\\.(net|org)/",
+        "subscribe": "黑名單訂閱",
+        "subscribe_update": "更新",
+        "subscribe_add": "添加訂閱",
+        "subscribe_url": "訂閱源地址",
+        "subscribe_name": "替代名稱",
+        "subscribe_name.placeholder": "當下載的訂閱源沒有名稱時所使用的替代名稱",
+        "subscribe_add_success": "訂閱源添加成功!",
+        "subscribe_delete": "刪除",
+        "title": "網路搜尋",
+        "overwrite": "覆蓋搜尋服務商",
+        "overwrite_tooltip": "強制使用搜尋服務商而不是大語言模型進行搜尋",
+        "apikey": "API 金鑰",
+        "free": "免費",
+        "content_limit": "內容長度限制",
+        "content_limit_tooltip": "限制搜尋結果的內容長度，超過限制的內容將被截斷"
+      },
+      "general.auto_check_update.title": "自動更新",
+      "general.early_access.title": "搶先體驗",
+      "general.early_access.tooltip": "開啟後，將使用 GitHub 的最新版本，下載速度可能較慢，請務必提前備份數據",
       "quickPhrase": {
         "title": "快捷短語",
         "add": "新增短語",
@@ -1885,7 +1928,7 @@
       "menu": {
         "description": "對當前輸入框內容進行翻譯"
       },
-      "detected.language": "檢測到的語言"
+      "detected.language": "自動檢測"
     },
     "tray": {
       "quit": "結束",
@@ -1914,7 +1957,8 @@
           "summary": "總結",
           "search": "搜尋",
           "refine": "優化",
-          "copy": "複製"
+          "copy": "複製",
+          "quote": "引用"
         },
         "window": {
           "pin": "置頂",
@@ -1941,11 +1985,16 @@
         "toolbar": {
           "title": "工具列",
           "trigger_mode": {
-            "title": "觸發方式",
-            "description": "劃詞立即顯示工具列，或者劃詞後按住 Ctrl 鍵才顯示工具列。",
+            "title": "取詞方式",
+            "description": "劃詞後，觸發取詞並顯示工具列的方式",
             "description_note": "在某些應用中可能無法透過 Ctrl 鍵劃詞。若使用了AHK等工具對Ctrl鍵進行了重新對應，可能導致部分應用程式無法劃詞。",
             "selected": "劃詞",
-            "ctrlkey": "Ctrl 鍵"
+            "selected_note": "劃詞後，立即顯示工具列",
+            "ctrlkey": "Ctrl 鍵",
+            "ctrlkey_note": "劃詞後，再 按住 Ctrl鍵，才顯示工具列",
+            "shortcut": "快捷鍵",
+            "shortcut_note": "劃詞後，使用快捷鍵顯示工具列。請在快捷鍵設定頁面中設置取詞快捷鍵並啟用。",
+            "shortcut_link": "前往快捷鍵設定"
           },
           "compact_mode": {
             "title": "緊湊模式",
