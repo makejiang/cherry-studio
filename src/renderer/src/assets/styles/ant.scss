@@ -211,7 +211,8 @@
     border: 0.5px solid var(--color-border);
     border-radius: 12px;
 
-    .ant-dropdown-menu-item {
+    .ant-dropdown-menu-item,
+    .ant-dropdown-menu-submenu-title {
       padding: 5px;
     }
   }
