@@ -1,276 +1,558 @@
-# 消息历史版本管理系统设计技术报告
+# 消息历史版本管理系统设计技术报告（最终版 - 含多模型支持）
 
-## 1. 项目背景与需求
+## 1. 系统概述
 
-### 1.1 当前架构状态
+基于现有扁平化架构的最小化扩展，通过 **Topic快照 + Message字段扩展（含siblingIds）** 实现版本管理、分支对话和多模型并行回复功能。
 
-- 已实现 `Message` 和 `MessageBlock` 的扁平化存储
-- 使用 Redux `createEntityAdapter` 进行状态管理
-- 数据库操作基于单个实体，已弃用 `topic.messages` 大数组
-- 缺少版本管理和分支对话功能
+### 1.1 核心设计理念
 
-### 1.2 设计目标
+- **最小破坏性**：只扩展现有实体，不新增表
+- **快照渲染**：通过Topic简单快照管理主线渲染顺序
+- **关系扩展**：通过Message字段实现树状分支、双向链表版本、多模型兄弟关系
 
-![image.png](topic-message-tree.png)
+## 2. 数据结构设计
 
-在现有扁平化架构基础上，增加：
-
-- 有向多叉树的对话结构管理
-- 双向链表的版本管理机制
-- 分支对话支持
-- 最小化对现有流式更新机制的影响
-
-## 2. 架构演进设计
-
-### 2.1 当前架构 vs 新架构
-
-**当前架构**：
-
-```
-Topic → Message[] (通过 selector 组装)
-Message → MessageBlock[]
-```
-
-**新架构**：
-
-```
-Topic → UserMessage ←→ UserMessage (线性链表)
-         ↓
-      AssistantMessageGroup ←→ AssistantMessageGroup (版本链表)
-         ↓
-      Message[] → MessageBlock[]
-```
-
-### 2.2 新增实体
-
-| 新增实体                | 作用                   | 与现有实体关系                     |
-| ----------------------- | ---------------------- | ---------------------------------- |
-| `UserMessage`           | 用户消息节点，树的主干 | 包含现有 user role 的 Message 功能 |
-| `AssistantMessageGroup` | 助手回复组，版本容器   | 组织现有 assistant role 的 Message |
-
-**现有实体调整**：
-
-- `Message`: 增加 `groupId` 字段，移除 user role
-- `MessageBlock`: 保持不变
-- `Topic`: 移除弃用字段，增加树指针，Topic 只维护当前"活跃对话路径"的快照，用户在 UI 上看到的默认对话流就是这个活跃快照
-
-### 2.3 数据结构预览
+### 2.1 实体定义
 
 ```typescript
-export interface UserMessage {
-  // 基础标识
+interface Topic {
+  // === 现有字段保持不变 ===
   id: string
-  topicId: string
+  name: string
   createdAt: string
-  updatedAt?: string
-  status: UserMessageStatus
-  // 消息内容关联
-  blocks: MessageBlock['id'][]
-  // 树结构关联 - 邻接列表
-  parentAssistantGroupId?: string // 指向父助手消息组（回复哪个助手消息）
-  // 线性链表关联 - 话题内用户消息顺序
-  prevUserMessageId?: string // 前一个用户消息
-  nextUserMessageId?: string // 后一个用户消息
+  updatedAt: string
+
+  // === 保持简单快照 ===
+  activeMessageIds: string[] // 当前活跃对话主线的消息ID顺序
 }
 
-export interface AssistantMessageGroup {
-  // 基础标识
+interface Message {
+  // === 现有字段保持不变 ===
   id: string
+  role: 'user' | 'assistant' | 'system'
   topicId: string
-  createdAt: string
-  updatedAt?: string
-  status: AssistantMessageStatus
-
-  // 树结构关联 - 邻接列表
-  parentUserMessageId: string // 指向父用户消息（回复哪个用户消息）
-
-  // 版本链表关联 - 同一用户消息下的不同版本
-  version: number // 版本号，从 0 开始
-  prevVersionGroupId?: string // 前一个版本组
-  nextVersionGroupId?: string // 后一个版本组
-
-  isActiveInTopic: boolean // 是否是当前活跃对话路径的快照
-
-  // 内容容器关联
-  messageIds: Message['id'][] // 包含的实际消息ID列表
-}
-
-export interface Message {
-  // 基础标识
-  id: string
-  createdAt: string
-  updatedAt?: string
-  status: AssistantMessageStatus
-
-  // 角色限制 - 不再包含 'user'
-  role: 'assistant' | 'system'
-
-  // 组织关联
-  groupId: string // 指向所属的 AssistantMessageGroup
-
-  // 消息内容关联
   blocks: MessageBlock['id'][]
 
-  // 向后兼容字段（用于现有代码）
-  askId?: string // 指向原始 UserMessage ID，保持向后兼容
-  topicId?: string // 冗余字段，便于查询优化
+  // === 新增：关系字段 ===
+  askId?: string // 问答关系：assistant指向对应的user消息
+  parentMessageId?: string // 分支关系：指向回复的目标消息
+  version?: number // 版本号（assistant消息专用）
+  prevVersionId?: string // 版本链表：前一版本
+  nextVersionId?: string // 版本链表：后一版本
+  groupRequestId?: string // 请求分组：同次API请求的标识
+  siblingIds?: string[] // 兄弟关系：同级多模型回复的ID列表
 }
 
-export interface Topic {
-  // 基础标识
+interface MessageBlock {
+  // === 完全不变 ===
   id: string
-  createdAt: string
-  updatedAt?: string
+  messageId: string
+  type: MessageBlockType
+  content: string
+  // ...其他现有字段
+}
+```
 
-  // 树结构入口指针
-  rootUserMessageId?: string // 第一个用户消息节点ID
-  latestUserMessageId?: string // 最新用户消息节点ID
-  activeConversationPath: {
-    // 新增：活跃路径快照
-    userMessageIds: string[] // 按时间顺序的用户消息ID列表
-    activeGroupIds: string[] // 每个用户消息当前激活的助手组ID
+### 2.2 数据关系图
+
+```mermaid
+graph TB
+    subgraph "Topic快照层 (主线)"
+        T[Topic.activeMessageIds: user1→asst1-gpt→user2]
+    end
+
+    subgraph "消息实体层"
+        U1[User Message 1<br/>id: user1]
+        A1G["GPT-4 回复<br/>id: asst1-gpt, askId: user1<br/>siblingIds: [asst1-claude]"]
+        A1C["Claude 回复<br/>id: asst1-claude, askId: user1<br/>siblingIds: [asst1-gpt]"]
+        U2["User Message 2<br/>id: user2, parentMessageId: asst1-gpt"]
+    end
+
+    subgraph "版本链表层 (隐藏)"
+        A1GV0[GPT-4 v0<br/>askId: user1, version: 0]
+        A1GV1[GPT-4 v1<br/>askId: user1, version: 1]
+
+        A1GV0 -.->|nextVersionId| A1GV1
+        A1GV1 -.->|prevVersionId| A1GV0
+    end
+
+    subgraph "分支树层 (隐藏)"
+        U1B[User Branch 1<br/>parentMessageId: asst1-gpt]
+        A1B[Assistant Branch 1<br/>askId: user1b]
+    end
+
+    T --> U1
+    T --> A1G
+    T --> U2
+
+    A1G -.->|askId| U1
+    A1C -.->|askId| U1
+    A1G -.->|siblingIds| A1C
+    A1C -.->|siblingIds| A1G
+    U2 -.->|parentMessageId| A1G
+
+    U1B -.->|parentMessageId| A1G
+    A1B -.->|askId| U1B
+```
+
+## 3. 核心操作流程
+
+### 3.1 发送新消息（多模型）
+
+```mermaid
+sequenceDiagram
+    participant UI
+    participant Redux
+    participant DB
+    participant API
+
+    UI->>Redux: sendMessage(userContent, models[])
+
+    Note over Redux: 1. 创建用户消息
+    Redux->>Redux: userMessage = { id: uuid(), role: 'user', ... }
+
+    Note over Redux: 2. 创建助手消息（多模型）
+    Redux->>Redux: groupRequestId = uuid()
+    Redux->>Redux: assistantMessages = models.map(m => createAssistant(userMessage.id, m))
+
+    Note over Redux: 3. 设置兄弟关系
+    Redux->>Redux: assistantIds = assistantMessages.map(m => m.id)
+    loop 每个助手消息
+        Redux->>Redux: msg.siblingIds = assistantIds.filter(id => id !== msg.id)
+    end
+
+    Note over Redux: 4. 更新Topic快照
+    Redux->>Redux: newActiveMessageIds = [<br/>...oldIds,<br/>userMessage.id,<br/>assistantMessages[0].id<br/>]
+
+    Note over Redux: 5. 原子保存
+    Redux->>DB: transaction([messages, topics])
+    DB->>DB: messages.bulkPut([userMessage, ...assistantMessages])
+    DB->>DB: topics.update(topicId, { activeMessageIds })
+
+    Note over Redux: 6. 发送API请求
+    loop 每个模型
+        Redux->>API: generateResponse(model, userContent)
+    end
+
+    Redux->>UI: 更新状态
+```
+
+**复杂度**：O(M) where M = 模型数量
+
+### 3.2 重发消息（版本管理）
+
+```mermaid
+sequenceDiagram
+    participant UI
+    participant Redux
+    participant DB
+
+    UI->>Redux: resendMessage(userMessageId)
+
+    Note over Redux: 1. 查找现有版本
+    Redux->>DB: messages.where('askId').equals(userMessageId)
+    DB-->>Redux: existingVersions[]
+
+    Note over Redux: 2. 计算新版本号
+    Redux->>Redux: latestVersion = max(versions.map(v => v.version))
+    Redux->>Redux: newVersion = latestVersion + 1
+
+    Note over Redux: 3. 创建新版本消息（可能多模型）
+    Redux->>Redux: newGroupRequestId = uuid()
+    Redux->>Redux: newVersionMessages = models.map(m => createNewVersion(prevMsg, newVersion, newGroupRequestId))
+
+    Note over Redux: 4. 设置新版本的兄弟关系
+    Redux->>Redux: newVersionIds = newVersionMessages.map(m => m.id)
+    loop 每个新版本消息
+        Redux->>Redux: msg.siblingIds = newVersionIds.filter(id => id !== msg.id)
+    end
+
+    Note over Redux: 5. 更新版本链表
+    Redux->>DB: transaction(messages)
+    DB->>DB: messages.update(prevMessage.id, { nextVersionId })
+    DB->>DB: messages.bulkPut(newVersionMessages)
+
+    Redux->>UI: 更新状态
+```
+
+**复杂度**：O(V) 查找 + O(M) 创建
+
+### 3.3 切换活跃模型（UI交互）
+
+```mermaid
+flowchart TD
+    A[用户在UI上选择其他模型] --> B[获取当前快照]
+    B --> C[找到当前助手消息在快照中的位置]
+    C --> D[用新选择的模型消息ID替换快照中的ID]
+    D --> E[保存到数据库]
+    E --> F[Redux自动重新渲染]
+
+    style A fill:#e1f5fe
+    style F fill:#c8e6c9
+```
+
+```typescript
+const switchActiveModel = async (topicId: string, messageIndex: number, newModelMessageId: string) => {
+  const topic = await db.topics.get(topicId)
+  const newActiveMessageIds = [...topic.activeMessageIds]
+  newActiveMessageIds[messageIndex] = newModelMessageId
+
+  await db.topics.update(topicId, { activeMessageIds: newActiveMessageIds })
+}
+```
+
+**复杂度**：O(1)
+
+## 4. 字段作用详解
+
+### 4.1 关键字段关系图
+
+```mermaid
+graph LR
+    subgraph "问答关系"
+        askId[askId<br/>assistant → user<br/>逻辑关系，永久不变]
+    end
+
+    subgraph "分支关系"
+        parentId[parentMessageId<br/>message → message<br/>分支对话，树状结构]
+    end
+
+    subgraph "版本关系"
+        version[version + prevVersionId + nextVersionId<br/>同askId下的版本链表]
+    end
+
+    subgraph "请求分组"
+        groupId[groupRequestId<br/>同次API请求标识<br/>一次性，每次重发都变]
+    end
+
+    subgraph "兄弟关系"
+        siblingId[siblingIds<br/>同级多模型回复<br/>双向引用]
+    end
+
+    askId -.-> version
+    askId -.-> siblingId
+    parentId -.-> askId
+    groupId -.-> askId
+```
+
+### 4.2 字段使用场景
+
+| 字段                             | 用途       | 查询场景                   | 生命周期 |
+| -------------------------------- | ---------- | -------------------------- | -------- |
+| **askId**                        | 问答映射   | 查找用户问题的所有回复版本 | 永久不变 |
+| **parentMessageId**              | 分支对话   | 查找某消息的回复分支       | 永久不变 |
+| **version + prev/nextVersionId** | 版本管理   | 版本历史导航               | 永久不变 |
+| **groupRequestId**               | 请求追踪   | 批量状态更新、请求监控     | 一次性   |
+| **siblingIds**                   | 多模型并行 | 渲染同级多模型回复         | 永久不变 |
+
+### 4.3 多模型并行渲染示例
+
+```mermaid
+graph TD
+    U1[User: 帮我写个函数<br/>id: user1]
+
+    subgraph "第一次请求 (groupRequestId: req1)"
+        A1["GPT-4 回复<br/>id: asst1-gpt, askId: user1<br/>siblingIds: [asst1-claude]"]
+        A2["Claude 回复<br/>id: asst1-claude, askId: user1<br/>siblingIds: [asst1-gpt]"]
+    end
+
+    subgraph "Topic快照 (主线)"
+        T["activeMessageIds: [user1, asst1-gpt]"]
+    end
+
+    subgraph "UI渲染 (通过siblingIds扩展)"
+        UI_U1[User: 帮我写个函数]
+        UI_A1["GPT-4 回复 (活跃)"]
+        UI_A2["Claude 回复 (可选)"]
+    end
+
+    U1 --> A1
+    U1 --> A2
+
+    T --> U1
+    T --> A1
+
+    A1 -.->|siblingIds| A2
+    A2 -.->|siblingIds| A1
+
+    UI_U1 -.-> UI_A1
+    UI_U1 -.-> UI_A2
+```
+
+## 5. 数据查询与状态管理
+
+### 5.1 话题加载流程
+
+```mermaid
+sequenceDiagram
+    participant UI
+    participant Redux
+    participant DB
+    participant Selector
+
+    UI->>Redux: loadTopic(topicId)
+    Redux->>DB: 并行查询
+
+    par 查询消息
+        DB->>DB: messages.where('topicId').equals(topicId)
+    and 查询块
+        DB->>DB: messageBlocks.where('topicId').equals(topicId)
+    end
+
+    DB-->>Redux: { messages[], blocks[] }
+    Redux->>Redux: 更新实体状态
+
+    UI->>Selector: selectActiveConversationWithSiblings(topicId)
+    Selector->>Redux: 获取Topic.activeMessageIds
+    Selector->>Redux: 获取messages实体
+    Selector-->>UI: 按快照顺序的消息列表 (含兄弟节点)
+
+    Note over UI: 渲染对话界面 (支持多模型)
+```
+
+### 5.2 渲染选择器（含兄弟节点）
+
+```typescript
+export const selectActiveConversationWithSiblings = createSelector(
+  [
+    (state: RootState, topicId: string) => state.topics.entities[topicId]?.activeMessageIds || [],
+    (state: RootState) => state.messages.entities,
+    (state: RootState) => state.messageBlocks.entities
+  ],
+  (activeMessageIds, messagesEntities, blocksEntities) => {
+    return activeMessageIds
+      .map((messageId) => {
+        const message = messagesEntities[messageId]
+        if (!message) return null
+
+        if (message.role === 'user') {
+          return { type: 'user', message, blocks: getMessageBlocks(message, blocksEntities) }
+        } else if (message.role === 'assistant') {
+          const siblingMessages = (message.siblingIds || []).map((id) => messagesEntities[id]).filter(Boolean)
+          const allAssistantMessages = [message, ...siblingMessages]
+
+          return {
+            type: 'assistant_group',
+            messages: allAssistantMessages.map((msg) => ({
+              message: msg,
+              blocks: getMessageBlocks(msg, blocksEntities),
+              isActive: msg.id === messageId
+            })),
+            activeMessageId: messageId
+          }
+        }
+      })
+      .filter(Boolean)
   }
-
-  /**
-   * @deprecated 已弃用的扁平数组，保留向后兼容
-   */
-  messages: Message[]
-}
+)
 ```
 
-## 3. 关键操作复杂度对比
+**复杂度**：O(N + S) where N = 快照长度, S = 兄弟节点总数
 
-### 3.1 变量定义
+## 6. 时空复杂度分析
 
-- `N`: 话题中用户消息轮次数量
-- `V`: 每轮平均版本数量
-- `M`: 每组平均消息数量
-- `B`: 平均消息块数量
+### 6.1 核心操作复杂度对比
 
-### 3.2 操作复杂度对比
+```mermaid
+graph LR
+    subgraph "现有架构"
+        A1[加载话题: O(M+B)]
+        A2[渲染对话: O(M) 需要过滤排序]
+        A3[发送消息: O(1)]
+    end
 
-| 操作           | 当前方案                    | 新方案              | 主要改进                                         |
-| -------------- | --------------------------- | ------------------- | ------------------------------------------------ |
-| **发送新消息** | O(1) 新增 + O(1) Topic更新  | O(1) 新增多个实体   | 实体数量增加，但复杂度相同                       |
-| **重发消息**   | O(M×B) 删除旧块 + O(1) 重置 | **O(1) 创建新版本** | **支持版本保留，避免删除操作**                   |
-| **加载话题**   | O(N×M+B) 批量查询           | O(N×M+B) 批量查询   | 只加载活跃路径的快照，不加载历史版本，复杂度相同 |
-| **删除消息**   | O(K) 删除相关实体           | O(K) 删除相关实体   | 复杂度相同                                       |
-| **版本切换**   | **不支持**                  | **O(1) 指针查找**   | **新功能**                                       |
-| **分支对话**   | **不支持**                  | **O(1) 创建分支**   | **新功能**                                       |
+    subgraph "新架构 (含多模型)"
+        B1[加载话题: O(M+B) ✅相同]
+        B2[渲染对话: O(N+S) ✅更优]
+        B3[发送消息: O(M_models) ✅相同]
+        B4[版本切换: O(1) ➕新功能]
+        B5[重发消息: O(V)+O(M_models) ➕新功能]
+        B6[模型切换: O(1) ➕新功能]
+    end
 
-### 3.3 性能影响分析
-
-**积极影响**：
-
-- **重发操作优化**：从删除重建变为版本创建，避免数据丢失
-- **版本管理**：O(1) 的版本切换和历史访问
-- **并发安全**：版本隔离减少操作冲突
-
-**成本增加**：
-
-- **存储空间**：增加 `O(V)` 倍的版本存储开销
-- **Selector 复杂度**：树状数据重组逻辑更复杂
-
-## 4. 流式更新兼容性分析
-
-### 4.1 现有机制保持不变
-
-```typescript
-// 现有的流式更新机制完全兼容
-throttledBlockUpdate(blockId, { content, status }) // 仍然是 O(1)
-dispatch(updateOneBlock({ id: blockId, changes })) // 仍然是 O(1)
+    style B1 fill:#c8e6c9
+    style B2 fill:#c8e6c9
+    style B3 fill:#c8e6c9
+    style B4 fill:#fff3e0
+    style B5 fill:#fff3e0
+    style B6 fill:#fff3e0
 ```
 
-### 4.2 新架构对流式更新的影响
+### 6.2 性能优势分析
 
-- **MessageBlock 层面**：零影响，仍通过 `messageId` 直接关联
-- **Message 层面**：增加 `groupId` 字段，不影响块更新逻辑
-- **状态同步**：保持现有的节流机制和事务策略
+| 操作         | 现有架构       | 新架构                       | 优势说明             |
+| ------------ | -------------- | ---------------------------- | -------------------- |
+| **话题加载** | O(M + B)       | O(M + B)                     | 性能保持不变         |
+| **对话渲染** | O(M) 过滤+排序 | **O(N+S)** 直接索引+兄弟扩展 | N << M，S通常较小    |
+| **发送消息** | O(1)           | O(M_models)                  | 支持多模型，合理增长 |
+| **版本切换** | 不支持         | **O(1)**                     | 新功能，极佳性能     |
+| **模型切换** | 不支持         | **O(1)**                     | 新功能，极佳性能     |
 
-## 5. Redux 状态管理演进
+**关键优势**：
 
-### 5.1 当前 State 结构
+- **渲染性能提升**：从 O(M) 优化到 O(N+S)，长对话场景收益显著
+- **多模型支持**：通过 siblingIds 优雅实现
+- **版本管理**：O(1) 的版本/模型切换，用户体验极佳
+- **向后兼容**：现有核心操作性能保持不变
 
-```typescript
-// 当前已有
-state = {
-  messages: { ids: [], entities: {} }, // 现有
-  messageBlocks: { ids: [], entities: {} } // 现有
-  // 其他现有 slice...
-}
+## 7. 数据库Schema演进
+
+### 7.1 Migration策略
+
+```mermaid
+flowchart TD
+    A[现有Schema] --> B[添加字段]
+    B --> C[创建索引]
+    C --> D[数据迁移]
+    D --> E[验证完整性]
+
+    B1[Topic: +activeMessageIds]
+    B2[Message: +askId, +parentMessageId<br/>+version, +prevVersionId<br/>+nextVersionId, +groupRequestId<br/>+siblingIds]
+
+    C1[idx_messages_askid_version]
+    C2[idx_messages_parent]
+    C3[idx_messages_group_request]
+
+    D1[生成activeMessageIds快照]
+    D2[设置现有assistant消息version=0]
+
+    B --> B1
+    B --> B2
+    C --> C1
+    C --> C2
+    C --> C3
+    D --> D1
+    D --> D2
 ```
 
-### 5.2 新增 State 结构
-
-```typescript
-// 新增 slice
-state = {
-  // 现有保持不变
-  messages: { ids: [], entities: {} },
-  messageBlocks: { ids: [], entities: {} },
-
-  // 新增
-  userMessages: { ids: [], entities: {} },
-  assistantMessageGroups: { ids: [], entities: {} }
-}
-```
-
-### 5.3 迁移策略
-
-1. **向后兼容**：现有 `Message` 和 `MessageBlock` API 保持不变
-2. **渐进式迁移**：新功能使用新实体，现有功能继续工作
-3. **Selector 适配**：调整 `selectMessagesForTopic` 以支持新的树状结构
-
-## 6. 数据库迁移策略
-
-### 6.1 Schema 演进
+### 7.2 SQL Migration
 
 ```sql
--- 保持现有表结构
-Messages: id(PK), 现有字段..., groupId(新增)
-MessageBlocks: id(PK), 现有字段... (无变化)
+-- 1. 添加字段
+ALTER TABLE topics ADD COLUMN activeMessageIds TEXT; -- JSON数组
+ALTER TABLE messages ADD COLUMN askId TEXT;
+ALTER TABLE messages ADD COLUMN parentMessageId TEXT;
+ALTER TABLE messages ADD COLUMN version INTEGER;
+ALTER TABLE messages ADD COLUMN prevVersionId TEXT;
+ALTER TABLE messages ADD COLUMN nextVersionId TEXT;
+ALTER TABLE messages ADD COLUMN groupRequestId TEXT;
+ALTER TABLE messages ADD COLUMN siblingIds TEXT; -- JSON数组
 
--- 新增表
-UserMessages: id(PK), topicId, parentAssistantGroupId, prevUserMessageId, nextUserMessageId
-AssistantMessageGroups: id(PK), topicId, parentUserMessageId, version, prevVersionGroupId, nextVersionGroupId
+-- 2. 创建索引
+CREATE INDEX idx_messages_askid_version ON messages(askId, version);
+CREATE INDEX idx_messages_parent ON messages(parentMessageId);
+CREATE INDEX idx_messages_group_request ON messages(groupRequestId);
+
+-- 3. 数据迁移
+UPDATE messages SET version = 0 WHERE role = 'assistant';
 ```
 
-### 6.2 数据迁移
+## 8. 流式更新兼容性
 
-```typescript
-// 迁移现有数据到新结构
-const migrateExistingMessages = async () => {
-  // 1. 识别 user role 的 Message，转换为 UserMessage
-  // 2. 按 askId 分组 assistant role 的 Message，创建 AssistantMessageGroup
-  // 3. 更新 Message 实体的 groupId 字段
-  // 4. 构建链表指针关系
-}
+### 8.1 MessageBlock更新流程
+
+```mermaid
+sequenceDiagram
+    participant Stream
+    participant Redux
+    participant DB
+    participant UI
+
+    Note over Stream: 流式内容到达
+    Stream->>Redux: updateBlock(blockId, content)
+    Redux->>Redux: updateOneBlock({ id, changes })
+    Redux->>UI: 立即更新显示
+
+    Note over Redux: 节流数据库写入
+    Redux->>DB: throttledDbUpdate(blockId, content)
+
+    Note over Stream,UI: 版本/兄弟关系不影响块更新
 ```
 
-## 7. 技术债务与风险评估
+**关键点**：
 
-### 7.1 新增复杂度
+- MessageBlock 仍然直接关联到 Message
+- 版本/兄弟关系在 Message 层面，不影响 Block 的流式更新
+- 现有的节流机制和更新逻辑完全保持不变
 
-- **开发复杂度**：新增 2 个实体类型和相应的 CRUD 操作
-- **测试复杂度**：版本管理和分支逻辑的测试覆盖
-- **维护复杂度**：更复杂的数据一致性保证
+## 9. 系统架构总览
 
-### 7.2 性能风险
+### 9.1 整体架构图
 
-- **内存占用**：历史版本累积可能导致内存压力
-- **查询性能**：复杂 Selector 可能影响渲染性能
-- **存储增长**：版本保留策略需要清理机制
+```mermaid
+graph TB
+    subgraph "UI层"
+        UI1[对话界面]
+        UI2[版本选择器]
+        UI3[分支导航]
+        UI4[模型切换器]
+    end
 
-### 7.3 缓解措施
+    subgraph "Redux状态层"
+        R1[topics: EntityAdapter]
+        R2[messages: EntityAdapter]
+        R3[messageBlocks: EntityAdapter]
+        S1[selectActiveConversationWithSiblings]
+        S2[selectVersionHistory]
+    end
 
-```typescript
-// 版本清理策略
-const cleanupOldVersions = async (topicId: string, keepVersions: number = 5) => {
-  // 保留最近 N 个版本，清理旧版本
-}
+    subgraph "数据库层"
+        DB1[(topics表)]
+        DB2[(messages表)]
+        DB3[(messageBlocks表)]
+    end
 
-// 惰性加载优化
-const loadTopicWithPagination = async (topicId: string, limit: number = 50) => {
-  // 分页加载历史消息，避免一次性加载全部
-}
+    subgraph "API层"
+        API1[多模型并行请求]
+        API2[流式响应处理]
+    end
+
+    UI1 --> S1
+    UI2 --> S2
+    UI4 --> S1
+    S1 --> R1
+    S1 --> R2
+    S2 --> R2
+
+    R1 <--> DB1
+    R2 <--> DB2
+    R3 <--> DB3
+
+    R2 --> API1
+    API2 --> R3
+
+    style UI1 fill:#e3f2fd
+    style R1 fill:#f3e5f5
+    style R2 fill:#f3e5f5
+    style R3 fill:#f3e5f5
+    style DB1 fill:#e8f5e8
+    style DB2 fill:#e8f5e8
+    style DB3 fill:#e8f5e8
+```
+
+### 9.2 数据流向
+
+```mermaid
+flowchart LR
+    A[用户输入] --> B[创建User Message]
+    B --> C["创建Assistant Messages (多模型)"]
+    C --> C1[设置Sibling关系]
+    C1 --> D["更新Topic快照 (主线)"]
+    D --> E[API并行请求]
+    E --> F[流式更新Blocks]
+    F --> G["UI实时渲染 (含多模型)"]
+
+    H[版本切换] --> I[更新快照指针]
+    I --> G
+
+    J[分支对话] --> K[创建分支消息]
+    K --> D
+
+    L[模型切换] --> I
+
+    style A fill:#ffebee
+    style G fill:#e8f5e8
+    style H fill:#fff3e0
+    style J fill:#f3e5f5
+    style L fill:#e1f5fe
 ```
