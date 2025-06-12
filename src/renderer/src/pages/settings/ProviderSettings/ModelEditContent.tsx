@@ -1,4 +1,3 @@
-import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import {
   isEmbeddingModel,
@@ -10,6 +9,7 @@ import {
 import { Model, ModelType } from '@renderer/types'
 import { getDefaultGroupName } from '@renderer/utils'
 import { Button, Checkbox, Divider, Flex, Form, Input, message, Modal } from 'antd'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -108,20 +108,25 @@ const ModelEditContent: FC<ModelEditContentProps> = ({ model, onUpdateModel, ope
           tooltip={t('settings.models.add.group_name.tooltip')}>
           <Input placeholder={t('settings.models.add.group_name.placeholder')} spellCheck={false} />
         </Form.Item>
-        <Form.Item style={{ marginBottom: 15, textAlign: 'center' }}>
+        <Form.Item style={{ marginBottom: 8, textAlign: 'center' }}>
           <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
-            <MoreSettingsRow onClick={() => setShowModelTypes(!showModelTypes)}>
+            <Button
+              color="default"
+              variant="filled"
+              icon={showModelTypes ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              iconPosition="end"
+              onClick={() => setShowModelTypes(!showModelTypes)}
+              style={{ color: 'var(--color-text-3)' }}>
               {t('settings.moresetting')}
-              <ExpandIcon>{showModelTypes ? <UpOutlined /> : <DownOutlined />}</ExpandIcon>
-            </MoreSettingsRow>
+            </Button>
             <Button type="primary" htmlType="submit" size="middle">
               {t('common.save')}
             </Button>
           </Flex>
         </Form.Item>
         {showModelTypes && (
-          <div>
-            <Divider style={{ margin: '0 0 15px 0' }} />
+          <div style={{ marginBottom: 8 }}>
+            <Divider style={{ margin: '16px 0 16px 0' }} />
             <TypeTitle>{t('models.type.select')}:</TypeTitle>
             {(() => {
               const defaultTypes = [
@@ -204,28 +209,6 @@ const TypeTitle = styled.div`
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 600;
-`
-
-const ExpandIcon = styled.div`
-  font-size: 12px;
-  color: var(--color-text-3);
-`
-
-const MoreSettingsRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-3);
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &:hover {
-    background-color: var(--color-background-soft);
-  }
 `
 
 export default ModelEditContent

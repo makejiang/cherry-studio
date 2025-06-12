@@ -2,7 +2,7 @@ import { HStack } from '@renderer/components/Layout'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { useAppDispatch } from '@renderer/store'
 import { setEnableTopicNaming, setTopicNamingPrompt } from '@renderer/store/settings'
-import { Button, Divider, Input, Modal, Switch } from 'antd'
+import { Button, Input, Modal, Switch } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -45,14 +45,13 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
       afterClose={onClose}
       transitionName="animation-move-down"
       footer={null}
+      width={500}
       centered>
-      <Divider style={{ margin: '10px 0' }} />
       <HStack style={{ gap: 10, marginBottom: 20, marginTop: 20 }} alignItems="center">
         <div>{t('settings.models.enable_topic_naming')}</div>
         <Switch checked={enableTopicNaming} onChange={(v) => dispatch(setEnableTopicNaming(v))} />
       </HStack>
-      <Divider style={{ margin: '10px 0' }} />
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 8 }}>
         <div style={{ marginBottom: 10 }}>{t('settings.models.topic_naming_prompt')}</div>
         <Input.TextArea
           rows={4}
