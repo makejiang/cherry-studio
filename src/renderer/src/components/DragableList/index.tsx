@@ -51,23 +51,27 @@ const DragableList: FC<Props<any>> = ({
             <VirtualList data={list} itemKey="id">
               {(item, index) => {
                 const id = item.id || item
-                return (
-                  <Draggable key={`draggable_${id}_${index}`} draggableId={id} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={{
-                          marginBottom: 8,
-                          ...listStyle,
-                          ...provided.draggableProps.style
-                        }}>
-                        {children(item, index)}
-                      </div>
-                    )}
-                  </Draggable>
-                )
+                if (!item.disabled) {
+                  return (
+                    <Draggable key={`draggable_${id}_${index}`} draggableId={id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            ...listStyle,
+                            ...provided.draggableProps.style,
+                            marginBottom: 8
+                          }}>
+                          {children(item, index)}
+                        </div>
+                      )}
+                    </Draggable>
+                  )
+                } else {
+                  return <div> {children(item, index)}</div>
+                }
               }}
             </VirtualList>
             {provided.placeholder}
