@@ -1,10 +1,9 @@
 import ContextMenu from '@renderer/components/ContextMenu'
 import Favicon from '@renderer/components/Icons/FallbackFavicon'
-import { HStack } from '@renderer/components/Layout'
 import { fetchWebContent } from '@renderer/utils/fetch'
 import { cleanMarkdownContent } from '@renderer/utils/formats'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Button, Drawer, message, Skeleton } from 'antd'
+import { Button, message, Popover, Skeleton } from 'antd'
 import { Check, Copy, FileSearch } from 'lucide-react'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -48,16 +47,40 @@ const truncateText = (text: string, maxLength = 100) => {
 
 const CitationsList: React.FC<CitationsListProps> = ({ citations }) => {
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
 
   const previewItems = citations.slice(0, 3)
   const count = citations.length
   if (!count) return null
 
+  // Popover 内容 - 显示所有引用
+  const popoverContent = (
+    <PopoverContent>
+      {citations.map((citation) => (
+        <div key={citation.url || citation.number}>
+          {citation.type === 'websearch' ? (
+            <WebSearchCitation citation={citation} />
+          ) : (
+            <KnowledgeCitation citation={citation} />
+          )}
+        </div>
+      ))}
+    </PopoverContent>
+  )
+
   return (
     <QueryClientProvider client={queryClient}>
-      <>
-        <OpenButton type="text" onClick={() => setOpen(true)}>
+      <Popover
+        arrow={false}
+        content={popoverContent}
+        title={<div style={{ padding: '8px 12px 0', fontWeight: 'bold' }}>{t('message.citations')}</div>}
+        placement="right"
+        trigger="hover"
+        styles={{
+          body: {
+            padding: '0 0 8px 0'
+          }
+        }}>
+        <OpenButton type="text">
           <PreviewIcons>
             {previewItems.map((c, i) => (
               <PreviewIcon key={i} style={{ zIndex: previewItems.length - i }}>
@@ -71,27 +94,7 @@ const CitationsList: React.FC<CitationsListProps> = ({ citations }) => {
           </PreviewIcons>
           {t('message.citation', { count })}
         </OpenButton>
-
-        <Drawer
-          title={t('message.citations')}
-          placement="right"
-          onClose={() => setOpen(false)}
-          open={open}
-          width={680}
-          styles={{ header: { border: 'none' }, body: { paddingTop: 0 } }}
-          destroyOnClose={false}>
-          {open &&
-            citations.map((citation) => (
-              <HStack key={citation.url || citation.number} style={{ alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                {citation.type === 'websearch' ? (
-                  <WebSearchCitation citation={citation} />
-                ) : (
-                  <KnowledgeCitation citation={citation} />
-                )}
-              </HStack>
-            ))}
-        </Drawer>
-      </>
+      </Popover>
     </QueryClientProvider>
   )
 }
@@ -253,7 +256,6 @@ const WebSearchCard = styled.div`
   width: 100%;
   padding: 12px;
   border-radius: var(--list-item-border-radius);
-  background-color: var(--color-background);
   transition: all 0.3s ease;
   position: relative;
 `
@@ -280,6 +282,11 @@ const WebSearchCardContent = styled.div`
     -ms-user-select: text;
     user-select: text;
   }
+`
+
+const PopoverContent = styled.div`
+  max-width: 300px;
+  max-height: 50vh;
 `
 
 export default CitationsList
