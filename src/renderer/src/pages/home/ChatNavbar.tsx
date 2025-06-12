@@ -42,15 +42,13 @@ const ChatNavbar: FC = () => {
   return (
     <Navbar className="home-navbar">
       <NavbarContainer $isFullscreen={isFullscreen} $showSidebar={showAssistants} className="home-navbar-right">
-        <HStack alignItems="center">
+        <HStack alignItems="center" gap={8}>
           <Tooltip title={t('settings.shortcuts.new_topic')} mouseEnterDelay={0.8}>
-            <NavbarIcon onClick={() => EventEmitter.emit(EVENT_NAMES.ADD_NEW_TOPIC)} style={{ marginRight: 5 }}>
+            <NavbarIcon onClick={() => EventEmitter.emit(EVENT_NAMES.ADD_NEW_TOPIC)}>
               <MessageSquareDiff size={18} />
             </NavbarIcon>
           </Tooltip>
-          <NavbarIcon
-            onClick={() => toggleShowAssistants()}
-            style={{ marginRight: 8, marginLeft: isMac && !isFullscreen ? 4 : -12 }}>
+          <NavbarIcon onClick={() => toggleShowAssistants()}>
             {showAssistants ? <PanelLeft size={18} /> : <PanelRight size={18} />}
           </NavbarIcon>
           <SelectModelButton assistant={assistant} />

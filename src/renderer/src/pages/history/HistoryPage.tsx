@@ -88,7 +88,7 @@ const TopicsPage: FC = () => {
           }
           suffix={search.length >= 2 ? <CornerDownLeft size={16} /> : <Search size={16} />}
           ref={inputRef}
-          placeholder={t('models.search')}
+          placeholder={t('history.search.placeholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value.trimStart())}
           allowClear
@@ -102,26 +102,6 @@ const TopicsPage: FC = () => {
       </HStack>
       <Divider style={{ margin: 0, marginTop: 4, borderBlockStartWidth: 0.5 }} />
 
-      {/* <Header>
-        {stack.length > 1 && (
-          <HeaderLeft>
-            <MenuIcon onClick={goBack}>
-              <ArrowLeftOutlined />
-            </MenuIcon>
-          </HeaderLeft>
-        )}
-        <SearchInput
-          placeholder={t('history.search.placeholder')}
-          type="search"
-          value={search}
-          autoFocus
-          allowClear
-          ref={inputRef}
-          onChange={(e) => setSearch(e.target.value.trimStart())}
-          suffix={search.length >= 2 ? <EnterOutlined /> : <Search size={16} />}
-          onPressEnter={onSearch}
-        />
-      </Header> */}
       <TopicsHistory
         keywords={search}
         onClick={onTopicClick as any}
