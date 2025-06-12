@@ -130,9 +130,7 @@ const topicsSlice = createSlice({
       topicsAdapter.removeMany(state, topicIds)
 
       // Create default topic
-      const defaultTopic = getDefaultTopic(assistantId)
-      topicsAdapter.addOne(state, defaultTopic)
-      state.topicIdsByAssistant[assistantId] = [defaultTopic.id]
+      topicsActions.addDefaultTopic({ assistantId })
     },
     moveTopic(state, action: PayloadAction<MoveTopicPayload>) {
       const { fromAssistantId, toAssistantId, topicId } = action.payload
@@ -154,6 +152,12 @@ const topicsSlice = createSlice({
         state.topicIdsByAssistant[toAssistantId] = []
       }
       state.topicIdsByAssistant[toAssistantId].unshift(topicId)
+    },
+    addDefaultTopic(state, action: PayloadAction<{ assistantId: string }>) {
+      const { assistantId } = action.payload
+      const defaultTopic = getDefaultTopic(assistantId)
+      topicsAdapter.addOne(state, defaultTopic)
+      state.topicIdsByAssistant[assistantId] = [defaultTopic.id]
     }
   }
 })

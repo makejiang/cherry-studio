@@ -1570,26 +1570,21 @@ const migrateConfig = {
   },
   '113': (state: RootState) => {
     try {
-      // Step 1: Merge defaultAssistant and assistants[0] topics to ensure consistency
-      // This fixes any inconsistencies from backup restores or previous versions
+      // Step 1: 把默认助手模板下面的话题合并到主页列表的默认助手Id下面，保持默认助手模板的纯粹性
 
       if (state.assistants?.defaultAssistant && state.assistants?.assistants?.length > 0) {
-        const defaultAssistantId = state.assistants.defaultAssistant.id
+        const defaultAssistantId = state['assistants'].defaultAssistant.id
         const defaultAssistantInArray = state.assistants.assistants.find((a) => a.id === defaultAssistantId)
 
         if (defaultAssistantInArray) {
-          // Merge topics from both defaultAssistant and assistants[0]
-          const defaultTopics = state.assistants.defaultAssistant.topics || []
+          const defaultTopics = state['assistants'].defaultAssistant.topics || []
           const arrayTopics = defaultAssistantInArray.topics || []
 
-          // Create a map to avoid duplicates (by topic id)
           const topicsMap = new Map<string, Topic>()
 
-          // Add topics from both sources
-          const allTopics = [...defaultTopics, ...arrayTopics]
+          const allTopics = [...arrayTopics, ...defaultTopics]
           allTopics.forEach((topic) => {
             if (topic && topic.id) {
-              // Keep the one with more recent updatedAt, or prefer the one from assistants array
               const existing = topicsMap.get(topic.id)
               if (
                 !existing ||
@@ -1603,19 +1598,14 @@ const migrateConfig = {
 
           const mergedTopics = Array.from(topicsMap.values())
 
-          // Update both defaultAssistant and the assistant in array
-          state.assistants.defaultAssistant.topics = mergedTopics
+          state['assistants'].defaultAssistant.topics = []
           defaultAssistantInArray.topics = mergedTopics
         } else {
-          // defaultAssistant not found in array, add it
-          state.assistants.assistants.unshift(state.assistants.defaultAssistant)
+          // 如果默认助手不存在，说明被用户删掉了
         }
       }
 
-      // Step 2: Migrate from nested topic structure to flattened topic structure
-      // This should run after v112 which ensures defaultAssistant and assistants[0] consistency
-
-      // Initialize the new topics slice if it doesn't exist
+      // Step 2: 迁移话题结构，从嵌套结构迁移到扁平结构
       if (!state.topics) {
         state.topics = {
           ids: [],
@@ -1632,8 +1622,8 @@ const migrateConfig = {
       const topicIdsByAssistant: Record<string, string[]> = {}
 
       // Process regular assistants
-      if (state.assistants?.assistants) {
-        state.assistants.assistants.forEach((assistant) => {
+      if (state['assistants'].assistants && state['assistants'].assistants.length > 0) {
+        state['assistants'].assistants.forEach((assistant) => {
           const legacyAssistant = assistant as LegacyAssistant
           if (legacyAssistant.topics && Array.isArray(legacyAssistant.topics) && legacyAssistant.topics.length > 0) {
             allTopics.push(...legacyAssistant.topics)
@@ -1653,14 +1643,6 @@ const migrateConfig = {
         })
       }
 
-      // Process default assistant - should already be consistent after v112
-      if (state.assistants?.defaultAssistant) {
-        const legacyDefaultAssistant = state.assistants.defaultAssistant as LegacyAssistant
-
-        // Since v112 already ensured consistency, just clear the deprecated field
-        legacyDefaultAssistant.topics = []
-      }
-
       // Populate the new topics slice
       const topicEntities: Record<string, Topic> = {}
       const topicIds: string[] = []
@@ -1670,7 +1652,6 @@ const migrateConfig = {
         topicIds.push(topic.id)
       })
 
-      // Update topics slice
       state.topics = {
         ids: topicIds,
         entities: topicEntities,
@@ -1679,7 +1660,6 @@ const migrateConfig = {
 
       return state
     } catch (error) {
-      console.error('Migration 112 failed:', error)
       return state
     }
   }

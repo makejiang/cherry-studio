@@ -2,6 +2,7 @@ import { DEFAULT_CONTEXTCOUNT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE } from '@
 import i18n from '@renderer/i18n'
 import store from '@renderer/store'
 import { addAssistant } from '@renderer/store/assistants'
+import { topicsActions } from '@renderer/store/topics'
 import type { Agent, Assistant, AssistantSettings, Model, Provider, Topic } from '@renderer/types'
 import { uuid } from '@renderer/utils'
 
@@ -11,7 +12,7 @@ export function getDefaultAssistant(): Assistant {
     name: i18n.t('chat.default.name'),
     emoji: '😀',
     prompt: '',
-    topics: [getDefaultTopic('default')],
+    topics: [],
     messages: [],
     type: 'assistant',
     regularPhrases: [] // Added regularPhrases
@@ -124,13 +125,13 @@ export async function createAssistantFromAgent(agent: Agent) {
     id: assistantId,
     name: agent.name,
     emoji: agent.emoji,
-    topics: [topic],
     model: agent.defaultModel,
     type: 'assistant',
     regularPhrases: agent.regularPhrases || [] // Ensured regularPhrases
   }
 
   store.dispatch(addAssistant(assistant))
+  store.dispatch(topicsActions.addTopic({ assistantId, topic }))
 
   window.message.success({
     content: i18n.t('message.assistant.added.content'),

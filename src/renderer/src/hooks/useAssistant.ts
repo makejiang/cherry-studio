@@ -1,5 +1,4 @@
 import { db } from '@renderer/databases'
-import { getDefaultTopic } from '@renderer/services/AssistantService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import {
   addAssistant,
@@ -22,7 +21,10 @@ export function useAssistants() {
   return {
     assistants,
     updateAssistants: (assistants: Assistant[]) => dispatch(updateAssistants(assistants)),
-    addAssistant: (assistant: Assistant) => dispatch(addAssistant(assistant)),
+    addAssistant: (assistant: Assistant) => {
+      dispatch(addAssistant(assistant))
+      dispatch(topicsActions.addDefaultTopic({ assistantId: assistant.id }))
+    },
     removeAssistant: (id: string) => {
       dispatch(removeAssistant({ id }))
       // Remove all topics for this assistant
@@ -85,24 +87,15 @@ export function useTopicsForAssistant(assistantId: string) {
   return useAppSelector((state) => selectTopicsForAssistant(state, assistantId))
 }
 
+/**
+ * 默认助手模板
+ */
 export function useDefaultAssistant() {
   const defaultAssistant = useAppSelector((state) => state.assistants.defaultAssistant)
-  const topics = useTopicsForAssistant(defaultAssistant.id)
   const dispatch = useAppDispatch()
 
-  // Ensure default assistant has at least one topic
-  const finalTopics = useMemo(() => {
-    if (topics.length > 0) {
-      return topics
-    }
-    return [getDefaultTopic(defaultAssistant.id)]
-  }, [topics, defaultAssistant.id])
-
   return {
-    defaultAssistant: {
-      ...defaultAssistant,
-      topics: finalTopics
-    },
+    defaultAssistant,
     updateDefaultAssistant: (assistant: Assistant) => dispatch(updateDefaultAssistant({ assistant }))
   }
 }
