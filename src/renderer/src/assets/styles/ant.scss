@@ -197,25 +197,29 @@
 }
 
 .ant-dropdown-menu .ant-dropdown-menu-sub {
-  max-height: 350px;
+  max-height: 50vh;
   width: max-content;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.ant-dropdown-menu {
-  max-height: 40vh;
-  overflow-y: auto;
   border: 0.5px solid var(--color-border);
   border-radius: 12px;
+}
+.ant-dropdown {
+  .ant-dropdown-menu {
+    max-height: 50vh;
+    overflow-y: auto;
+    border: 0.5px solid var(--color-border);
+    border-radius: 12px;
 
-  .ant-dropdown-menu-item {
-    padding: 5px;
+    .ant-dropdown-menu-item {
+      padding: 5px;
+    }
+  }
+  .ant-dropdown-arrow + .ant-dropdown-menu {
+    border: none;
   }
 }
-.ant-dropdown-arrow + .ant-dropdown-menu {
-  border: none;
-}
+
 .ant-popover-inner {
   border: 0.5px solid var(--color-border);
   border-radius: 12px;
@@ -230,6 +234,9 @@
   }
 }
 .ant-modal {
+  .ant-modal-confirm-title {
+    padding: 16px 0 16px 0;
+  }
   .ant-modal-content {
     border-radius: 12px;
     border: 0.5px solid var(--color-border);
@@ -245,6 +252,9 @@
     }
     .ant-modal-footer {
       padding: 0 16px 8px 16px;
+    }
+    .ant-modal-confirm-btns {
+      margin-bottom: 8px;
     }
   }
 }

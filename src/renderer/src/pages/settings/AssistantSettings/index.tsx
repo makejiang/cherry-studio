@@ -92,7 +92,10 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
           overflow: 'hidden',
           background: 'var(--color-background)'
         },
-        header: { padding: '10px 15px', borderBottom: '0.5px solid var(--color-border)', margin: 0 }
+        header: { padding: '10px 15px', borderBottom: '0.5px solid var(--color-border)', margin: 0, borderRadius: 0 },
+        body: {
+          padding: 0
+        }
       }}
       width="70vw"
       height="80vh"

@@ -73,7 +73,7 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
         token: {
           colorPrimary: colorPrimary,
           fontFamily: 'var(--font-family)',
-          colorBgMask: _theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)'
+          colorBgMask: _theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)'
         }
       }}>
       {children}

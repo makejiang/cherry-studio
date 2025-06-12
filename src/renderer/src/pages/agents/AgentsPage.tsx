@@ -321,7 +321,7 @@ const AgentDescription = styled.div`
 `
 
 const AgentPrompt = styled.div`
-  max-height: 60vh;
+  max-height: 50vh;
   overflow-y: scroll;
   background-color: var(--color-background-soft);
   padding: 8px;
