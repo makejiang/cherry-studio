@@ -2,7 +2,6 @@ import { DownOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons'
 import { Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
-import { useAgents } from '@renderer/hooks/useAgents'
 import { useAssistants } from '@renderer/hooks/useAssistant'
 import { useAssistantsTabSortType } from '@renderer/hooks/useStore'
 import { useTags } from '@renderer/hooks/useTags'
@@ -29,7 +28,6 @@ const Assistants: FC<AssistantsTabProps> = ({
   const { assistants, removeAssistant, addAssistant, updateAssistants } = useAssistants()
   const [dragging, setDragging] = useState(false)
   const [collapsedTags, setCollapsedTags] = useState<Record<string, boolean>>({})
-  const { addAgent } = useAgents()
   const { t } = useTranslation()
   const { getGroupedAssistants, allTags, updateTagsOrder } = useTags()
   const { assistantsTabSortType = 'list', setAssistantsTabSortType } = useAssistantsTabSortType()
@@ -206,7 +204,6 @@ const Assistants: FC<AssistantsTabProps> = ({
                                   isActive={assistant?.id === activeAssistant.id}
                                   onSwitch={setActiveAssistant}
                                   onDelete={onDelete}
-                                  addAgent={addAgent}
                                   addAssistant={addAssistant}
                                   onCreateDefaultAssistant={() => {}}
                                 />
@@ -249,7 +246,6 @@ const Assistants: FC<AssistantsTabProps> = ({
             sortBy={assistantsTabSortType}
             onSwitch={setActiveAssistant}
             onDelete={onDelete}
-            addAgent={addAgent}
             addAssistant={addAssistant}
             onCreateDefaultAssistant={onCreateDefaultAssistant}
             handleSortByChange={handleSortByChange}

@@ -39,7 +39,6 @@ interface AssistantItemProps {
   onSwitch: (assistant: Assistant) => void
   onDelete: (assistant: Assistant) => void
   onCreateDefaultAssistant: () => void
-  addAgent: (agent: any) => void
   addAssistant: (assistant: Assistant) => void
   onTagClick?: (tag: string) => void
   handleSortByChange?: (sortType: AssistantsSortType) => void
@@ -52,7 +51,6 @@ const AssistantItem: FC<AssistantItemProps> = ({
   sortBy,
   onSwitch,
   onDelete,
-  addAgent,
   addAssistant,
   handleSortByChange,
   singleLine = false
@@ -95,7 +93,6 @@ const AssistantItem: FC<AssistantItemProps> = ({
         allTags,
         assistants,
         updateAssistants,
-        addAgent,
         addAssistant,
         onSwitch,
         onDelete,
@@ -112,7 +109,6 @@ const AssistantItem: FC<AssistantItemProps> = ({
       allTags,
       assistants,
       updateAssistants,
-      addAgent,
       addAssistant,
       onSwitch,
       onDelete,
@@ -280,7 +276,6 @@ function getMenuItems({
   allTags,
   assistants,
   updateAssistants,
-  addAgent,
   addAssistant,
   onSwitch,
   onDelete,
@@ -329,8 +324,8 @@ function getMenuItems({
       onClick: async () => {
         const agent = omit(assistant, ['model', 'emoji'])
         agent.id = uuid()
-        agent.type = 'agent'
-        addAgent(agent)
+        agent.isTemplate = true
+        addAssistant(agent)
         window.message.success({
           content: t('assistants.save.success'),
           key: 'save-to-agent'

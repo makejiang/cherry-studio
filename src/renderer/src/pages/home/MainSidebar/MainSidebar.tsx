@@ -2,7 +2,6 @@ import EmojiAvatar from '@renderer/components/Avatar/EmojiAvatar'
 import UserPopup from '@renderer/components/Popups/UserPopup'
 import { AppLogo, UserAvatar } from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
-import { useAssistants } from '@renderer/hooks/useAssistant'
 import useAvatar from '@renderer/hooks/useAvatar'
 import { useChat } from '@renderer/hooks/useChat'
 import { useMinappPopup } from '@renderer/hooks/useMinappPopup'
@@ -11,6 +10,7 @@ import { useShortcut } from '@renderer/hooks/useShortcuts'
 import { useShowAssistants } from '@renderer/hooks/useStore'
 import i18n from '@renderer/i18n'
 import AssistantItem from '@renderer/pages/home/Tabs/components/AssistantItem'
+import { getAssistantById } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { ThemeMode } from '@renderer/types'
 import { isEmoji } from '@renderer/utils'
@@ -57,7 +57,6 @@ import PinnedApps from './PinnedApps'
 type Tab = 'assistants' | 'topic'
 
 const MainSidebar: FC = () => {
-  const { assistants } = useAssistants()
   const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('assistants')
   const avatar = useAvatar()
@@ -92,7 +91,7 @@ const MainSidebar: FC = () => {
   useEffect(() => {
     const unsubscribes = [
       EventEmitter.on(EVENT_NAMES.SWITCH_ASSISTANT, (assistantId: string) => {
-        const newAssistant = assistants.find((a) => a.id === assistantId)
+        const newAssistant = getAssistantById(assistantId)
         if (newAssistant) {
           setActiveAssistant(newAssistant)
         }
@@ -104,7 +103,7 @@ const MainSidebar: FC = () => {
     ]
 
     return () => unsubscribes.forEach((unsubscribe) => unsubscribe())
-  }, [assistants, setActiveAssistant, tab])
+  }, [setActiveAssistant, tab])
 
   useEffect(() => {
     const canMinimize = !showAssistants && !showTopics
@@ -204,7 +203,6 @@ const MainSidebar: FC = () => {
             sortBy="list"
             onSwitch={() => {}}
             onDelete={() => {}}
-            addAgent={() => {}}
             addAssistant={() => {}}
             onCreateDefaultAssistant={() => {}}
             handleSortByChange={() => {}}
