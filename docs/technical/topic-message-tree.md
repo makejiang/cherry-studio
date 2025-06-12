@@ -556,3 +556,80 @@ flowchart LR
     style J fill:#f3e5f5
     style L fill:#e1f5fe
 ```
+
+## 10. Redux Slice 实现范例
+
+根据上述架构设计，`messages` slice 将演变为一个纯粹的、由 `createEntityAdapter` 管理的"消息池"。它只负责高效地存储和访问单个消息实体，而不再关心对话的顺序。
+
+### `store/messagesSlice.ts`
+
+```typescript
+import { createSlice, createEntityAdapter, PayloadAction } from '@reduxjs/toolkit'
+import type { RootState } from './store' // 你的store类型定义
+import type { Message } from '@renderer/types/newMessage' // 假设 Message 类型定义在外部
+
+// 1. 创建 Entity Adapter
+// 它会自动生成管理实体的reducer逻辑，实现一个高效的消息池。
+const messagesAdapter = createEntityAdapter<Message>()
+
+// 2. 定义 Slice 的初始状态
+// adapter.getInitialState() 会自动创建 { ids: [], entities: {} } 结构
+const initialState = messagesAdapter.getInitialState()
+
+// 3. 创建 Slice
+const messagesSlice = createSlice({
+  name: 'messages',
+  initialState,
+  // Reducers被极大简化，多数直接引用adapter提供的方法
+  reducers: {
+    // Action: 添加一条消息
+    messageAdded: messagesAdapter.addOne,
+
+    // Action: 一次性添加或更新多个消息 (高性能)
+    // 用途: 加载话题历史、发送新一轮问答(user+assistants)
+    messagesUpserted: messagesAdapter.upsertMany,
+
+    // Action: 更新单个消息
+    // 用途: 流式更新结束、状态变更等
+    messageUpdated: messagesAdapter.updateOne,
+
+    // Action: 删除单个消息
+    messageRemoved: messagesAdapter.removeOne,
+
+    // Action: 删除多个消息
+    messagesRemoved: messagesAdapter.removeMany,
+
+    // Action: 用新数据完全替换消息池
+    // 用途: 首次加载或强制刷新
+    messagesSet: messagesAdapter.setAll
+  }
+})
+
+// 4. 导出 Actions
+export const { messageAdded, messagesUpserted, messageUpdated, messageRemoved, messagesRemoved, messagesSet } =
+  messagesSlice.actions
+
+// 5. 导出 Selectors
+// Adapter 会自动创建高效的查询函数 (e.g., O(1) by ID)
+export const messagesSelectors = messagesAdapter.getSelectors((state: RootState) => state.messages)
+
+// 6. 导出 Reducer
+export default messagesSlice.reducer
+```
+
+### 核心思想总结
+
+1.  **职责单一**: 此 Slice 只做一件事——管理 `Message` 实体。它像一个数据库表，高效地处理增删改查，但对业务逻辑（如对话顺序）一无所知。
+2.  **逻辑上移**: 所有涉及多个 Slice 的复杂业务逻辑（如发送消息、切换版本）都应封装在 **Thunks** 或其他中间件中。Thunk 作为流程协调者，会 `dispatch` 多个原子化的 Action 给 `messagesSlice` 和 `topicsSlice`，以完成一次完整的业务操作并保证数据一致性。
+3.  **性能保证**: `createEntityAdapter` 内部使用哈希表（对象）来存储实体，确保通过 ID 查询消息的操作为 O(1) 复杂度，性能极佳。
+
+### 旧状态属性迁移
+
+为了完成 `messagesSlice` 向纯粹"消息池"的演进，原有的混合状态属性需要被迁移或废弃，以实现彻底的职责分离。
+
+| 原属性 (`newMessage.ts`) | 处理方式      | 新的归宿 / 说明                                                                               |
+| :----------------------- | :------------ | :-------------------------------------------------------------------------------------------- |
+| `messageIdsByTopic`      | **废弃**      | 核心职责转移。由 `topicsSlice` 中的 `activeMessageIds` 字段接管，作为渲染快照。               |
+| `currentTopicId`         | **迁移**      | 属于UI当前上下文状态，应迁移至 `topicsSlice`。                                                |
+| `loadingByTopic`         | **迁移**      | 话题的加载状态与话题本身更相关，应迁移至 `topicsSlice`。                                      |
+| `displayCount`           | **废弃/迁移** | UI相关的显示逻辑，不属于消息数据层。建议迁移至专门的 `Slice` 或在相关组件中作为本地状态管理。 |
