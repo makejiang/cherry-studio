@@ -1,4 +1,3 @@
-import { isMac } from '@renderer/config/constant'
 import { isLocalAi } from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import db from '@renderer/databases'
@@ -63,10 +62,10 @@ export function useAppInit() {
   }, [language])
 
   useEffect(() => {
-    const transparentWindow = isMac && !minappShow
+    const transparentWindow = !minappShow
 
     if (minappShow) {
-      window.root.style.background = isMac ? 'var(--color-background)' : 'var(--navbar-background)'
+      window.root.style.background = 'var(--color-background)'
       return
     }
 
