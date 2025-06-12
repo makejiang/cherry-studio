@@ -2,7 +2,7 @@ import db from '@renderer/databases'
 import i18n from '@renderer/i18n'
 import { deleteMessageFiles } from '@renderer/services/MessagesService'
 import store from '@renderer/store'
-import { updateTopic } from '@renderer/store/assistants'
+import { selectTopicById, topicsActions } from '@renderer/store/topics'
 import { Assistant, Topic } from '@renderer/types'
 import { findMainTextBlocks } from '@renderer/utils/messageUtils/find'
 import { isEmpty } from 'lodash'
@@ -11,18 +11,17 @@ import { getStoreSetting } from './useSettings'
 
 const renamingTopics = new Set<string>()
 
-export function useTopic(assistant: Assistant, topicId?: string) {
-  return assistant?.topics.find((topic) => topic.id === topicId)
+export function useTopic(topicId?: string) {
+  if (!topicId) return undefined
+  return selectTopicById(store.getState(), topicId)
 }
 
-export function getTopic(assistant: Assistant, topicId: string) {
-  return assistant?.topics.find((topic) => topic.id === topicId)
+export function getTopic(topicId: string) {
+  return selectTopicById(store.getState(), topicId)
 }
 
 export async function getTopicById(topicId: string) {
-  const assistants = store.getState().assistants.assistants
-  const topics = assistants.map((assistant) => assistant.topics).flat()
-  const topic = topics.find((topic) => topic.id === topicId)
+  const topic = selectTopicById(store.getState(), topicId)
   const messages = await TopicManager.getTopicMessages(topicId)
   return { ...topic, messages } as Topic
 }
@@ -55,7 +54,7 @@ export const autoRenameTopic = async (assistant: Assistant, topicId: string) => 
         .substring(0, 50)
       if (topicName) {
         const data = { ...topic, name: topicName } as Topic
-        store.dispatch(updateTopic({ assistantId: assistant.id, topic: data }))
+        store.dispatch(topicsActions.updateTopic({ assistantId: assistant.id, topic: data }))
       }
       return
     }
@@ -65,7 +64,7 @@ export const autoRenameTopic = async (assistant: Assistant, topicId: string) => 
       const summaryText = await fetchMessagesSummary({ messages: topic.messages, assistant })
       if (summaryText) {
         const data = { ...topic, name: summaryText }
-        store.dispatch(updateTopic({ assistantId: assistant.id, topic: data }))
+        store.dispatch(topicsActions.updateTopic({ assistantId: assistant.id, topic: data }))
       }
     }
   } finally {

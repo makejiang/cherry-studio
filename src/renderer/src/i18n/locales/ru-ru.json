@@ -706,7 +706,7 @@
       "warn.siyuan.exporting": "Экспортируется в Siyuan, пожалуйста, не отправляйте повторные запросы!",
       "download.success": "Скачано успешно",
       "download.failed": "Скачивание не удалось",
-      "error.fetchTopicName": "[to be translated]:Failed to name the topic"
+      "error.fetchTopicName": "Не удалось назвать топик"
     },
     "minapp": {
       "popup": {
@@ -980,6 +980,7 @@
       "azure-openai": "Azure OpenAI",
       "baichuan": "Baichuan",
       "baidu-cloud": "Baidu Cloud",
+      "cephalon": "Cephalon",
       "copilot": "GitHub Copilot",
       "dashscope": "Alibaba Cloud",
       "deepseek": "DeepSeek",
@@ -1020,7 +1021,8 @@
       "zhipu": "ZHIPU AI",
       "voyageai": "Voyage AI",
       "qiniu": "Qiniu AI",
-      "tokenflux": "TokenFlux"
+      "tokenflux": "TokenFlux",
+      "302ai": "302.AI"
     },
     "restore": {
       "confirm": "Вы уверены, что хотите восстановить данные?",
