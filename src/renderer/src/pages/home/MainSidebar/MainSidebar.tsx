@@ -52,7 +52,6 @@ import {
   SubMenu
 } from './MainSidebarStyles'
 import OpenedMinappTabs from './OpenedMinapps'
-import PinnedApps from './PinnedApps'
 
 type Tab = 'assistants' | 'topic'
 
@@ -174,7 +173,7 @@ const MainSidebar: FC = () => {
         overflow: showAssistants ? 'initial' : 'hidden'
       }}>
       <MainNavbar />
-      <MainMenu>
+      <MainMenu style={{ marginBottom: 4 }}>
         <MainMenuItem active={isAppMenuExpanded} onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}>
           <MainMenuItemLeft>
             <MainMenuItemIcon>
@@ -200,7 +199,6 @@ const MainSidebar: FC = () => {
                 </MainMenuItemLeft>
               </MainMenuItem>
             ))}
-            <PinnedApps />
           </SubMenu>
         )}
         <OpenedMinappTabs />
@@ -299,9 +297,7 @@ const MainContainer = styled.div`
 `
 
 const AssistantContainer = styled.div`
-  margin: 0 10px;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  margin: 4px 10px;
   display: flex;
 `
 

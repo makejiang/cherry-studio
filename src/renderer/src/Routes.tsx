@@ -1,5 +1,5 @@
 import { IpcChannel } from '@shared/IpcChannel'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, easeInOut, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
@@ -94,9 +94,9 @@ const PageContainer = styled(motion.div)`
 `
 
 const pageTransition = {
-  type: 'tween',
+  type: 'tween' as const,
   duration: 0.25,
-  ease: [0.4, 0.0, 0.2, 1]
+  ease: easeInOut
 }
 
 const pageVariants = {

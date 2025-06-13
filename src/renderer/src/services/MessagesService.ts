@@ -81,15 +81,7 @@ export function isGenerating() {
   })
 }
 
-export async function locateToMessage({
-  message,
-  setActiveAssistant,
-  setActiveTopic
-}: {
-  message: Message
-  setActiveAssistant: (assistant: Assistant) => void
-  setActiveTopic: (topic: Topic) => void
-}) {
+export async function locateToMessage(message: Message) {
   await isGenerating()
 
   SearchPopup.hide()
@@ -100,11 +92,11 @@ export async function locateToMessage({
     return
   }
 
-  setActiveAssistant(assistant)
-  setActiveTopic(topic)
+  EventEmitter.emit(EVENT_NAMES.SET_ASSISTANT, assistant)
+  EventEmitter.emit(EVENT_NAMES.SET_TOPIC, topic)
 
   setTimeout(() => EventEmitter.emit(EVENT_NAMES.SHOW_TOPIC_SIDEBAR), 0)
-  setTimeout(() => EventEmitter.emit(EVENT_NAMES.LOCATE_MESSAGE + ':' + message.id), 500)
+  setTimeout(() => EventEmitter.emit(EVENT_NAMES.LOCATE_MESSAGE + ':' + message.id), 200)
 }
 
 /**

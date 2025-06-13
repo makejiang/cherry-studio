@@ -85,7 +85,6 @@ export const TabsContainer = styled.div`
 
 export const TabsWrapper = styled(Scrollbar as any)`
   width: 100%;
-  padding: 5px 0;
   max-height: 50vh;
 `
 

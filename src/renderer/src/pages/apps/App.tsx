@@ -29,7 +29,9 @@ const App: FC<Props> = ({ app, onClick, size = 60, isLast }) => {
 
   const handleClick = () => {
     if (!isHome) {
-      navigate('/')
+      setTimeout(() => {
+        navigate('/')
+      }, 300)
     }
 
     openMinappKeepAlive(app)
