@@ -173,7 +173,7 @@ const MainSidebar: FC = () => {
         overflow: showAssistants ? 'initial' : 'hidden'
       }}>
       <MainNavbar />
-      <MainMenu style={{ marginBottom: 4 }}>
+      <MainMenu>
         <MainMenuItem active={isAppMenuExpanded} onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}>
           <MainMenuItemLeft>
             <MainMenuItemIcon>

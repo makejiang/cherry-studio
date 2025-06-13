@@ -81,7 +81,7 @@ const OpenedMinapps: FC = () => {
   if (!isShowApps) return <TabsContainer className="TabsContainer" />
 
   return (
-    <TabsContainer className="TabsContainer">
+    <TabsContainer className="TabsContainer" style={{ marginBottom: 4 }}>
       <Divider />
       <TabsWrapper>
         <DragableList
