@@ -165,8 +165,7 @@ const Assistants: FC<AssistantsTabProps> = ({
           droppableProps={{ type: 'TAG' }}
           list={getGroupedAssistants.map((_) => ({ ..._, disabled: _.tag === t('assistants.tags.untagged') }))}
           onUpdate={() => {}}
-          onDragEnd={handleGroupDragEnd}
-          style={{ paddingBottom: 0 }}>
+          onDragEnd={handleGroupDragEnd}>
           {(group) => (
             <Droppable droppableId={group.tag} type="ASSISTANT">
               {(provided) => (
@@ -187,7 +186,7 @@ const Assistants: FC<AssistantsTabProps> = ({
                     </GroupTitle>
                   )}
                   {!collapsedTags[group.tag] && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <>
                       {group.assistants.map((assistant, index) => (
                         <Draggable
                           key={`draggable_${group.tag}_${assistant?.id}_${index}`}
@@ -204,13 +203,15 @@ const Assistants: FC<AssistantsTabProps> = ({
                                 onDelete={onDelete}
                                 addAgent={addAgent}
                                 addAssistant={addAssistant}
+                                handleSortByChange={handleSortByChange}
                                 onCreateDefaultAssistant={() => {}}
+                                style={{ margin: '4px 0' }}
                               />
                             </div>
                           )}
                         </Draggable>
                       ))}
-                    </div>
+                    </>
                   )}
                   {provided.placeholder}
                 </TagsContainer>
@@ -268,13 +269,12 @@ const Assistants: FC<AssistantsTabProps> = ({
 const Container = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
-  padding: 4px 10px;
+  padding: 0 10px;
 `
 
 const TagsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
 `
 
 const AssistantAddItem = styled.div`
@@ -303,7 +303,7 @@ const GroupTitle = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 24px;
-  padding-top: 8px;
+  margin: 5px 0;
 `
 
 const GroupTitleName = styled.div`

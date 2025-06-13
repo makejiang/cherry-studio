@@ -44,6 +44,7 @@ interface AssistantItemProps {
   onTagClick?: (tag: string) => void
   handleSortByChange?: (sortType: AssistantsSortType) => void
   singleLine?: boolean
+  style?: React.CSSProperties
 }
 
 const AssistantItem: FC<AssistantItemProps> = ({
@@ -55,7 +56,8 @@ const AssistantItem: FC<AssistantItemProps> = ({
   addAgent,
   addAssistant,
   handleSortByChange,
-  singleLine = false
+  singleLine = false,
+  style
 }) => {
   const { t } = useTranslation()
   const { allTags } = useTags()
@@ -164,7 +166,8 @@ const AssistantItem: FC<AssistantItemProps> = ({
     return (
       <Container
         onClick={handleSwitch}
-        className={classNames({ active: isActive, 'is-menu-open': isMenuOpen, singleLine })}>
+        className={classNames({ active: isActive, 'is-menu-open': isMenuOpen, singleLine })}
+        style={style}>
         {assistantNave}
         <Button
           className="item-menu-button"
@@ -184,7 +187,8 @@ const AssistantItem: FC<AssistantItemProps> = ({
     <Dropdown menu={{ items: menuItems }} trigger={['contextMenu']}>
       <Container
         onClick={handleSwitch}
-        className={classNames({ active: isActive, 'is-menu-open': isMenuOpen, singleLine })}>
+        className={classNames({ active: isActive, 'is-menu-open': isMenuOpen, singleLine })}
+        style={style}>
         {assistantNave}
         <Dropdown menu={{ items: menuItems }} trigger={['click']} onOpenChange={setIsMenuOpen}>
           <Button
