@@ -38,11 +38,6 @@ const Container = styled.div`
   flex-direction: column;
 `
 
-const ContentContainer = styled.div`
-  overflow: hidden;
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-`
+const ContentContainer = styled.div``
 
 export default HomePage
