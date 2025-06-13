@@ -64,6 +64,7 @@
     "canvas": "3.1.0",
     "jsdom": "26.1.0",
     "os-proxy-config": "^1.1.2",
+    "pdf-to-img": "^4.4.0",
     "pdfjs-dist": "4.2.67",
     "selection-hook": "^0.9.23",
     "turndown": "7.2.0"
@@ -182,7 +183,6 @@
     "officeparser": "^4.1.1",
     "openai": "patch:openai@npm%3A5.1.0#~/.yarn/patches/openai-npm-5.1.0-0e7b3ccb07.patch",
     "p-queue": "^8.1.0",
-    "pdf-to-img": "^4.4.0",
     "playwright": "^1.52.0",
     "prettier": "^3.5.3",
     "proxy-agent": "^6.5.0",

@@ -43,6 +43,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
     writeStream: fs.WriteStream
   ): Promise<void> {
     await this.initMacOCR()
+    // TODO: 下个版本后面使用批处理，以及p-queue来优化
     for (let i = 0; i < totalPages; i++) {
       // Convert pages to buffers
       const pageNum = i + 1
