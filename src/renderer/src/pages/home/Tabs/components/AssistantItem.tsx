@@ -60,7 +60,7 @@ const AssistantItem: FC<AssistantItemProps> = ({
   const { t } = useTranslation()
   const { allTags } = useTags()
   const { removeAllTopics } = useAssistant(assistant.id)
-  const { assistantIconType, setAssistantIconType, topicPosition } = useSettings()
+  const { assistantIconType, setAssistantIconType, clickAssistantToShowTopic } = useSettings()
   const defaultModel = getDefaultModel()
   const { assistants, updateAssistants } = useAssistants()
 
@@ -128,16 +128,14 @@ const AssistantItem: FC<AssistantItemProps> = ({
       return
     }
 
-    if (topicPosition === 'left') {
-      EventEmitter.emit(EVENT_NAMES.SHOW_TOPIC_SIDEBAR)
-    }
+    EventEmitter.emit(EVENT_NAMES.SHOW_TOPIC_SIDEBAR, assistant)
 
     if (singleLine) {
       EventEmitter.emit(EVENT_NAMES.SWITCH_TOPIC_SIDEBAR)
     }
 
     onSwitch(assistant)
-  }, [isMenuOpen, topicPosition, singleLine, onSwitch, assistant])
+  }, [isMenuOpen, assistant, singleLine, onSwitch])
 
   const assistantName = useMemo(() => assistant.name || t('chat.default.name'), [assistant.name, t])
   const fullAssistantName = useMemo(

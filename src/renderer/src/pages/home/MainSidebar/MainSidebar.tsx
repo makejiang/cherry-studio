@@ -11,10 +11,9 @@ import { useShowAssistants } from '@renderer/hooks/useStore'
 import i18n from '@renderer/i18n'
 import { getAssistantById } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
-import { ThemeMode } from '@renderer/types'
+import { Assistant, ThemeMode } from '@renderer/types'
 import { isEmoji } from '@renderer/utils'
 import { Avatar, Dropdown } from 'antd'
-import { AnimatePresence } from 'framer-motion'
 import {
   Blocks,
   ChevronDown,
@@ -71,7 +70,7 @@ const MainSidebar: FC = () => {
   const { pathname } = location
 
   const { activeAssistant, activeTopic, setActiveAssistant } = useChat()
-  const { showTopics } = useSettings()
+  const { showTopics, clickAssistantToShowTopic } = useSettings()
 
   const { openMinapp } = useMinappPopup()
 
@@ -80,14 +79,30 @@ const MainSidebar: FC = () => {
 
   useEffect(() => {
     const unsubscribe = [
-      EventEmitter.on(EVENT_NAMES.SHOW_TOPIC_SIDEBAR, () => setTab('topic')),
+      EventEmitter.on(EVENT_NAMES.SHOW_TOPIC_SIDEBAR, (assistant: Assistant) => {
+        if (clickAssistantToShowTopic) {
+          setTab('topic')
+        } else {
+          if (activeAssistant.id === assistant.id) {
+            setTab('topic')
+          }
+        }
+      }),
       EventEmitter.on(EVENT_NAMES.SWITCH_TOPIC_SIDEBAR, () => {
         setTab(tab === 'topic' ? 'assistants' : 'topic')
         !showAssistants && toggleShowAssistants()
       })
     ]
     return () => unsubscribe.forEach((unsubscribe) => unsubscribe())
-  }, [isAppMenuExpanded, showAssistants, tab, toggleShowAssistants])
+  }, [
+    activeAssistant.id,
+    activeTopic.assistantId,
+    clickAssistantToShowTopic,
+    isAppMenuExpanded,
+    showAssistants,
+    tab,
+    toggleShowAssistants
+  ])
 
   useEffect(() => {
     const unsubscribes = [
@@ -175,24 +190,21 @@ const MainSidebar: FC = () => {
             )}
           </MainMenuItemRight>
         </MainMenuItem>
-        <AnimatePresence initial={false}>
-          {isAppMenuExpanded && (
-            <SubMenu>
-              {appMenuItems.map((item) => (
-                <MainMenuItem key={item.path} active={isRoutes(item.path)} onClick={() => navigate(item.path)}>
-                  <MainMenuItemLeft>
-                    <MainMenuItemIcon>{item.icon}</MainMenuItemIcon>
-                    <MainMenuItemText>{item.text}</MainMenuItemText>
-                  </MainMenuItemLeft>
-                </MainMenuItem>
-              ))}
-              <PinnedApps />
-            </SubMenu>
-          )}
-        </AnimatePresence>
+        {isAppMenuExpanded && (
+          <SubMenu>
+            {appMenuItems.map((item) => (
+              <MainMenuItem key={item.path} active={isRoutes(item.path)} onClick={() => navigate(item.path)}>
+                <MainMenuItemLeft>
+                  <MainMenuItemIcon>{item.icon}</MainMenuItemIcon>
+                  <MainMenuItemText>{item.text}</MainMenuItemText>
+                </MainMenuItemLeft>
+              </MainMenuItem>
+            ))}
+            <PinnedApps />
+          </SubMenu>
+        )}
         <OpenedMinappTabs />
       </MainMenu>
-
       {tab === 'topic' && (
         <AssistantContainer onClick={() => setIsAppMenuExpanded(false)}>
           <AssistantItem
@@ -209,23 +221,10 @@ const MainSidebar: FC = () => {
           />
         </AssistantContainer>
       )}
-
       <MainContainer>
-        {/* <TabContainer>
-          <TabItem
-            active={tab === 'assistants'}
-            style={{ borderRight: '0.5px solid var(--color-border)' }}
-            onClick={() => setTab('assistants')}>
-            <TabItemText>{t('assistants.title')}</TabItemText>
-          </TabItem>
-          <TabItem active={tab === 'topic'} onClick={() => setTab('topic')}>
-            <TabItemText>{t('common.topics')}</TabItemText>
-          </TabItem>
-        </TabContainer> */}
         {tab === 'assistants' && <AssistantsTab />}
         {tab === 'topic' && <TopicsTab style={{ paddingTop: 4 }} />}
       </MainContainer>
-
       <UserMenu>
         <UserMenuLeft onClick={() => UserPopup.show()}>
           {isEmoji(avatar) ? (
@@ -237,7 +236,6 @@ const MainSidebar: FC = () => {
           )}
           {userName && <UserMenuText>{userName}</UserMenuText>}
         </UserMenuLeft>
-
         <Dropdown
           placement="topRight"
           trigger={['click']}
@@ -306,37 +304,6 @@ const AssistantContainer = styled.div`
   margin-bottom: 4px;
   display: flex;
 `
-
-// const TabContainer = styled.div`
-//   display: flex;
-//   flex: 1;
-//   flex-direction: row;
-//   height: 32px;
-//   max-height: 32px;
-//   min-height: 32px;
-//   border-radius: 8px;
-//   border: 0.5px solid var(--color-border);
-//   margin: 5px 10px 8px 10px;
-//   overflow: hidden;
-// `
-
-// const TabItem = styled.div<{ active: boolean }>`
-//   display: flex;
-//   flex: 1;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   cursor: pointer;
-//   background-color: ${({ active }) => (active ? 'var(--color-list-item)' : 'transparent')};
-//   &:hover {
-//     background-color: var(--color-list-item);
-//   }
-// `
-
-// const TabItemText = styled.div`
-//   font-size: 14px;
-//   font-weight: 500;
-// `
 
 const UserMenu = styled.div`
   display: flex;
