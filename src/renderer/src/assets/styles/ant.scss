@@ -232,7 +232,7 @@
   }
 }
 
-.ant-modal {
+.ant-modal:not(.ant-modal-confirm) {
   .ant-modal-confirm-body-has-title {
     padding: 16px 0 0 0;
   }
@@ -255,6 +255,11 @@
     .ant-modal-confirm-btns {
       margin-bottom: 8px;
     }
+  }
+}
+.ant-modal.ant-modal-confirm.ant-modal-confirm-confirm {
+  .ant-modal-content {
+    padding: 16px;
   }
 }
 
