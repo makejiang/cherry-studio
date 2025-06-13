@@ -215,6 +215,9 @@
     border: none;
   }
 }
+.ant-select-dropdown {
+  border: 0.5px solid var(--color-border);
+}
 
 .ant-popover {
   .ant-popover-inner {
