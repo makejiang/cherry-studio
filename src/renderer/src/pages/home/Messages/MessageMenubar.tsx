@@ -492,10 +492,10 @@ const MessageMenubar: FC<Props> = (props) => {
       </Popconfirm>
       {!isUserMessage && (
         <Dropdown
+          arrow={false}
           menu={{ items: dropdownItems, onClick: (e) => e.domEvent.stopPropagation() }}
           trigger={['click']}
-          placement="topRight"
-          arrow>
+          placement="topRight">
           <ActionButton className="message-action-button" onClick={(e) => e.stopPropagation()}>
             <Menu size={19} />
           </ActionButton>
