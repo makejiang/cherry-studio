@@ -1,4 +1,5 @@
 import { InfoCircleOutlined, SettingOutlined, WarningOutlined } from '@ant-design/icons'
+import AiProvider from '@renderer/aiCore'
 import { TopView } from '@renderer/components/TopView'
 import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
@@ -9,7 +10,6 @@ import { useKnowledgeBases } from '@renderer/hooks/useKnowledge'
 import { useOcrProviders } from '@renderer/hooks/useOcr'
 import { usePreprocessProviders } from '@renderer/hooks/usePreprocess'
 import { useProviders } from '@renderer/hooks/useProvider'
-import AiProvider from '@renderer/providers/AiProvider'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { KnowledgeBase, Model, OcrProvider, PreprocessProvider } from '@renderer/types'
@@ -426,48 +426,6 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
       destroyOnClose
       centered
       okButtonProps={{ loading }}>
-      {/* <Form form={form} layout="vertical">
-        <Form.Item
-          name="name"
-          label={t('common.name')}
-          rules={[{ required: true, message: t('message.error.enter.name') }]}>
-          <Input placeholder={t('common.name')} ref={nameInputRef} />
-        </Form.Item>
-
-        <Form.Item
-          name="model"
-          label={t('models.embedding_model')}
-          tooltip={{ title: t('models.embedding_model_tooltip'), placement: 'right' }}
-          rules={[{ required: true, message: t('message.error.enter.model') }]}>
-          <Select style={{ width: '100%' }} options={embeddingSelectOptions} placeholder={t('settings.models.empty')} />
-        </Form.Item>
-
-        <Form.Item
-          name="rerankModel"
-          label={t('models.rerank_model')}
-          tooltip={{ title: t('models.rerank_model_tooltip'), placement: 'right' }}
-          rules={[{ required: false, message: t('message.error.enter.model') }]}>
-          <Select style={{ width: '100%' }} options={rerankSelectOptions} placeholder={t('settings.models.empty')} />
-        </Form.Item>
-        <SettingHelpText style={{ marginTop: -15, marginBottom: 20 }}>
-          {t('models.rerank_model_not_support_provider', {
-            provider: NOT_SUPPORTED_REANK_PROVIDERS.map((id) => t(`provider.${id}`))
-          })}
-        </SettingHelpText>
-        <Form.Item
-          name="documentCount"
-          label={t('knowledge.document_count')}
-          initialValue={DEFAULT_KNOWLEDGE_DOCUMENT_COUNT} // 设置初始值
-          tooltip={{ title: t('knowledge.document_count_help') }}>
-          <Slider
-            style={{ width: '100%' }}
-            min={1}
-            max={30}
-            step={1}
-            marks={{ 1: '1', 6: t('knowledge.document_count_default'), 30: '30' }}
-          />
-        </Form.Item>
-      </Form> */}
       <div>
         <Tabs style={{ minHeight: '50vh' }} defaultActiveKey="1" tabPosition={'left'} items={settingItems} />
       </div>
