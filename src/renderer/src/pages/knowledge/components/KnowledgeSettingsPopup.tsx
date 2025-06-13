@@ -1,4 +1,4 @@
-import { DownOutlined, WarningOutlined } from '@ant-design/icons'
+import { WarningOutlined } from '@ant-design/icons'
 import { TopView } from '@renderer/components/TopView'
 import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
@@ -10,8 +10,9 @@ import { useProviders } from '@renderer/hooks/useProvider'
 import { SettingHelpText } from '@renderer/pages/settings'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { KnowledgeBase } from '@renderer/types'
-import { Alert, Form, Input, InputNumber, Modal, Select, Slider } from 'antd'
+import { Alert, Button, Form, Input, InputNumber, Modal, Select, Slider } from 'antd'
 import { sortBy } from 'lodash'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -140,7 +141,13 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
           initialValue={getModelUniqId(base.model)}
           tooltip={{ title: t('models.embedding_model_tooltip'), placement: 'right' }}
           rules={[{ required: true, message: t('message.error.enter.model') }]}>
-          <Select style={{ width: '100%' }} options={selectOptions} placeholder={t('settings.models.empty')} disabled />
+          <Select
+            style={{ width: '100%' }}
+            options={selectOptions}
+            placeholder={t('settings.models.empty')}
+            disabled
+            suffixIcon={<ChevronDown size={16} color="var(--color-border)" />}
+          />
         </Form.Item>
 
         <Form.Item
@@ -154,6 +161,7 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
             options={rerankSelectOptions}
             placeholder={t('settings.models.empty')}
             allowClear
+            suffixIcon={<ChevronDown size={16} color="var(--color-border)" />}
           />
         </Form.Item>
         <SettingHelpText style={{ marginTop: -15, marginBottom: 20 }}>
@@ -166,27 +174,21 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
           name="documentCount"
           label={t('knowledge.document_count')}
           tooltip={{ title: t('knowledge.document_count_help') }}>
-          <Slider
-            style={{ width: '100%' }}
-            min={1}
-            max={30}
-            step={1}
-            marks={{ 1: '1', 6: t('knowledge.document_count_default'), 30: '30' }}
-          />
+          <Slider min={1} max={30} step={1} marks={{ 1: '1', 6: t('knowledge.document_count_default'), 30: '30' }} />
         </Form.Item>
 
-        <AdvancedSettingsButton onClick={() => setShowAdvanced(!showAdvanced)}>
-          <DownOutlined
+        <Button color="default" variant="filled" onClick={() => setShowAdvanced(!showAdvanced)}>
+          {t('common.advanced_settings')}
+          <ChevronDown
+            size={16}
             style={{
               transform: showAdvanced ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s',
-              marginRight: 8
+              transition: 'transform 0.3s'
             }}
           />
-          {t('common.advanced_settings')}
-        </AdvancedSettingsButton>
+        </Button>
 
-        <div style={{ display: showAdvanced ? 'block' : 'none' }}>
+        <div style={{ display: showAdvanced ? 'block' : 'none', marginTop: 16 }}>
           <Form.Item
             name="chunkSize"
             label={t('knowledge.chunk_size')}
