@@ -15,7 +15,6 @@ import { sortBy } from 'lodash'
 import { ChevronDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
 interface ShowParams {
   base: KnowledgeBase
@@ -270,15 +269,6 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
 }
 
 const TopViewKey = 'KnowledgeSettingsPopup'
-
-const AdvancedSettingsButton = styled.div`
-  cursor: pointer;
-  margin-bottom: 16px;
-  margin-top: -10px;
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-`
 
 export default class KnowledgeSettingsPopup {
   static hide() {
