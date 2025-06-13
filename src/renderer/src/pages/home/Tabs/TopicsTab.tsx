@@ -15,6 +15,7 @@ import PromptPopup from '@renderer/components/Popups/PromptPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
 import { isMac } from '@renderer/config/constant'
 import { useAssistant, useAssistants, useTopicsForAssistant } from '@renderer/hooks/useAssistant'
+import { useChat } from '@renderer/hooks/useChat'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { finishTopicRenaming, startTopicRenaming, TopicManager } from '@renderer/hooks/useTopic'
@@ -24,7 +25,7 @@ import store from '@renderer/store'
 import { RootState } from '@renderer/store'
 import { setGenerating } from '@renderer/store/runtime'
 import { Assistant, Topic } from '@renderer/types'
-import { removeSpecialCharactersForFileName } from '@renderer/utils'
+import { classNames, removeSpecialCharactersForFileName } from '@renderer/utils'
 import { copyTopicAsMarkdown, copyTopicAsPlainText } from '@renderer/utils/copy'
 import {
   exportMarkdownToJoplin,
@@ -44,19 +45,18 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-interface Props {
-  assistant: Assistant
-  activeTopic: Topic
-  setActiveTopic: (topic: Topic) => void
+interface TopicsTabProps {
+  style?: React.CSSProperties
 }
 
-const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic }) => {
+const Topics: FC<TopicsTabProps> = ({ style }) => {
+  const { activeAssistant, activeTopic, setActiveTopic } = useChat()
   const { assistants } = useAssistants()
-  const { assistant, removeTopic, moveTopic, updateTopic, updateTopics } = useAssistant(_assistant.id)
+  const { assistant, removeTopic, moveTopic, updateTopic, updateTopics } = useAssistant(activeAssistant.id)
   const { t } = useTranslation()
-  const { showTopicTime, pinTopicsToTop } = useSettings()
+  const { showTopicTime, pinTopicsToTop, topicPosition } = useSettings()
 
-  const topics = useTopicsForAssistant(_assistant.id)
+  const topics = useTopicsForAssistant(activeAssistant.id)
 
   const renamingTopics = useSelector((state: RootState) => state.runtime.chat.renamingTopics)
   const newlyRenamedTopics = useSelector((state: RootState) => state.runtime.chat.newlyRenamedTopics)
@@ -69,6 +69,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
   const pendingTopics = useMemo(() => {
     return new Set<string>()
   }, [])
+
   const isPending = useCallback(
     (topicId: string) => {
       const hasPending = hasTopicPendingRequests(topicId)
@@ -432,7 +433,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
 
   return (
     <Dropdown menu={{ items: getTopicMenuItems }} trigger={['contextMenu']}>
-      <Container className="topics-tab">
+      <Container className={`topics-tab ${topicPosition === 'right' ? 'right' : ''}`} style={style}>
         <DragableList list={sortedTopics} onUpdate={updateTopics}>
           {(topic) => {
             const isActive = topic.id === activeTopic?.id
@@ -449,7 +450,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
             return (
               <TopicListItem
                 onContextMenu={() => setTargetTopic(topic)}
-                className={isActive ? 'active' : ''}
+                className={classNames('topic-item', { active: isActive })}
                 onClick={() => onSwitchTopic(topic)}
                 style={{ borderRadius }}>
                 {isPending(topic.id) && !isActive && <PendingIndicator />}
@@ -513,6 +514,17 @@ const Container = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
   padding: 10px;
+  max-height: calc(100vh - var(--navbar-height));
+  min-width: var(--assistant-width);
+  &.right {
+    border-right: 0.5px solid var(--color-border);
+    .topic-item:hover {
+      background-color: var(--color-background-soft);
+    }
+    .topic-item.active {
+      background-color: var(--color-background-mute);
+    }
+  }
 `
 
 const TopicListItem = styled.div`

@@ -195,10 +195,10 @@ const MessageMenubar: FC<Props> = (props) => {
         }
       },
       {
-        label: t('chat.message.settings'),
+        label: t('common.settings'),
         key: 'message-settings',
         icon: <Settings2 size={16} />,
-        onClick: () => MessageSettingsPopup.show({ title: t('chat.message.settings') })
+        onClick: () => MessageSettingsPopup.show({ title: t('common.settings') })
       },
       {
         label: t('chat.topics.export.title'),

@@ -9,13 +9,12 @@ import { useSettings } from '@renderer/hooks/useSettings'
 import { useShortcut } from '@renderer/hooks/useShortcuts'
 import { useShowAssistants } from '@renderer/hooks/useStore'
 import i18n from '@renderer/i18n'
-import AssistantItem from '@renderer/pages/home/Tabs/components/AssistantItem'
 import { getAssistantById } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { ThemeMode } from '@renderer/types'
 import { isEmoji } from '@renderer/utils'
 import { Avatar, Dropdown } from 'antd'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import {
   Blocks,
   ChevronDown,
@@ -39,7 +38,9 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import Tabs from '../../../pages/home/Tabs'
+import AssistantsTab from '../Tabs/AssistantsTab'
+import AssistantItem from '../Tabs/components/AssistantItem'
+import TopicsTab from '../Tabs/TopicsTab'
 import MainNavbar from './MainNavbar'
 import {
   Container,
@@ -69,7 +70,7 @@ const MainSidebar: FC = () => {
   const location = useLocation()
   const { pathname } = location
 
-  const { activeAssistant, activeTopic, setActiveAssistant, setActiveTopic } = useChat()
+  const { activeAssistant, activeTopic, setActiveAssistant } = useChat()
   const { showTopics } = useSettings()
 
   const { openMinapp } = useMinappPopup()
@@ -145,6 +146,10 @@ const MainSidebar: FC = () => {
     })
   }
 
+  if (!showAssistants) {
+    return null
+  }
+
   return (
     <Container
       id="main-sidebar"
@@ -172,23 +177,17 @@ const MainSidebar: FC = () => {
         </MainMenuItem>
         <AnimatePresence initial={false}>
           {isAppMenuExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}>
-              <SubMenu>
-                {appMenuItems.map((item) => (
-                  <MainMenuItem key={item.path} active={isRoutes(item.path)} onClick={() => navigate(item.path)}>
-                    <MainMenuItemLeft>
-                      <MainMenuItemIcon>{item.icon}</MainMenuItemIcon>
-                      <MainMenuItemText>{item.text}</MainMenuItemText>
-                    </MainMenuItemLeft>
-                  </MainMenuItem>
-                ))}
-                <PinnedApps />
-              </SubMenu>
-            </motion.div>
+            <SubMenu>
+              {appMenuItems.map((item) => (
+                <MainMenuItem key={item.path} active={isRoutes(item.path)} onClick={() => navigate(item.path)}>
+                  <MainMenuItemLeft>
+                    <MainMenuItemIcon>{item.icon}</MainMenuItemIcon>
+                    <MainMenuItemText>{item.text}</MainMenuItemText>
+                  </MainMenuItemLeft>
+                </MainMenuItem>
+              ))}
+              <PinnedApps />
+            </SubMenu>
           )}
         </AnimatePresence>
         <OpenedMinappTabs />
@@ -211,13 +210,22 @@ const MainSidebar: FC = () => {
         </AssistantContainer>
       )}
 
-      <Tabs
-        tab={tab}
-        activeAssistant={activeAssistant}
-        activeTopic={activeTopic}
-        setActiveAssistant={setActiveAssistant}
-        setActiveTopic={setActiveTopic}
-      />
+      <MainContainer>
+        {/* <TabContainer>
+          <TabItem
+            active={tab === 'assistants'}
+            style={{ borderRight: '0.5px solid var(--color-border)' }}
+            onClick={() => setTab('assistants')}>
+            <TabItemText>{t('assistants.title')}</TabItemText>
+          </TabItem>
+          <TabItem active={tab === 'topic'} onClick={() => setTab('topic')}>
+            <TabItemText>{t('common.topics')}</TabItemText>
+          </TabItem>
+        </TabContainer> */}
+        {tab === 'assistants' && <AssistantsTab />}
+        {tab === 'topic' && <TopicsTab style={{ paddingTop: 4 }} />}
+      </MainContainer>
+
       <UserMenu>
         <UserMenuLeft onClick={() => UserPopup.show()}>
           {isEmoji(avatar) ? (
@@ -283,10 +291,52 @@ const ThemeIcon = () => {
   )
 }
 
+const MainContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  height: 0;
+  min-height: 0;
+`
+
 const AssistantContainer = styled.div`
   margin: 0 10px;
   margin-top: 4px;
+  margin-bottom: 4px;
+  display: flex;
 `
+
+// const TabContainer = styled.div`
+//   display: flex;
+//   flex: 1;
+//   flex-direction: row;
+//   height: 32px;
+//   max-height: 32px;
+//   min-height: 32px;
+//   border-radius: 8px;
+//   border: 0.5px solid var(--color-border);
+//   margin: 5px 10px 8px 10px;
+//   overflow: hidden;
+// `
+
+// const TabItem = styled.div<{ active: boolean }>`
+//   display: flex;
+//   flex: 1;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   cursor: pointer;
+//   background-color: ${({ active }) => (active ? 'var(--color-list-item)' : 'transparent')};
+//   &:hover {
+//     background-color: var(--color-list-item);
+//   }
+// `
+
+// const TabItemText = styled.div`
+//   font-size: 14px;
+//   font-weight: 500;
+// `
 
 const UserMenu = styled.div`
   display: flex;

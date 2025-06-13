@@ -40,6 +40,9 @@ const Container = styled.div`
 
 const ContentContainer = styled.div`
   overflow: hidden;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
 `
 
 export default HomePage

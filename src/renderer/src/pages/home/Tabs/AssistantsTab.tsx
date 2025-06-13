@@ -1,11 +1,14 @@
 import { DownOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons'
 import { Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
 import DragableList from '@renderer/components/DragableList'
+import AddAssistantPopup from '@renderer/components/Popups/AddAssistantPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
-import { useAssistants } from '@renderer/hooks/useAssistant'
+import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
+import { useChat } from '@renderer/hooks/useChat'
 import { useAssistantsTabSortType } from '@renderer/hooks/useStore'
 import { useTags } from '@renderer/hooks/useTags'
 import { Assistant, AssistantsSortType } from '@renderer/types'
+import { uuid } from '@renderer/utils'
 import { Tooltip } from 'antd'
 import { FC, useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,18 +16,8 @@ import styled from 'styled-components'
 
 import AssistantItem from './components/AssistantItem'
 
-interface AssistantsTabProps {
-  activeAssistant: Assistant
-  setActiveAssistant: (assistant: Assistant) => void
-  onCreateAssistant: () => void
-  onCreateDefaultAssistant: () => void
-}
-const Assistants: FC<AssistantsTabProps> = ({
-  activeAssistant,
-  setActiveAssistant,
-  onCreateAssistant,
-  onCreateDefaultAssistant
-}) => {
+const Assistants: FC = () => {
+  const { activeAssistant, setActiveAssistant } = useChat()
   const { assistants, removeAssistant, addAssistant, updateAssistants } = useAssistants()
   const [dragging, setDragging] = useState(false)
   const [collapsedTags, setCollapsedTags] = useState<Record<string, boolean>>({})
@@ -32,6 +25,18 @@ const Assistants: FC<AssistantsTabProps> = ({
   const { getGroupedAssistants, allTags, updateTagsOrder } = useTags()
   const { assistantsTabSortType = 'list', setAssistantsTabSortType } = useAssistantsTabSortType()
   const containerRef = useRef<HTMLDivElement>(null)
+  const { defaultAssistant } = useDefaultAssistant()
+
+  const onCreateAssistant = async () => {
+    const assistant = await AddAssistantPopup.show()
+    assistant && setActiveAssistant(assistant)
+  }
+
+  const onCreateDefaultAssistant = useCallback(() => {
+    const assistant = { ...defaultAssistant, id: uuid() }
+    addAssistant(assistant)
+    setActiveAssistant(assistant)
+  }, [addAssistant, defaultAssistant, setActiveAssistant])
 
   const onDelete = useCallback(
     (assistant: Assistant) => {
