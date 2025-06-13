@@ -23,7 +23,7 @@ interface FileItemProps {
   columnWidths?: string
 }
 
-const FileList: React.FC<FileItemProps> = ({ list, columnWidths }) => {
+const FileList: React.FC<FileItemProps> = ({ list, columnWidths, selectedFileIds = [] }) => {
   // if (id === FileTypes.IMAGE && files?.length && files?.length > 0) {
   //   return (
   //     <div style={{ padding: 16, overflowY: 'auto' }}>
@@ -90,6 +90,7 @@ const FileList: React.FC<FileItemProps> = ({ list, columnWidths }) => {
               actions: item.actions
             }}
             gridTemplate={columnWidths}
+            isSelected={selectedFileIds.includes(item.key as string)}
           />
         </div>
       )}

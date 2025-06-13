@@ -29,6 +29,7 @@ interface FileItemProps {
   }
   style?: React.CSSProperties
   gridTemplate?: string
+  isSelected?: boolean
 }
 
 const getFileIcon = (type?: string) => {
@@ -79,13 +80,17 @@ const getFileIcon = (type?: string) => {
   return <FileUnknownFilled />
 }
 
-const FileItem: React.FC<FileItemProps> = ({ fileInfo, style, gridTemplate = '' }) => {
+const FileItem: React.FC<FileItemProps> = ({ fileInfo, style, gridTemplate = '', isSelected = false }) => {
   const { name, ext, size, created_at, count, actions, icon, checkbox } = fileInfo
 
   return (
-    <FileItemCard style={style}>
+    <FileItemCard style={style} className={isSelected ? 'selected' : ''}>
       <FileGrid style={{ gridTemplateColumns: gridTemplate }}>
-        {checkbox && <FileCell>{checkbox}</FileCell>}
+        {checkbox && (
+          <FileCell>
+            <CheckboxContainer className="file-checkbox">{checkbox}</CheckboxContainer>
+          </FileCell>
+        )}
         <FileCell>
           <FileIcon>{icon || getFileIcon(ext)}</FileIcon>
         </FileCell>
@@ -116,11 +121,26 @@ const FileItemCard = styled.div`
     box-shadow 0.2s ease,
     background-color 0.2s ease;
   --shadow-color: rgba(0, 0, 0, 0.05);
+
   &:hover {
     box-shadow:
       0 10px 15px -3px var(--shadow-color),
       0 4px 6px -4px var(--shadow-color);
   }
+
+  .file-checkbox {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .file-checkbox {
+    opacity: 1;
+  }
+
+  &.selected .file-checkbox {
+    opacity: 1;
+  }
+
   body[theme-mode='dark'] & {
     --shadow-color: rgba(255, 255, 255, 0.02);
   }
@@ -176,6 +196,12 @@ const FileName = styled.div`
 const FileCount = styled.div`
   font-size: 13px;
   color: var(--color-text-2);
+`
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export default memo(FileItem)

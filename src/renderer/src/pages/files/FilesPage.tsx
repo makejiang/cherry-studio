@@ -267,12 +267,14 @@ const FilesPage: FC = () => {
           <TableHeader>
             <TableGrid style={{ gridTemplateColumns: GRID_TEMPLATE }}>
               <TableCell>
-                <Checkbox
-                  indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < sortedFiles.length}
-                  checked={selectedFileIds.length === sortedFiles.length && sortedFiles.length > 0}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  disabled={sortedFiles.length === 0}
-                />
+                <CheckboxContainer className={`header-checkbox ${selectedFileIds.length > 0 ? 'selected' : ''}`}>
+                  <Checkbox
+                    indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < sortedFiles.length}
+                    checked={selectedFileIds.length === sortedFiles.length && sortedFiles.length > 0}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disabled={sortedFiles.length === 0}
+                  />
+                </CheckboxContainer>
               </TableCell>
               <TableCell>{/* 图标列 */}</TableCell>
               <TableCell>
@@ -471,6 +473,25 @@ const TableCell = styled.div`
 
 const TableHeader = styled.div`
   margin: 0 16px;
+
+  .header-checkbox {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .header-checkbox {
+    opacity: 1;
+  }
+
+  .header-checkbox.selected {
+    opacity: 1;
+  }
+`
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export default FilesPage
