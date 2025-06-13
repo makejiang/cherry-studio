@@ -9,15 +9,19 @@ import { TypedArray } from 'pdfjs-dist/types/src/display/api'
 
 export default abstract class BasePreprocessProvider {
   protected provider: PreprocessProvider
+  protected userId?: string
   public storageDir = path.join(app.getPath('userData'), 'Data', 'Files')
 
-  constructor(provider: PreprocessProvider) {
+  constructor(provider: PreprocessProvider, userId?: string) {
     if (!provider) {
       throw new Error('Preprocess provider is not set')
     }
     this.provider = provider
+    this.userId = userId
   }
-  abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }>
+  abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata; quota?: number }>
+
+  abstract checkQuota(): Promise<number>
 
   /**
    * 检查文件是否已经被预处理过

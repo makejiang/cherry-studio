@@ -243,6 +243,13 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
               style={{ width: '100%' }}
               options={embeddingSelectOptions}
               placeholder={t('settings.models.empty')}
+              onChange={(value) => {
+                const model = value
+                  ? providers.flatMap((p) => p.models).find((m) => getModelUniqId(m) === value)
+                  : undefined
+                if (!model) return
+                setNewBase({ ...newBase, model })
+              }}
             />
           </SettingsItem>
 

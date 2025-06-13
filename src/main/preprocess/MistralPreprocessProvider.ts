@@ -180,4 +180,8 @@ export default class MistralPreprocessProvider extends BasePreprocessProvider {
       count: 1
     } as FileMetadata
   }
+
+  public checkQuota(): Promise<number> {
+    throw new Error('Method not implemented.')
+  }
 }

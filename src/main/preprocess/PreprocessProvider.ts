@@ -5,10 +5,13 @@ import PreprocessProviderFactory from './PreprocessProviderFactory'
 
 export default class PreprocessProvider {
   private sdk: BasePreprocessProvider
-  constructor(provider: Provider) {
-    this.sdk = PreprocessProviderFactory.create(provider)
+  constructor(provider: Provider, userId?: string) {
+    this.sdk = PreprocessProviderFactory.create(provider, userId)
   }
-  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
+  public async parseFile(
+    sourceId: string,
+    file: FileMetadata
+  ): Promise<{ processedFile: FileMetadata; quota?: number }> {
     return this.sdk.parseFile(sourceId, file)
   }
 

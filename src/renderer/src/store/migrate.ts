@@ -1565,6 +1565,9 @@ const migrateConfig = {
   },
   '112': (state: RootState) => {
     try {
+      if (!state.settings.userId) {
+        state.settings.userId = uuid()
+      }
       if (!state.preprocess) {
         state.preprocess = {
           defaultProvider: '',

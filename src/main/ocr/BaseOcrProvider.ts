@@ -18,7 +18,7 @@ export default abstract class BaseOcrProvider {
     }
     this.provider = provider
   }
-  abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }>
+  abstract parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata; quota?: number }>
 
   /**
    * 检查文件是否已经被预处理过

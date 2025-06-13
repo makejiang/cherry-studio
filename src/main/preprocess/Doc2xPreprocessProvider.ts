@@ -322,4 +322,8 @@ export default class Doc2xPreprocessProvider extends BasePreprocessProvider {
       }
     }
   }
+
+  public checkQuota(): Promise<number> {
+    throw new Error('Method not implemented.')
+  }
 }

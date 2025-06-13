@@ -579,7 +579,8 @@
       "status_embedding_completed": "嵌入完成",
       "status_preprocess_completed": "预处理完成",
       "status_embedding_failed": "嵌入失败",
-      "status_preprocess_failed": "预处理失败"
+      "status_preprocess_failed": "预处理失败",
+      "quota": "{{name}} 剩余额度：{{quota}}"
     },
     "languages": {
       "arabic": "阿拉伯文",

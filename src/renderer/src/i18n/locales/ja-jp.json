@@ -579,7 +579,8 @@
       "dimensions_error_invalid": "埋め込み次元のサイズを入力してください",
       "dimensions_size_too_large": "埋め込み次元はモデルのコンテキスト制限（{{max_context}}）を超えてはなりません。",
       "dimensions_set_right": "⚠️ モデルが設定した埋め込み次元のサイズをサポートしていることを確認してください",
-      "dimensions_default": "モデルはデフォルトの埋め込み次元を使用します"
+      "dimensions_default": "モデルはデフォルトの埋め込み次元を使用します",
+      "quota": "{{name}} 残りクォータ: {{quota}}"
     },
     "languages": {
       "arabic": "アラビア語",
@@ -711,7 +712,8 @@
       "warn.siyuan.exporting": "思源ノートにエクスポート中です。重複してエクスポートしないでください!",
       "error.yuque.no_config": "語雀のAPIアドレスまたはトークンが設定されていません",
       "download.success": "ダウンロードに成功しました",
-      "download.failed": "ダウンロードに失敗しました"
+      "download.failed": "ダウンロードに失敗しました",
+      "error.fetchTopicName": "トピックの命名に失敗しました"
     },
     "minapp": {
       "popup": {

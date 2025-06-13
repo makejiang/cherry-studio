@@ -40,12 +40,14 @@ export interface KnowledgeBaseAddItemOptions {
   base: KnowledgeBaseParams
   item: KnowledgeItem
   forceReload?: boolean
+  userId?: string
 }
 
 interface KnowledgeBaseAddItemOptionsNonNullableAttribute {
   base: KnowledgeBaseParams
   item: KnowledgeItem
   forceReload: boolean
+  userId: string
 }
 
 interface EvaluateTaskWorkload {
@@ -174,7 +176,7 @@ class KnowledgeService {
     ragApplication: RAGApplication,
     options: KnowledgeBaseAddItemOptionsNonNullableAttribute
   ): LoaderTask {
-    const { base, item, forceReload } = options
+    const { base, item, forceReload, userId } = options
     const file = item.content as FileMetadata
 
     const loaderTask: LoaderTask = {
@@ -184,7 +186,7 @@ class KnowledgeService {
           task: async () => {
             try {
               // 添加预处理逻辑
-              const fileToProcess: FileMetadata = await this.preprocessing(file, base, item)
+              const fileToProcess: FileMetadata = await this.preprocessing(file, base, item, userId)
 
               // 使用处理后的文件进行加载
               return addFileLoader(ragApplication, fileToProcess, base, forceReload)
@@ -470,8 +472,8 @@ class KnowledgeService {
 
   public add = async (_: Electron.IpcMainInvokeEvent, options: KnowledgeBaseAddItemOptions): Promise<LoaderReturn> => {
     return new Promise((resolve) => {
-      const { base, item, forceReload = false } = options
-      const optionsNonNullableAttribute = { base, item, forceReload }
+      const { base, item, forceReload = false, userId = '' } = options
+      const optionsNonNullableAttribute = { base, item, forceReload, userId }
       this.getRagApplication(base)
         .then((ragApplication) => {
           const task = (() => {
@@ -551,14 +553,15 @@ class KnowledgeService {
   private preprocessing = async (
     file: FileMetadata,
     base: KnowledgeBaseParams,
-    item: KnowledgeItem
+    item: KnowledgeItem,
+    userId: string
   ): Promise<FileMetadata> => {
     let fileToProcess: FileMetadata = file
     if (base.preprocessOrOcrProvider && file.ext.toLowerCase() === '.pdf') {
       try {
         let provider: PreprocessProvider | OcrProvider
         if (base.preprocessOrOcrProvider.type === 'preprocess') {
-          provider = new PreprocessProvider(base.preprocessOrOcrProvider.provider)
+          provider = new PreprocessProvider(base.preprocessOrOcrProvider.provider, userId)
         } else {
           provider = new OcrProvider(base.preprocessOrOcrProvider.provider)
         }
@@ -571,12 +574,12 @@ class KnowledgeService {
 
         // 执行预处理
         Logger.info(`Starting preprocess processing for scanned PDF: ${file.path}`)
-        const { processedFile } = await provider.parseFile(item.id, file)
+        const { processedFile, quota } = await provider.parseFile(item.id, file)
         fileToProcess = processedFile
-        console.warn('base', base, 'item', item, 'file', file)
         const mainWindow = windowService.getMainWindow()
         mainWindow?.webContents.send('file-preprocess-finished', {
-          itemId: item.id
+          itemId: item.id,
+          quota: quota
         })
       } catch (err) {
         Logger.error(`Preprocess processing failed: ${err}`)

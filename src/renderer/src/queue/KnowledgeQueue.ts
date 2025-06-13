@@ -1,5 +1,6 @@
 import Logger from '@renderer/config/logger'
 import db from '@renderer/databases'
+import { getStoreSetting } from '@renderer/hooks/useSettings'
 import { getKnowledgeBaseParams } from '@renderer/services/KnowledgeService'
 import { NotificationService } from '@renderer/services/NotificationService'
 import store from '@renderer/store'
@@ -93,6 +94,7 @@ class KnowledgeQueue {
 
   private async processItem(baseId: string, item: KnowledgeItem): Promise<void> {
     const notificationService = NotificationService.getInstance()
+    const userId = getStoreSetting('userId')
     try {
       if (item.retryCount && item.retryCount >= this.MAX_RETRIES) {
         Logger.log(`[KnowledgeQueue] Item ${item.id} has reached max retries, skipping`)

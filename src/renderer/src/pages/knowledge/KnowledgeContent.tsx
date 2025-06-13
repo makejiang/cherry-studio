@@ -7,6 +7,7 @@ import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Logger from '@renderer/config/logger'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
+import { usePreprocessProvider } from '@renderer/hooks/usePreprocess'
 import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { FileMetadata, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
@@ -40,26 +41,6 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   const [expandAll, setExpandAll] = useState(false)
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map())
   const [preprocessMap, setPreprocessMap] = useState<Map<string, boolean>>(new Map())
-  useEffect(() => {
-    const handlers = [
-      window.electron.ipcRenderer.on('file-preprocess-finished', (_, { itemId }) => {
-        setPreprocessMap((prev) => new Map(prev).set(itemId, true))
-      }),
-
-      window.electron.ipcRenderer.on('file-preprocess-progress', (_, { itemId, progress }) => {
-        setProgressMap((prev) => new Map(prev).set(itemId, progress))
-      }),
-
-      window.electron.ipcRenderer.on('directory-processing-percent', (_, { itemId, percent }) => {
-        console.log('[Progress] Directory:', itemId, percent)
-        setProgressMap((prev) => new Map(prev).set(itemId, percent))
-      })
-    ]
-
-    return () => {
-      handlers.forEach((cleanup) => cleanup())
-    }
-  }, [])
 
   const {
     base,
@@ -80,9 +61,38 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     updateItem
   } = useKnowledge(selectedBase.id || '')
 
+  const { updatePreprocessProvider } = usePreprocessProvider(
+    selectedBase.preprocessOrOcrProvider?.provider.id || 'mineru'
+  )
+
   const providerName = getProviderName(base?.model.provider || '')
   const disabled = !base?.version || !providerName
-  console.log(fileItems)
+  useEffect(() => {
+    const handlers = [
+      window.electron.ipcRenderer.on('file-preprocess-finished', (_, { itemId, quota }) => {
+        setPreprocessMap((prev) => new Map(prev).set(itemId, true))
+        if (base?.preprocessOrOcrProvider && quota) {
+          updatePreprocessProvider({
+            ...base.preprocessOrOcrProvider.provider,
+            quota: quota
+          })
+        }
+      }),
+
+      window.electron.ipcRenderer.on('file-preprocess-progress', (_, { itemId, progress }) => {
+        setProgressMap((prev) => new Map(prev).set(itemId, progress))
+      }),
+
+      window.electron.ipcRenderer.on('directory-processing-percent', (_, { itemId, percent }) => {
+        console.log('[Progress] Directory:', itemId, percent)
+        setProgressMap((prev) => new Map(prev).set(itemId, percent))
+      })
+    ]
+
+    return () => {
+      handlers.forEach((cleanup) => cleanup())
+    }
+  }, [])
 
   if (!base) {
     return null
@@ -291,6 +301,15 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
             {base.rerankModel && (
               <Tag color="cyan" style={{ borderRadius: 20, margin: 0 }}>
                 {base.rerankModel.name}
+              </Tag>
+            )}
+
+            {base.preprocessOrOcrProvider && base.preprocessOrOcrProvider.provider.quota && (
+              <Tag color="orange" style={{ borderRadius: 20, margin: 0 }}>
+                {t('knowledge.quota', {
+                  name: base.preprocessOrOcrProvider.provider.name,
+                  quota: base.preprocessOrOcrProvider.provider.quota
+                })}
               </Tag>
             )}
           </div>

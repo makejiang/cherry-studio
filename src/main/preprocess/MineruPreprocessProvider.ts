@@ -39,14 +39,26 @@ type ExtractResultResponse = {
   extract_result: ExtractFileResult[]
 }
 
+type QuotaResponse = {
+  code: number
+  data: {
+    left_quota: number
+  }
+  msg?: string
+  trace_id?: string
+}
+
 export default class MineruPreprocessProvider extends BasePreprocessProvider {
-  constructor(provider: PreprocessProvider) {
-    super(provider)
+  constructor(provider: PreprocessProvider, userId?: string) {
+    super(provider, userId)
     // todo：免费期结束后删除
     this.provider.apiKey = this.provider.apiKey || import.meta.env.VITE_MINERU_API_KEY
   }
 
-  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
+  public async parseFile(
+    sourceId: string,
+    file: FileMetadata
+  ): Promise<{ processedFile: FileMetadata; quota: number }> {
     try {
       Logger.info(`MinerU preprocess processing started: ${file.path}`)
       await this.validateFile(file.path)
@@ -62,9 +74,13 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       // 3. 下载并解压文件
       const { path: outputPath } = await this.downloadAndExtractFile(extractResult.full_zip_url!, file)
 
-      // 4. 创建处理后的文件信息
+      // 4. check quota
+      const quota = await this.checkQuota()
+
+      // 5. 创建处理后的文件信息
       return {
-        processedFile: this.createProcessedFileInfo(file, outputPath)
+        processedFile: this.createProcessedFileInfo(file, outputPath),
+        quota
       }
     } catch (error: any) {
       Logger.error(`MinerU preprocess processing failed for ${file.path}: ${error.message}`)
@@ -72,7 +88,30 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
     }
   }
 
+  public async checkQuota() {
+    try {
+      const quota = await fetch(`${this.provider.apiHost}/api/v4/quota`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.provider.apiKey}`,
+          token: this.userId ?? ''
+        }
+      })
+      if (!quota.ok) {
+        throw new Error(`HTTP ${quota.status}: ${quota.statusText}`)
+      }
+      const { data }: ApiResponse<QuotaResponse> = await quota.json()
+      console.log('MinerU left quota:', data.data.left_quota)
+      return data.data.left_quota
+    } catch (error) {
+      console.error('Error checking quota:', error)
+      throw error
+    }
+  }
+
   private async validateFile(filePath: string): Promise<void> {
+    const quota = await this.checkQuota()
     const pdfBuffer = await fs.promises.readFile(filePath)
 
     const doc = await this.readPdf(new Uint8Array(pdfBuffer))
@@ -85,6 +124,10 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
     if (pdfBuffer.length >= 200 * 1024 * 1024) {
       const fileSizeMB = Math.round(pdfBuffer.length / (1024 * 1024))
       throw new Error(`PDF file size (${fileSizeMB}MB) exceeds the limit of 200MB`)
+    }
+    // 检查配额
+    if (quota <= 0 || quota - doc.numPages <= 0) {
+      throw new Error('MinerU解析配额不足，请申请企业账户或自行部署，剩余额度：' + quota)
     }
   }
 

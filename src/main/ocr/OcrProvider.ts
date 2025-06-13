@@ -8,7 +8,10 @@ export default class OcrProvider {
   constructor(provider: Provider) {
     this.sdk = OcrProviderFactory.create(provider)
   }
-  public async parseFile(sourceId: string, file: FileMetadata): Promise<{ processedFile: FileMetadata }> {
+  public async parseFile(
+    sourceId: string,
+    file: FileMetadata
+  ): Promise<{ processedFile: FileMetadata; quota?: number }> {
     return this.sdk.parseFile(sourceId, file)
   }
 
