@@ -7,7 +7,6 @@ import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Logger from '@renderer/config/logger'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
-import { usePreprocessProvider } from '@renderer/hooks/usePreprocess'
 import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { FileMetadata, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
@@ -26,6 +25,7 @@ import FileItem from '../files/FileItem'
 import { NavbarIcon } from '../home/Navbar'
 import KnowledgeSearchPopup from './components/KnowledgeSearchPopup'
 import KnowledgeSettings from './components/KnowledgeSettings'
+import QuotaTag from './components/QuotaTag'
 import StatusIcon from './components/StatusIcon'
 
 const { Dragger } = Upload
@@ -41,6 +41,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   const [expandAll, setExpandAll] = useState(false)
   const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map())
   const [preprocessMap, setPreprocessMap] = useState<Map<string, boolean>>(new Map())
+  const [quota, setQuota] = useState<number | undefined>(undefined)
 
   const {
     base,
@@ -61,22 +62,14 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     updateItem
   } = useKnowledge(selectedBase.id || '')
 
-  const { provider: preprocessProvider, updatePreprocessProvider } = usePreprocessProvider(
-    selectedBase.preprocessOrOcrProvider?.provider.id || 'mineru'
-  )
-
   const providerName = getProviderName(base?.model.provider || '')
   const disabled = !base?.version || !providerName
   useEffect(() => {
     const handlers = [
       window.electron.ipcRenderer.on('file-preprocess-finished', (_, { itemId, quota }) => {
         setPreprocessMap((prev) => new Map(prev).set(itemId, true))
-        if (base?.preprocessOrOcrProvider && quota) {
-          console.log('[KnowledgeContent] Update preprocess provider quota:', quota)
-          updatePreprocessProvider({
-            ...base.preprocessOrOcrProvider.provider,
-            quota: quota
-          })
+        if (quota) {
+          setQuota(quota)
         }
       }),
 
@@ -304,14 +297,8 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                 {base.rerankModel.name}
               </Tag>
             )}
-
-            {preprocessProvider && preprocessProvider.quota && (
-              <Tag color="orange" style={{ borderRadius: 20, margin: 0 }}>
-                {t('knowledge.quota', {
-                  name: preprocessProvider.name,
-                  quota: preprocessProvider.quota
-                })}
-              </Tag>
+            {base.preprocessOrOcrProvider && base.preprocessOrOcrProvider.type === 'preprocess' && (
+              <QuotaTag providerId={base.preprocessOrOcrProvider?.provider.id} quota={quota} />
             )}
           </div>
         </ModelInfo>
