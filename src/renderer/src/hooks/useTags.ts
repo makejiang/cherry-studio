@@ -23,7 +23,7 @@ export const useTags = () => {
 
   // 计算所有标签
   const allTags = useMemo(() => {
-    const tags = uniq(flatMap(assistants, (assistant) => assistant.tags || []))
+    const tags = uniq(flatMap(assistants, (assistant) => assistant?.tags || []))
     if (savedTagsOrder.length > 0) {
       return [
         ...savedTagsOrder.filter((tag) => tags.includes(tag)),
@@ -69,6 +69,7 @@ export const useTags = () => {
 
     // 按标签分组并构建结果
     const grouped = Object.entries(groupBy(assistantsByTags, 'tag')).map(([tag, group]) => ({
+      id: tag,
       tag,
       assistants: group.map((g) => g.assistant)
     }))

@@ -1,4 +1,5 @@
 import { DownOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons'
+import { Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
 import { useAgents } from '@renderer/hooks/useAgents'
@@ -30,7 +31,7 @@ const Assistants: FC<AssistantsTabProps> = ({
   const [collapsedTags, setCollapsedTags] = useState<Record<string, boolean>>({})
   const { addAgent } = useAgents()
   const { t } = useTranslation()
-  const { getGroupedAssistants } = useTags()
+  const { getGroupedAssistants, allTags, updateTagsOrder } = useTags()
   const { assistantsTabSortType = 'list', setAssistantsTabSortType } = useAssistantsTabSortType()
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -59,73 +60,165 @@ const Assistants: FC<AssistantsTabProps> = ({
     },
     [setAssistantsTabSortType]
   )
-
+  // 修改tag的方式得调整
+  // 多条修改 同时修改assistants的tag
   const handleGroupReorder = useCallback(
-    (tag: string, newGroupList: Assistant[]) => {
-      let insertIndex = 0
-      const newGlobal = assistants.map((a) => {
-        const tags = a.tags?.length ? a.tags : [t('assistants.tags.untagged')]
-        if (tags.includes(tag)) {
-          const replaced = newGroupList[insertIndex]
-          insertIndex += 1
-          return replaced
+    (newGroupList: { tag: string; newGroup: Assistant[] }[], _assistants: Assistant[]) => {
+      const insertIndexMap = {}
+
+      newGroupList.map((_) => {
+        insertIndexMap[_.tag] = 0
+      })
+
+      const newGlobal = _assistants.map((a) => {
+        const tag = (a.tags?.length ? a.tags : [t('assistants.tags.untagged')])[0]
+        for (const group of newGroupList) {
+          if (group.tag === tag) {
+            const replaced = group.newGroup[insertIndexMap[tag]]
+            insertIndexMap[tag] += 1
+            return replaced
+          }
         }
         return a
       })
       updateAssistants(newGlobal)
     },
-    [assistants, t, updateAssistants]
+    [t, updateAssistants]
   )
 
+  const handleGroupDragEnd = useCallback(
+    (result: DropResult) => {
+      const { type, source, destination } = result
+      if (!destination) return // 没有目标视作放弃移动 或者后续可以改成删除？
+      if (type === 'ASSISTANT') {
+        const sourceTag = source.droppableId
+        const destTag = destination?.droppableId
+        if (sourceTag !== destTag) {
+          // 组件移动的时候要修改tag再移动
+          // 移动到不同组
+          const sourceGroup = getGroupedAssistants.find((g) => g.id === sourceTag)
+          const sourceGroupAssistants = [...sourceGroup!.assistants]
+          const destGroup = getGroupedAssistants.find((g) => g.id === destTag)
+          const destGroupAssistants = [...destGroup!.assistants]
+
+          // 未分组的情况 分组的加上
+          const sourceAssitant = {
+            ...sourceGroupAssistants.splice(source.index, 1)[0]
+          }
+          if (destTag === t('assistants.tags.untagged')) {
+            delete sourceAssitant.tags
+          } else {
+            sourceAssitant.tags = [destGroup!.tag]
+          }
+
+          // 修改对应tag
+          const _assistants = assistants.map((_) => {
+            if (_.id === sourceAssitant.id) {
+              const newAssistant = { ..._ }
+              if (destTag === t('assistants.tags.untagged')) {
+                delete newAssistant.tags
+              } else {
+                newAssistant.tags = [destGroup!.tag]
+              }
+              return newAssistant
+            }
+            return _
+          })
+
+          // 进行置换
+          destGroupAssistants?.splice(destination.index, 0, sourceAssitant)
+
+          return handleGroupReorder(
+            [
+              { tag: sourceTag, newGroup: sourceGroupAssistants },
+              { tag: destTag, newGroup: destGroupAssistants }
+            ],
+            _assistants
+          )
+        }
+        if (sourceTag === destTag) {
+          // 移动到同一组
+          const sourceGroup = getGroupedAssistants.find((g) => g.id === sourceTag)
+          const sourceAssitant = sourceGroup!.assistants.splice(source.index, 1)
+          sourceGroup!.assistants.splice(destination.index, 0, sourceAssitant[0])
+
+          return handleGroupReorder([{ tag: sourceTag, newGroup: sourceGroup!.assistants }], assistants)
+        }
+      } else if (type === 'TAG') {
+        const items = Array.from(allTags)
+        const [reorderedItem] = items.splice(source.index - 1, 1)
+        items.splice(destination.index - 1, 0, reorderedItem)
+        updateTagsOrder(items)
+      }
+      result
+      return
+    },
+    [allTags, assistants, getGroupedAssistants, handleGroupReorder, t, updateTagsOrder]
+  )
+  //尝试过使用两个DragableList 但是会有问题
+  //也试过不用DragList 直接写 但是会有问题
+  //发现只有这样写是符合预期效果的
   if (assistantsTabSortType === 'tags') {
     return (
       <Container className="assistants-tab" ref={containerRef}>
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 4, gap: 10 }}>
-          {getGroupedAssistants.map((group) => (
-            <TagsContainer key={group.tag}>
-              {group.tag !== t('assistants.tags.untagged') && (
-                <GroupTitle onClick={() => toggleTagCollapse(group.tag)}>
-                  <Tooltip title={group.tag}>
-                    <GroupTitleName>
-                      {collapsedTags[group.tag] ? (
-                        <RightOutlined style={{ fontSize: '10px', marginRight: '5px' }} />
-                      ) : (
-                        <DownOutlined style={{ fontSize: '10px', marginRight: '5px' }} />
-                      )}
-                      {group.tag}
-                    </GroupTitleName>
-                  </Tooltip>
-                  <GroupTitleDivider />
-                </GroupTitle>
+        <DragableList
+          droppableProps={{ type: 'TAG' }}
+          list={getGroupedAssistants.map((_) => ({ ..._, disabled: _.tag === t('assistants.tags.untagged') }))}
+          onUpdate={() => {}}
+          onDragEnd={handleGroupDragEnd}>
+          {(group) => (
+            <Droppable droppableId={group.tag} type="ASSISTANT">
+              {(provided) => (
+                <TagsContainer key={group.tag} {...provided.droppableProps} ref={provided.innerRef}>
+                  {group.tag !== t('assistants.tags.untagged') && (
+                    <GroupTitle onClick={() => toggleTagCollapse(group.tag)}>
+                      <Tooltip title={group.tag}>
+                        <GroupTitleName>
+                          {collapsedTags[group.tag] ? (
+                            <RightOutlined style={{ fontSize: '10px', marginRight: '5px' }} />
+                          ) : (
+                            <DownOutlined style={{ fontSize: '10px', marginRight: '5px' }} />
+                          )}
+                          {group.tag}
+                        </GroupTitleName>
+                      </Tooltip>
+                      <GroupTitleDivider />
+                    </GroupTitle>
+                  )}
+                  {!collapsedTags[group.tag] && (
+                    <>
+                      {group.assistants.map((assistant, index) => (
+                        <Draggable
+                          key={`draggable_${group.tag}_${assistant?.id}_${index}`}
+                          draggableId={`draggable_${group.tag}_${assistant?.id}_${index}`}
+                          index={index}>
+                          {(provided) => (
+                            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                              <AssistantItem
+                                key={assistant?.id}
+                                assistant={assistant}
+                                sortBy="tags"
+                                isActive={assistant?.id === activeAssistant.id}
+                                onSwitch={setActiveAssistant}
+                                onDelete={onDelete}
+                                addAgent={addAgent}
+                                addAssistant={addAssistant}
+                                handleSortByChange={handleSortByChange}
+                                onCreateDefaultAssistant={() => {}}
+                                style={{ margin: '4px 0' }}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </>
+                  )}
+                  {provided.placeholder}
+                </TagsContainer>
               )}
-              {!collapsedTags[group.tag] && (
-                <div>
-                  <DragableList
-                    list={group.assistants}
-                    onUpdate={(newList) => handleGroupReorder(group.tag, newList)}
-                    style={{ paddingBottom: dragging ? '34px' : 0 }}
-                    onDragStart={() => setDragging(true)}
-                    onDragEnd={() => setDragging(false)}>
-                    {(assistant) => (
-                      <AssistantItem
-                        key={assistant.id}
-                        assistant={assistant}
-                        isActive={assistant.id === activeAssistant.id}
-                        sortBy={assistantsTabSortType}
-                        onSwitch={setActiveAssistant}
-                        onDelete={onDelete}
-                        addAgent={addAgent}
-                        addAssistant={addAssistant}
-                        onCreateDefaultAssistant={onCreateDefaultAssistant}
-                        handleSortByChange={handleSortByChange}
-                      />
-                    )}
-                  </DragableList>
-                </div>
-              )}
-            </TagsContainer>
-          ))}
-        </div>
+            </Droppable>
+          )}
+        </DragableList>
         <AssistantAddItem onClick={onCreateAssistant}>
           <AssistantName>
             <PlusOutlined style={{ color: 'var(--color-text-2)', marginRight: 4 }} />
@@ -176,13 +269,12 @@ const Assistants: FC<AssistantsTabProps> = ({
 const Container = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
-  padding: 4px 10px;
+  padding: 0 10px;
 `
 
 const TagsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
 `
 
 const AssistantAddItem = styled.div`
@@ -211,6 +303,7 @@ const GroupTitle = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 24px;
+  margin: 5px 0;
 `
 
 const GroupTitleName = styled.div`

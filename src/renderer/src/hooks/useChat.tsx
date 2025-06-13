@@ -6,13 +6,14 @@ import { Assistant } from '@renderer/types'
 import { Topic } from '@renderer/types'
 import { useEffect } from 'react'
 
-import { useAssistants } from './useAssistant'
+import { useAssistants, useTopicsForAssistant } from './useAssistant'
 import { useSettings } from './useSettings'
 
 export const useChat = () => {
   const { assistants } = useAssistants()
   const activeAssistant = useAppSelector((state) => state.runtime.chat.activeAssistant) || assistants[0]
-  const activeTopic = useAppSelector((state) => state.runtime.chat.activeTopic) || activeAssistant?.topics[0]!
+  const topics = useTopicsForAssistant(activeAssistant.id)
+  const activeTopic = useAppSelector((state) => state.runtime.chat.activeTopic) || topics[0]
   const { clickAssistantToShowTopic } = useSettings()
   const dispatch = useAppDispatch()
 
@@ -24,12 +25,12 @@ export const useChat = () => {
   }, [activeTopic, dispatch])
 
   useEffect(() => {
-    if (activeAssistant?.topics?.find((topic) => topic.id === activeTopic?.id)) {
+    if (topics.find((topic) => topic.id === activeTopic?.id)) {
       return
     }
-    const firstTopic = activeAssistant.topics[0]
+    const firstTopic = topics[0]
     firstTopic && dispatch(setActiveTopic(firstTopic))
-  }, [activeAssistant, activeTopic?.id, dispatch])
+  }, [activeAssistant, activeTopic?.id, dispatch, topics])
 
   useEffect(() => {
     if (clickAssistantToShowTopic) {

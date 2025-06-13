@@ -5,7 +5,8 @@ import { SYSTEM_MODELS } from '@renderer/config/models'
 import { TRANSLATE_PROMPT } from '@renderer/config/prompts'
 import db from '@renderer/databases'
 import i18n from '@renderer/i18n'
-import { Assistant, WebSearchProvider } from '@renderer/types'
+import { getDefaultTopic } from '@renderer/services/AssistantService'
+import { Assistant, Topic, WebSearchProvider } from '@renderer/types'
 import { getDefaultGroupName, getLeadingEmoji, runAsyncFunction, uuid } from '@renderer/utils'
 import { isEmpty } from 'lodash'
 import { createMigrate } from 'redux-persist'
@@ -1550,6 +1551,112 @@ const migrateConfig = {
 
       // add selection_assistant_toggle and selection_assistant_select_text shortcuts after mini_window
       addShortcuts(state, ['selection_assistant_toggle', 'selection_assistant_select_text'], 'mini_window')
+
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '112': (state: RootState) => {
+    try {
+      addProvider(state, 'cephalon')
+      addProvider(state, '302ai')
+      state.llm.providers = moveProvider(state.llm.providers, 'cephalon', 13)
+      state.llm.providers = moveProvider(state.llm.providers, '302ai', 14)
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '113': (state: RootState) => {
+    try {
+      // Step 1: 把默认助手模板下面的话题合并到主页列表的默认助手Id下面，保持默认助手模板的纯粹性
+
+      if (state.assistants?.defaultAssistant && state.assistants?.assistants?.length > 0) {
+        const defaultAssistantId = state['assistants'].defaultAssistant.id
+        const defaultAssistantInArray = state.assistants.assistants.find((a) => a.id === defaultAssistantId)
+
+        if (defaultAssistantInArray) {
+          const defaultTopics = state['assistants'].defaultAssistant.topics || []
+          const arrayTopics = defaultAssistantInArray.topics || []
+
+          const topicsMap = new Map<string, Topic>()
+
+          const allTopics = [...arrayTopics, ...defaultTopics]
+          allTopics.forEach((topic) => {
+            if (topic && topic.id) {
+              const existing = topicsMap.get(topic.id)
+              if (
+                !existing ||
+                (topic.updatedAt && existing.updatedAt && topic.updatedAt > existing.updatedAt) ||
+                arrayTopics.includes(topic)
+              ) {
+                topicsMap.set(topic.id, topic)
+              }
+            }
+          })
+
+          const mergedTopics = Array.from(topicsMap.values())
+
+          state['assistants'].defaultAssistant.topics = []
+          defaultAssistantInArray.topics = mergedTopics
+        } else {
+          // 如果默认助手不存在，说明被用户删掉了
+        }
+      }
+
+      // Step 2: 迁移话题结构，从嵌套结构迁移到扁平结构
+      if (!state.topics) {
+        state.topics = {
+          ids: [],
+          entities: {},
+          topicIdsByAssistant: {}
+        }
+      }
+
+      // Type for legacy assistant with topics
+      type LegacyAssistant = Assistant
+
+      // Extract all topics from assistants and flatten them
+      const allTopics: Topic[] = []
+      const topicIdsByAssistant: Record<string, string[]> = {}
+
+      // Process regular assistants
+      if (state['assistants'].assistants && state['assistants'].assistants.length > 0) {
+        state['assistants'].assistants.forEach((assistant) => {
+          const legacyAssistant = assistant as LegacyAssistant
+          if (legacyAssistant.topics && Array.isArray(legacyAssistant.topics) && legacyAssistant.topics.length > 0) {
+            allTopics.push(...legacyAssistant.topics)
+            topicIdsByAssistant[assistant.id] = legacyAssistant.topics.map((t: Topic) => t.id)
+
+            // Clear deprecated field
+            legacyAssistant.topics = []
+          } else {
+            // Create default topic for assistant with no topics
+            const defaultTopic = getDefaultTopic(assistant.id)
+            allTopics.push(defaultTopic)
+            topicIdsByAssistant[assistant.id] = [defaultTopic.id]
+
+            // Set deprecated field
+            legacyAssistant.topics = []
+          }
+        })
+      }
+
+      // Populate the new topics slice
+      const topicEntities: Record<string, Topic> = {}
+      const topicIds: string[] = []
+
+      allTopics.forEach((topic) => {
+        topicEntities[topic.id] = topic
+        topicIds.push(topic.id)
+      })
+
+      state.topics = {
+        ids: topicIds,
+        entities: topicEntities,
+        topicIdsByAssistant
+      }
 
       return state
     } catch (error) {

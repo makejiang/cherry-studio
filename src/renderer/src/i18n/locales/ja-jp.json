@@ -706,7 +706,7 @@
       "error.yuque.no_config": "語雀のAPIアドレスまたはトークンが設定されていません",
       "download.success": "ダウンロードに成功しました",
       "download.failed": "ダウンロードに失敗しました",
-      "error.fetchTopicName": "[to be translated]:Failed to name the topic"
+      "error.fetchTopicName": "トピック名の取得に失敗しました"
     },
     "minapp": {
       "popup": {
@@ -1020,7 +1020,9 @@
       "zhipu": "智譜AI",
       "voyageai": "Voyage AI",
       "qiniu": "七牛云 AI 推理",
-      "tokenflux": "TokenFlux"
+      "tokenflux": "TokenFlux",
+      "302ai": "302.AI",
+      "cephalon": "Cephalon"
     },
     "restore": {
       "confirm": "データを復元しますか？",
