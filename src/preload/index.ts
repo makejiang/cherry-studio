@@ -125,13 +125,13 @@ const api = {
     add: ({
       base,
       item,
-      forceReload = false,
-      userId
+      userId,
+      forceReload = false
     }: {
       base: KnowledgeBaseParams
       item: KnowledgeItem
-      forceReload?: boolean
       userId?: string
+      forceReload?: boolean
     }) => ipcRenderer.invoke(IpcChannel.KnowledgeBase_Add, { base, item, forceReload, userId }),
     remove: ({ uniqueId, uniqueIds, base }: { uniqueId: string; uniqueIds: string[]; base: KnowledgeBaseParams }) =>
       ipcRenderer.invoke(IpcChannel.KnowledgeBase_Remove, { uniqueId, uniqueIds, base }),

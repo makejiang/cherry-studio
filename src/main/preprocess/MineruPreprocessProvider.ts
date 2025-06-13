@@ -42,7 +42,8 @@ type ExtractResultResponse = {
 type QuotaResponse = {
   code: number
   data: {
-    left_quota: number
+    user_left_quota: number
+    total_left_quota: number
   }
   msg?: string
   trace_id?: string
@@ -101,9 +102,8 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
       if (!quota.ok) {
         throw new Error(`HTTP ${quota.status}: ${quota.statusText}`)
       }
-      const { data }: ApiResponse<QuotaResponse> = await quota.json()
-      console.log('MinerU left quota:', data.data.left_quota)
-      return data.data.left_quota
+      const response: QuotaResponse = await quota.json()
+      return response.data.user_left_quota
     } catch (error) {
       console.error('Error checking quota:', error)
       throw error
@@ -243,7 +243,9 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.provider.apiKey}`
+          Authorization: `Bearer ${this.provider.apiKey}`,
+          token: this.userId ?? '',
+          Accept: '*/*'
         },
         body: JSON.stringify(payload)
       })
@@ -276,17 +278,39 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
         method: 'PUT',
         body: fileBuffer,
         headers: {
-          'Content-Length': fileBuffer.length.toString()
+          'Content-Type': 'application/pdf'
         }
+        // headers: {
+        //   'Content-Length': fileBuffer.length.toString()
+        // }
       })
 
       if (!response.ok) {
-        throw new Error(`Upload failed with status ${response.status}: ${response.statusText}`)
+        // 克隆 response 以避免消费 body stream
+        const responseClone = response.clone()
+
+        try {
+          const responseBody = await responseClone.text()
+          const errorInfo = {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            type: response.type,
+            redirected: response.redirected,
+            headers: Object.fromEntries(response.headers.entries()),
+            body: responseBody
+          }
+
+          console.error('Response details:', errorInfo)
+          throw new Error(`Upload failed with status ${response.status}: ${responseBody}`)
+        } catch (parseError) {
+          throw new Error(`Upload failed with status ${response.status}. Could not parse response body.`)
+        }
       }
 
       Logger.info(`File uploaded successfully to: ${uploadUrl}`)
     } catch (error: any) {
-      Logger.error(`Failed to upload file to URL ${uploadUrl}: ${error.message}`)
+      Logger.error(`Failed to upload file to URL ${uploadUrl}: ${error}`)
       throw new Error(error.message)
     }
   }
@@ -299,7 +323,8 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.provider.apiKey}`
+          Authorization: `Bearer ${this.provider.apiKey}`,
+          token: this.userId ?? ''
         }
       })
 

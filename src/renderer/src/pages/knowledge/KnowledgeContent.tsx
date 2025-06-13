@@ -61,7 +61,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     updateItem
   } = useKnowledge(selectedBase.id || '')
 
-  const { updatePreprocessProvider } = usePreprocessProvider(
+  const { provider: preprocessProvider, updatePreprocessProvider } = usePreprocessProvider(
     selectedBase.preprocessOrOcrProvider?.provider.id || 'mineru'
   )
 
@@ -72,6 +72,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
       window.electron.ipcRenderer.on('file-preprocess-finished', (_, { itemId, quota }) => {
         setPreprocessMap((prev) => new Map(prev).set(itemId, true))
         if (base?.preprocessOrOcrProvider && quota) {
+          console.log('[KnowledgeContent] Update preprocess provider quota:', quota)
           updatePreprocessProvider({
             ...base.preprocessOrOcrProvider.provider,
             quota: quota
@@ -304,11 +305,11 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
               </Tag>
             )}
 
-            {base.preprocessOrOcrProvider && base.preprocessOrOcrProvider.provider.quota && (
+            {preprocessProvider && preprocessProvider.quota && (
               <Tag color="orange" style={{ borderRadius: 20, margin: 0 }}>
                 {t('knowledge.quota', {
-                  name: base.preprocessOrOcrProvider.provider.name,
-                  quota: base.preprocessOrOcrProvider.provider.quota
+                  name: preprocessProvider.name,
+                  quota: preprocessProvider.quota
                 })}
               </Tag>
             )}

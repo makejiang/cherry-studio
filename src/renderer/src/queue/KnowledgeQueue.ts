@@ -139,7 +139,7 @@ class KnowledgeQueue {
           }
           break
         default:
-          result = await window.api.knowledgeBase.add({ base: baseParams, item: sourceItem })
+          result = await window.api.knowledgeBase.add({ base: baseParams, item: sourceItem, userId: userId as string })
           break
       }
 
