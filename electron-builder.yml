@@ -1,6 +1,7 @@
 appId: com.kangfenmao.CherryStudio
 productName: Cherry Studio
 excludeReBuildModules:
+  - 'pdfjs-dist'
   - 'canvas'
 electronLanguages:
   - zh-CN
@@ -13,9 +14,6 @@ electronLanguages:
   - en # for macOS
 directories:
   buildResources: build
-excludeReBuildModules:
-  - 'pdfjs-dist'
-  - 'canvas'
 files:
   - '**/*'
   - '!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc}'
