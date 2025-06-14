@@ -470,7 +470,7 @@
       "count": "ファイル",
       "created_at": "作成日",
       "delete": "削除",
-      "delete.content": "ファイルを削除すると、ファイルがすべてのメッセージで参照されることを削除します。このファイルを削除してもよろしいですか？",
+      "delete.content": "ファイルを削除すると、ファイルがすべてのメッセージで参照されることを削除します。この{{count}}ファイルを削除してもよろしいですか？",
       "delete.paintings.warning": "画像に含まれているため、削除できません",
       "delete.title": "ファイルを削除",
       "document": "ドキュメント",
@@ -482,7 +482,9 @@
       "size": "サイズ",
       "text": "テキスト",
       "title": "ファイル",
-      "type": "タイプ"
+      "type": "タイプ",
+      "batch_operation": "一括操作",
+      "batch_delete": "一括削除"
     },
     "gpustack": {
       "keep_alive_time.description": "モデルがメモリに保持される時間（デフォルト：5分）",
@@ -1718,6 +1720,7 @@
       "theme.light": "ライト",
       "theme.title": "テーマ",
       "theme.color_primary": "テーマ色",
+      "theme.window.style.opaque": "不透明ウィンドウ",
       "theme.window.style.title": "ウィンドウスタイル",
       "theme.window.style.transparent": "透明ウィンドウ",
       "title": "設定",

@@ -470,7 +470,7 @@
       "count": "个文件",
       "created_at": "创建时间",
       "delete": "删除",
-      "delete.content": "删除文件会删除文件在所有消息中的引用，确定要删除此文件吗?",
+      "delete.content": "删除文件会删除文件在所有消息中的引用，确定要删除这{{count}}个文件吗?",
       "delete.paintings.warning": "绘图中包含该图片，暂时无法删除",
       "delete.title": "删除文件",
       "document": "文档",
@@ -482,7 +482,9 @@
       "size": "大小",
       "text": "文本",
       "title": "文件",
-      "type": "类型"
+      "type": "类型",
+      "batch_operation": "批量操作",
+      "batch_delete": "批量删除"
     },
     "gpustack": {
       "keep_alive_time.description": "模型在内存中保持的时间（默认：5分钟）",
@@ -1730,6 +1732,7 @@
       "theme.light": "浅色",
       "theme.title": "主题",
       "theme.color_primary": "主题颜色",
+      "theme.window.style.opaque": "不透明窗口",
       "theme.window.style.title": "窗口样式",
       "theme.window.style.transparent": "透明窗口",
       "title": "设置",

@@ -470,7 +470,7 @@
       "count": "files",
       "created_at": "Created At",
       "delete": "Delete",
-      "delete.content": "Deleting a file will delete its reference from all messages. Are you sure you want to delete this file?",
+      "delete.content": "Deleting a file will delete its reference from all messages. Are you sure you want to delete {{count}} files?",
       "delete.paintings.warning": "Image contains this file, deletion is not possible",
       "delete.title": "Delete File",
       "document": "Document",
@@ -482,7 +482,9 @@
       "size": "Size",
       "text": "Text",
       "title": "Files",
-      "type": "Type"
+      "type": "Type",
+      "batch_operation": "Batch Operation",
+      "batch_delete": "Batch Delete"
     },
     "gpustack": {
       "keep_alive_time.description": "The time in minutes to keep the connection alive, default is 5 minutes.",
@@ -1730,6 +1732,7 @@
       "theme.light": "Light",
       "theme.title": "Theme",
       "theme.color_primary": "Primary Color",
+      "theme.window.style.opaque": "Opaque Window",
       "theme.window.style.title": "Window Style",
       "theme.window.style.transparent": "Transparent Window",
       "title": "Settings",
