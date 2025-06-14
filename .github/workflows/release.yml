@@ -69,7 +69,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install Dependencies
+      - name: Install Dependencies (Linux/Windows)
+        if: matrix.os != 'macos-latest'
+        run: yarn install --ignore-optional
+
+      - name: Install Dependencies (macOS)
+        if: matrix.os == 'macos-latest'
         run: yarn install
 
       - name: Build Linux
