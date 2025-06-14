@@ -52,30 +52,6 @@ jobs:
       - name: Install corepack
         run: corepack enable && corepack prepare yarn@4.6.0 --activate
 
-      - name: Install Windows Prerequisites
-        if: matrix.os == 'windows-latest'
-        shell: pwsh # 使用 PowerShell
-        run: |
-          Write-Host "Starting Windows prerequisites installation..."
-
-          Write-Host "Installing GTK..."
-          Invoke-WebRequest "https://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip" -OutFile "gtk.zip"
-          Expand-Archive gtk.zip -DestinationPath "C:\GTK"
-          Write-Host "GTK installed to C:\GTK"
-
-          Write-Host "Installing libjpeg-turbo..."
-          Invoke-WebRequest "https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.4/libjpeg-turbo-2.0.4-vc64.exe" -OutFile "libjpeg.exe" -UserAgent NativeHost
-          Start-Process -FilePath ".\libjpeg.exe" -ArgumentList "/S" -Wait # /S 表示静默安装
-          Write-Host "libjpeg-turbo installed."
-
-          Write-Host "Installing and configuring node-gyp..."
-          npm install -g node-gyp@8
-          $NPM_PREFIX_G = (npm prefix -g).Trim()
-          npm config set node_gyp "$NPM_PREFIX_G\node_modules\node-gyp\bin\node-gyp.js"
-          Write-Host "node-gyp configured."
-
-          Write-Host "Windows prerequisites installation complete."
-
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
