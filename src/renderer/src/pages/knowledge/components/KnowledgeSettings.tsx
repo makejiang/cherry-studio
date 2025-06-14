@@ -1,6 +1,6 @@
 import { InfoCircleOutlined, SettingOutlined, WarningOutlined } from '@ant-design/icons'
 import { TopView } from '@renderer/components/TopView'
-import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
+import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT, isMac } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
@@ -84,7 +84,10 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
     options: ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
   }
 
-  const preprocessOrOcrSelectOptions = [preprocessOptions, ocrOptions].filter((group) => group.options.length > 0)
+  const preprocessOrOcrSelectOptions = [
+    ...(preprocessOptions.options.length > 0 ? [preprocessOptions] : []),
+    ...(isMac && ocrOptions.options.length > 0 ? [ocrOptions] : [])
+  ]
 
   const onOk = async () => {
     try {

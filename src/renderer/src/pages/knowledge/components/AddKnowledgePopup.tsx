@@ -1,7 +1,7 @@
 import { InfoCircleOutlined, SettingOutlined, WarningOutlined } from '@ant-design/icons'
 import AiProvider from '@renderer/aiCore'
 import { TopView } from '@renderer/components/TopView'
-import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT } from '@renderer/config/constant'
+import { DEFAULT_KNOWLEDGE_DOCUMENT_COUNT, isMac } from '@renderer/config/constant'
 import { getEmbeddingMaxContext } from '@renderer/config/embedings'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { NOT_SUPPORTED_REANK_PROVIDERS } from '@renderer/config/providers'
@@ -108,7 +108,8 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
       title: t('settings.tool.ocr.provider'),
       options: ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
     }
-    return [preprocessOptions, ocrOptions]
+
+    return isMac ? [preprocessOptions, ocrOptions] : [preprocessOptions]
   }, [ocrProviders, preprocessProviders])
 
   const onOk = async () => {

@@ -53,7 +53,7 @@ export default class MineruPreprocessProvider extends BasePreprocessProvider {
   constructor(provider: PreprocessProvider, userId?: string) {
     super(provider, userId)
     // todo：免费期结束后删除
-    this.provider.apiKey = this.provider.apiKey || import.meta.env.RENDERER_VITE_MINERU_API_KEY
+    this.provider.apiKey = this.provider.apiKey || import.meta.env.MAIN_VITE_MINERU_API_KEY
   }
 
   public async parseFile(
