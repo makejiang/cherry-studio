@@ -59,7 +59,7 @@ const MainSidebar: FC = () => {
   const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('assistants')
   const avatar = useAvatar()
-  const { userName, defaultPaintingProvider } = useSettings()
+  const { userName, defaultPaintingProvider, transparentWindow } = useSettings()
   const { t } = useTranslation()
   const { theme, settedTheme, toggleTheme } = useTheme()
   const [isAppMenuExpanded, setIsAppMenuExpanded] = useState(false)
@@ -167,6 +167,7 @@ const MainSidebar: FC = () => {
   return (
     <Container
       id="main-sidebar"
+      transparent={transparentWindow}
       style={{
         width: showAssistants ? 'var(--assistants-width)' : '0px',
         opacity: showAssistants ? 1 : 0,

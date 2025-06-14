@@ -55,8 +55,8 @@ const ColorCircle = styled.div<{ color: string; isActive?: boolean }>`
 
 const DisplaySettings: FC = () => {
   const {
-    windowStyle,
-    setWindowStyle,
+    transparentWindow,
+    setTransparentWindow,
     topicPosition,
     setTopicPosition,
     clickAssistantToShowTopic,
@@ -76,13 +76,6 @@ const DisplaySettings: FC = () => {
 
   const [visibleIcons, setVisibleIcons] = useState(sidebarIcons?.visible || DEFAULT_SIDEBAR_ICONS)
   const [disabledIcons, setDisabledIcons] = useState(sidebarIcons?.disabled || [])
-
-  const handleWindowStyleChange = useCallback(
-    (checked: boolean) => {
-      setWindowStyle(checked ? 'transparent' : 'opaque')
-    },
-    [setWindowStyle]
-  )
 
   const handleColorPrimaryChange = useCallback(
     (colorHex: string) => {
@@ -211,7 +204,7 @@ const DisplaySettings: FC = () => {
             <SettingDivider />
             <SettingRow>
               <SettingRowTitle>{t('settings.theme.window.style.transparent')}</SettingRowTitle>
-              <Switch checked={windowStyle === 'transparent'} onChange={handleWindowStyleChange} />
+              <Switch checked={transparentWindow} onChange={setTransparentWindow} />
             </SettingRow>
           </>
         )}
