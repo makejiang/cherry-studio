@@ -47,7 +47,12 @@ jobs:
       - name: macos-latest dependencies fix
         if: matrix.os == 'macos-latest'
         run: |
-          brew install python-setuptools
+          brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman python-setuptools
+
+      - name: ubuntu-latest dependencies fix
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
       - name: windows-latest dependencies fix
         if: matrix.os == 'windows-latest'
