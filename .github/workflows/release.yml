@@ -44,6 +44,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: macos-latest dependencies fix
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install python-setuptools
+
+      - name: Install corepack
+        run: corepack enable && corepack prepare yarn@4.6.0 --activate
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
@@ -71,6 +79,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RENDERER_VITE_AIHUBMIX_SECRET: ${{ vars.RENDERER_VITE_AIHUBMIX_SECRET }}
           NODE_OPTIONS: --max-old-space-size=8192
+          VITE_MINERU_API_KEY: ${{ vars.VITE_MINERU_API_KEY }}
 
       - name: Build Mac
         if: matrix.os == 'macos-latest'
