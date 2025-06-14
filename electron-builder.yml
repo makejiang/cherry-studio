@@ -60,8 +60,6 @@ asarUnpack:
 win:
   executableName: Cherry Studio
   artifactName: ${productName}-${version}-${arch}-setup.${ext}
-  files:
-    - '!node_modules/@cherrystudio/mac-system-ocr'
   target:
     - target: nsis
     - target: portable
@@ -95,8 +93,6 @@ mac:
     - target: zip
 linux:
   artifactName: ${productName}-${version}-${arch}.${ext}
-  files:
-    - '!node_modules/@cherrystudio/mac-system-ocr'
   target:
     - target: AppImage
   maintainer: electronjs.org
