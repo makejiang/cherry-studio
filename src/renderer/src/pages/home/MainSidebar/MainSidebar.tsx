@@ -355,7 +355,7 @@ const Icon = styled.div<{ theme: string }>`
     height: 34px;
   }
   &:hover {
-    background-color: var(--color-background-mute);
+    background-color: var(--color-list-item);
     opacity: 0.8;
     cursor: pointer;
     .icon {
@@ -363,7 +363,7 @@ const Icon = styled.div<{ theme: string }>`
     }
   }
   &.active {
-    background-color: ${({ theme }) => (theme === 'dark' ? 'var(--color-black)' : 'var(--color-white)')};
+    background-color: var(--color-list-item);
     border: 0.5px solid var(--color-border);
     .icon {
       color: var(--color-primary);
