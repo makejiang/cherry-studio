@@ -112,10 +112,15 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           MAIN_VITE_MINERU_API_KEY: ${{ vars.MAIN_VITE_MINERU_API_KEY }}
 
-      - name: Rebuild canvas for Windows
+      - name: Build canvas for Windows x64
         if: matrix.os == 'windows-latest'
         run: |
-          cd node_modules/canvas && node-gyp rebuild && cd ../..
+          cd node_modules/canvas && node-gyp rebuild --arch=x64 && cd ../..
+
+      - name: Build canvas for Windows ARM64
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd node_modules/canvas && node-gyp rebuild --arch=arm64 && cd ../..
 
       - name: Build Windows
         if: matrix.os == 'windows-latest'
