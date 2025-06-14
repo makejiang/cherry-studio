@@ -355,7 +355,7 @@ const Icon = styled.div<{ theme: string }>`
     height: 34px;
   }
   &:hover {
-    background-color: ${({ theme }) => (theme === 'dark' ? 'var(--color-black)' : 'var(--color-white)')};
+    background-color: var(--color-background-mute);
     opacity: 0.8;
     cursor: pointer;
     .icon {
