@@ -4,12 +4,10 @@ import { getDataPath } from './utils'
 
 const isDev = process.env.NODE_ENV === 'development'
 
-let isFirstSetupDev = true
-
-if (isDev && isFirstSetupDev) {
+if (isDev) {
   app.setPath('userData', app.getPath('userData') + 'Dev')
-  isFirstSetupDev = false
 }
+
 export const DATA_PATH = getDataPath()
 
 export const titleBarOverlayDark = {
