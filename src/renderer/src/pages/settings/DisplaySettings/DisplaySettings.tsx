@@ -1,7 +1,7 @@
 import { SyncOutlined } from '@ant-design/icons'
 import CodeEditor from '@renderer/components/CodeEditor'
 import { HStack } from '@renderer/components/Layout'
-import { THEME_COLOR_PRESETS } from '@renderer/config/constant'
+import { isMac, THEME_COLOR_PRESETS } from '@renderer/config/constant'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useSettings } from '@renderer/hooks/useSettings'
 import useUserTheme from '@renderer/hooks/useUserTheme'
@@ -199,11 +199,15 @@ const DisplaySettings: FC = () => {
             />
           </HStack>
         </SettingRow>
-        <SettingDivider />
-        <SettingRow>
-          <SettingRowTitle>{t('settings.theme.window.style.transparent')}</SettingRowTitle>
-          <Switch checked={transparentWindow} onChange={setTransparentWindow} />
-        </SettingRow>
+        {!isMac && (
+          <>
+            <SettingDivider />
+            <SettingRow>
+              <SettingRowTitle>{t('settings.theme.window.style.transparent')}</SettingRowTitle>
+              <Switch checked={transparentWindow} onChange={setTransparentWindow} />
+            </SettingRow>
+          </>
+        )}
       </SettingGroup>
       <SettingGroup theme={theme}>
         <SettingTitle>{t('settings.display.zoom.title')}</SettingTitle>

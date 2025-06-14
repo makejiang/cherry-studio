@@ -1,4 +1,3 @@
-import { isMac } from '@renderer/config/constant'
 import { isLocalAi } from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import db from '@renderer/databases'
@@ -68,11 +67,7 @@ export function useAppInit() {
       return
     }
 
-    window.root.style.background = !minappShow
-      ? isMac
-        ? 'var(--navbar-background-mac)'
-        : 'var(--navbar-background-win)'
-      : 'var(--color-background)'
+    window.root.style.background = !minappShow ? 'var(--navbar-background-mac)' : 'var(--navbar-background)'
   }, [minappShow, theme])
 
   useEffect(() => {
