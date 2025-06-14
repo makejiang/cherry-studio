@@ -62,7 +62,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: powershell
         run: |
-          $gtkUrl = "https://sourceforge.net/projects/pidgin/files/GTK%2B%20for%20Windows/2.24.32/gtk-dev-2.24.32-rev1-win64.zip/download"
+          $gtkUrl = "https://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip"
           $gtkZipPath = "C:\gtk-bundle.zip"
           $gtkExtractPath = "C:\GTK_TEMP_EXTRACT"
           $gtkInstallPath = "C:\GTK"
