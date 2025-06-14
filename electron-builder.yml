@@ -1,8 +1,5 @@
 appId: com.kangfenmao.CherryStudio
 productName: Cherry Studio
-excludeReBuildModules:
-  - 'pdfjs-dist'
-  - 'canvas'
 electronLanguages:
   - zh-CN
   - zh-TW
@@ -66,6 +63,9 @@ win:
   signtoolOptions:
     sign: scripts/win-sign.js
   verifyUpdateCodeSignature: false
+  excludeReBuildModules:
+    - 'pdfjs-dist'
+    - 'canvas'
 nsis:
   artifactName: ${productName}-${version}-${arch}-setup.${ext}
   shortcutName: ${productName}
