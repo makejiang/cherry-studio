@@ -140,3 +140,8 @@
 
   --border-width: 0.5px;
 }
+
+[transparent-window='false'] {
+  --color-list-item: var(--color-background-mute);
+  --color-list-item-hover: var(--color-background-soft);
+}
