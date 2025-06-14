@@ -1,5 +1,7 @@
 appId: com.kangfenmao.CherryStudio
 productName: Cherry Studio
+excludeRebuildModules:
+  - 'canvas'
 electronLanguages:
   - zh-CN
   - zh-TW
