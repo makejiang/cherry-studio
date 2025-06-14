@@ -15,7 +15,7 @@ import store from '@renderer/store'
 import { FileType, FileTypes } from '@renderer/types'
 import { Message } from '@renderer/types/newMessage'
 import { formatFileSize } from '@renderer/utils'
-import { Button, Checkbox, Empty, Flex, Popconfirm } from 'antd'
+import { Button, Empty, Flex, Popconfirm } from 'antd'
 import dayjs from 'dayjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { File as FileIcon, FileImage, FileText, FileType as FileTypeIcon } from 'lucide-react'
@@ -25,8 +25,6 @@ import styled from 'styled-components'
 
 import FileList from './FileList'
 
-const GRID_TEMPLATE = 'auto 60px 1fr 120px 140px 100px'
-
 type SortField = 'created_at' | 'size' | 'name'
 type SortOrder = 'asc' | 'desc'
 
@@ -35,7 +33,6 @@ const FilesPage: FC = () => {
   const [fileType, setFileType] = useState<string>('document')
   const [sortField, setSortField] = useState<SortField>('created_at')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([])
 
   const tempFilesSort = (files: FileType[]) => {
     return files.sort((a, b) => {
@@ -173,38 +170,6 @@ const FilesPage: FC = () => {
     }
   }
 
-  // 全选/取消全选
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedFileIds(sortedFiles.map((file) => file.id))
-    } else {
-      setSelectedFileIds([])
-    }
-  }
-
-  // 单个文件选择
-  const handleFileSelect = (fileId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedFileIds((prev) => [...prev, fileId])
-    } else {
-      setSelectedFileIds((prev) => prev.filter((id) => id !== fileId))
-    }
-  }
-
-  // 批量删除
-  const handleBatchDelete = async () => {
-    if (selectedFileIds.length === 0) return
-
-    try {
-      for (const fileId of selectedFileIds) {
-        await handleDelete(fileId)
-      }
-      setSelectedFileIds([])
-    } catch (error) {
-      Logger.error('Batch delete error:', error)
-    }
-  }
-
   const dataSource = sortedFiles?.map((file) => {
     return {
       key: file.id,
@@ -216,18 +181,12 @@ const FilesPage: FC = () => {
       ext: file.ext,
       created_at: dayjs(file.created_at).format('MM-DD HH:mm'),
       created_at_unix: dayjs(file.created_at).unix(),
-      checkbox: (
-        <Checkbox
-          checked={selectedFileIds.includes(file.id)}
-          onChange={(e) => handleFileSelect(file.id, e.target.checked)}
-        />
-      ),
       actions: (
         <Flex align="center" gap={0} style={{ opacity: 0.7 }}>
           <Button type="text" icon={<EditOutlined />} onClick={() => handleRename(file.id)} />
           <Popconfirm
             title={t('files.delete.title')}
-            description={t('files.delete.content', { count: 1 })}
+            description={t('files.delete.content')}
             okText={t('common.confirm')}
             cancelText={t('common.cancel')}
             onConfirm={() => handleDelete(file.id)}
@@ -264,90 +223,26 @@ const FilesPage: FC = () => {
           ))}
         </SideNav>
         <MainContent>
-          <TableHeader>
-            <TableGrid style={{ gridTemplateColumns: GRID_TEMPLATE }}>
-              <TableCell>
-                <Checkbox
-                  indeterminate={selectedFileIds.length > 0 && selectedFileIds.length < sortedFiles.length}
-                  checked={selectedFileIds.length === sortedFiles.length && sortedFiles.length > 0}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  disabled={sortedFiles.length === 0}
-                />
-              </TableCell>
-              <TableCell>{/* 图标列 */}</TableCell>
-              <TableCell>
-                <SortButton
-                  active={sortField === 'name'}
-                  onClick={() => {
-                    if (sortField === 'name') {
-                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-                    } else {
-                      setSortField('name')
-                      setSortOrder('desc')
-                    }
-                  }}>
-                  {t('files.name')}
-                  {sortField === 'name' &&
-                    (sortOrder === 'desc' ? <SortDescendingOutlined /> : <SortAscendingOutlined />)}
-                </SortButton>
-              </TableCell>
-              <TableCell>
-                <SortButton
-                  active={sortField === 'size'}
-                  onClick={() => {
-                    if (sortField === 'size') {
-                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-                    } else {
-                      setSortField('size')
-                      setSortOrder('desc')
-                    }
-                  }}>
-                  {t('files.size')}
-                  {sortField === 'size' &&
-                    (sortOrder === 'desc' ? <SortDescendingOutlined /> : <SortAscendingOutlined />)}
-                </SortButton>
-              </TableCell>
-              <TableCell>
-                <SortButton
-                  active={sortField === 'created_at'}
-                  onClick={() => {
-                    if (sortField === 'created_at') {
-                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-                    } else {
-                      setSortField('created_at')
-                      setSortOrder('desc')
-                    }
-                  }}>
-                  {t('files.created_at')}
-                  {sortField === 'created_at' &&
-                    (sortOrder === 'desc' ? <SortDescendingOutlined /> : <SortAscendingOutlined />)}
-                </SortButton>
-              </TableCell>
-              <TableCell style={{ justifyContent: 'center' }}>
-                {selectedFileIds.length > 0 && (
-                  <Popconfirm
-                    title={t('files.delete.title')}
-                    description={t('files.delete.content', { count: selectedFileIds.length })}
-                    okText={t('common.confirm')}
-                    cancelText={t('common.cancel')}
-                    onConfirm={handleBatchDelete}
-                    icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}>
-                    <Button type="text" danger icon={<DeleteOutlined />} />
-                  </Popconfirm>
-                )}
-              </TableCell>
-            </TableGrid>
-          </TableHeader>
-
+          <SortContainer>
+            {['created_at', 'size', 'name'].map((field) => (
+              <SortButton
+                key={field}
+                active={sortField === field}
+                onClick={() => {
+                  if (sortField === field) {
+                    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+                  } else {
+                    setSortField(field as 'created_at' | 'size' | 'name')
+                    setSortOrder('desc')
+                  }
+                }}>
+                {t(`files.${field}`)}
+                {sortField === field && (sortOrder === 'desc' ? <SortDescendingOutlined /> : <SortAscendingOutlined />)}
+              </SortButton>
+            ))}
+          </SortContainer>
           {dataSource && dataSource?.length > 0 ? (
-            <FileList
-              id={fileType}
-              list={dataSource}
-              files={sortedFiles}
-              selectedFileIds={selectedFileIds}
-              onFileSelect={handleFileSelect}
-              columnWidths={GRID_TEMPLATE}
-            />
+            <FileList id={fileType} list={dataSource} files={sortedFiles} />
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           )}
@@ -368,6 +263,14 @@ const MainContent = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+`
+
+const SortContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 0.5px solid var(--color-border);
 `
 
 const ContentContainer = styled.div`
@@ -412,65 +315,25 @@ const SideNav = styled.div`
   }
 `
 
-const SortButton = styled.div<{ active?: boolean }>`
-  position: relative;
+const SortButton = styled(Button)<{ active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 12px;
   height: 30px;
+  border-radius: var(--list-item-border-radius);
+  border: 0.5px solid ${(props) => (props.active ? 'var(--color-border)' : 'transparent')};
+  background-color: ${(props) => (props.active ? 'var(--color-background-soft)' : 'transparent')};
   color: ${(props) => (props.active ? 'var(--color-text)' : 'var(--color-text-secondary)')};
-  font-weight: ${(props) => (props.active ? '500' : '400')};
-  cursor: pointer;
-  z-index: 1;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -8px;
-    right: -8px;
-    bottom: -4px;
-    border-radius: var(--list-item-border-radius);
-    border: 0.5px solid ${(props) => (props.active ? 'var(--color-border)' : 'transparent')};
-    background-color: ${(props) => (props.active ? 'var(--color-background-soft)' : 'transparent')};
-    transition: all 0.2s ease;
-    z-index: -1;
-  }
-
-  &:hover::before {
+  &:hover {
     background-color: var(--color-background-soft);
-    border-color: var(--color-border);
-  }
-
-  > * {
-    position: relative;
-    z-index: 2;
+    color: var(--color-text);
   }
 
   .anticon {
     font-size: 12px;
   }
-`
-
-const TableGrid = styled.div`
-  display: grid;
-  gap: 8px;
-  padding: 8px 8px 0px 16px;
-  align-items: center;
-`
-
-const TableCell = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  &:last-child {
-    justify-content: center;
-  }
-`
-
-const TableHeader = styled.div`
-  margin: 0 16px;
 `
 
 export default FilesPage

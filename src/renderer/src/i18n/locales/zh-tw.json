@@ -470,7 +470,7 @@
       "count": "個檔案",
       "created_at": "建立時間",
       "delete": "刪除",
-      "delete.content": "刪除檔案會刪除檔案在所有訊息中的引用，確定要刪除這{{count}}個檔案嗎？",
+      "delete.content": "刪除檔案會刪除檔案在所有訊息中的引用，確定要刪除此檔案嗎？",
       "delete.paintings.warning": "繪圖中包含該圖片，暫時無法刪除",
       "delete.title": "刪除檔案",
       "document": "文件",
