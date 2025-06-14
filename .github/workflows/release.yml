@@ -47,7 +47,10 @@ jobs:
       - name: macos-latest dependencies fix
         if: matrix.os == 'macos-latest'
         run: |
-          brew install python-setuptools
+          brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman python-setuptools
+          echo "PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/opt/homebrew/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/opt/homebrew/include" >> $GITHUB_ENV
 
       - name: Install corepack
         run: corepack enable && corepack prepare yarn@4.6.0 --activate
