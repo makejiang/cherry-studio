@@ -79,7 +79,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RENDERER_VITE_AIHUBMIX_SECRET: ${{ vars.RENDERER_VITE_AIHUBMIX_SECRET }}
           NODE_OPTIONS: --max-old-space-size=8192
-          VITE_MINERU_API_KEY: ${{ vars.VITE_MINERU_API_KEY }}
+          RENDERER_VITE_MINERU_API_KEY: ${{ vars.RENDERER_VITE_MINERU_API_KEY }}
 
       - name: Build Mac
         if: matrix.os == 'macos-latest'
@@ -96,7 +96,7 @@ jobs:
           RENDERER_VITE_AIHUBMIX_SECRET: ${{ vars.RENDERER_VITE_AIHUBMIX_SECRET }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_OPTIONS: --max-old-space-size=8192
-          VITE_MINERU_API_KEY: ${{ vars.VITE_MINERU_API_KEY }}
+          RENDERER_VITE_MINERU_API_KEY: ${{ vars.RENDERER_VITE_MINERU_API_KEY }}
 
       - name: Build Windows
         if: matrix.os == 'windows-latest'
@@ -107,7 +107,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RENDERER_VITE_AIHUBMIX_SECRET: ${{ vars.RENDERER_VITE_AIHUBMIX_SECRET }}
           NODE_OPTIONS: --max-old-space-size=8192
-          VITE_MINERU_API_KEY: ${{ vars.VITE_MINERU_API_KEY }}
+          RENDERER_VITE_MINERU_API_KEY: ${{ vars.RENDERER_VITE_MINERU_API_KEY }}
 
       - name: Release
         uses: ncipollo/release-action@v1
