@@ -1,5 +1,17 @@
 {
   "translation": {
+    "title": {
+      "home": "Home",
+      "agents": "Agents",
+      "paintings": "Paintings",
+      "translate": "Translate",
+      "files": "Files",
+      "knowledge": "Knowledge Base",
+      "apps": "Apps",
+      "mcp-servers": "MCP Servers",
+      "settings": "Settings",
+      "launchpad": "Launchpad"
+    },
     "agents": {
       "add.button": "Add to Assistant",
       "add.knowledge_base": "Knowledge Base",

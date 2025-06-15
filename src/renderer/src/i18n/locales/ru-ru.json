@@ -1,5 +1,17 @@
 {
   "translation": {
+    "title": {
+      "home": "Главная",
+      "agents": "Агенты",
+      "paintings": "Рисунки",
+      "translate": "Перевод",
+      "files": "Файлы",
+      "knowledge": "База знаний",
+      "apps": "Приложения",
+      "mcp-servers": "MCP серверы",
+      "settings": "Настройки",
+      "launchpad": "Запуск"
+    },
     "agents": {
       "add.button": "Добавить в ассистента",
       "add.knowledge_base": "База знаний",

@@ -1,5 +1,17 @@
 {
   "translation": {
+    "title": {
+      "home": "主頁",
+      "agents": "智能體",
+      "paintings": "繪畫",
+      "translate": "翻譯",
+      "files": "文件",
+      "knowledge": "知識庫",
+      "apps": "小程序",
+      "mcp-servers": "MCP 伺服器",
+      "settings": "設定",
+      "launchpad": "啟動台"
+    },
     "agents": {
       "add.button": "新增到助手",
       "add.knowledge_base": "知識庫",

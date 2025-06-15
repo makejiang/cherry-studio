@@ -40,7 +40,6 @@ import styled from 'styled-components'
 import AssistantsTab from '../Tabs/AssistantsTab'
 import AssistantItem from '../Tabs/components/AssistantItem'
 import TopicsTab from '../Tabs/TopicsTab'
-import MainNavbar from './MainNavbar'
 import {
   Container,
   MainMenu,
@@ -177,7 +176,6 @@ const MainSidebar: FC = () => {
         opacity: showAssistants ? 1 : 0,
         overflow: showAssistants ? 'initial' : 'hidden'
       }}>
-      <MainNavbar />
       <MainMenu>
         <SidebarSearch onSearch={setSearchValue} />
         <MainMenuItem active={isAppMenuExpanded} onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}>
@@ -305,6 +303,7 @@ const MainContainer = styled.div`
 const AssistantContainer = styled.div`
   margin: 4px 10px;
   display: flex;
+  margin-top: 0;
 `
 
 const UserMenu = styled.div`

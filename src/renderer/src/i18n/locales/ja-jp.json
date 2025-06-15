@@ -1,5 +1,17 @@
 {
   "translation": {
+    "title": {
+      "home": "ホーム",
+      "agents": "エージェント",
+      "paintings": "ペインティング",
+      "translate": "翻訳",
+      "files": "ファイル",
+      "knowledge": "ナレッジベース",
+      "apps": "アプリ",
+      "mcp-servers": "MCP サーバー",
+      "settings": "設定",
+      "launchpad": "ランチパッド"
+    },
     "agents": {
       "add.button": "アシスタントに追加",
       "add.knowledge_base": "ナレッジベース",

@@ -42,7 +42,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Set initial theme and OS attributes on body
     document.body.setAttribute('os', isMac ? 'mac' : 'windows')
     document.body.setAttribute('theme-mode', actualTheme)
-    document.body.setAttribute('transparent-window', transparentWindow ? 'true' : 'false')
 
     // if theme is old auto, then set theme to system
     // we can delete this after next big release
