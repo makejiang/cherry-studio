@@ -118,7 +118,7 @@ export const PROVIDER_CONFIG = {
     },
     websites: {
       official: 'https://302.ai',
-      apiKey: 'https://dash.302.ai/apis/list',
+      apiKey: 'https://share.302.ai/F1B71g',
       docs: 'https://302ai.apifox.cn/api-147522039',
       models: 'https://302.ai/pricing/'
     }
