@@ -5731,6 +5731,7 @@ __metadata:
     os-proxy-config: "npm:^1.1.2"
     p-queue: "npm:^8.1.0"
     pdf-to-img: "npm:^4.4.0"
+    pdfjs-dist: "npm:4.2.67"
     playwright: "npm:^1.52.0"
     prettier: "npm:^3.5.3"
     proxy-agent: "npm:^6.5.0"
