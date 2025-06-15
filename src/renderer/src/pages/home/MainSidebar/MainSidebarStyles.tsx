@@ -53,7 +53,6 @@ export const Container = styled.div<{ transparent?: boolean }>`
   max-width: var(--assistants-width);
   border-right: 0.5px solid var(--color-border);
   height: 100vh;
-  background-color: ${({ transparent }) => (transparent ? 'transparent' : 'var(--color-background)')};
 `
 
 export const MainMenu = styled.div`

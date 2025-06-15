@@ -94,8 +94,8 @@ const MainSidebar: FC = () => {
     ]
     return () => unsubscribe.forEach((unsubscribe) => unsubscribe())
   }, [
-    activeAssistant.id,
-    activeTopic.assistantId,
+    activeAssistant?.id,
+    activeTopic?.assistantId,
     clickAssistantToShowTopic,
     isAppMenuExpanded,
     showAssistants,
