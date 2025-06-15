@@ -63,9 +63,6 @@ win:
   signtoolOptions:
     sign: scripts/win-sign.js
   verifyUpdateCodeSignature: false
-  excludeReBuildModules:
-    - 'pdfjs-dist'
-    - 'canvas'
 nsis:
   artifactName: ${productName}-${version}-${arch}-setup.${ext}
   shortcutName: ${productName}

@@ -48,10 +48,9 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
       // Convert pages to buffers
       const pageNum = i + 1
       const pageBuffer = await results.getPage(pageNum)
-      const croppedPageBuffer = await this.cropImage(pageBuffer)
 
       // Process batch
-      const ocrResult = await this.MacOCR.recognizeFromBuffer(croppedPageBuffer, {
+      const ocrResult = await this.MacOCR.recognizeFromBuffer(pageBuffer, {
         ocrOptions: {
           recognitionLevel: this.getRecognitionLevel(this.provider.options?.recognitionLevel),
           minConfidence: this.provider.options?.minConfidence || 0.5
