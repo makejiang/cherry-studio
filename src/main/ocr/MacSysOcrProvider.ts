@@ -86,7 +86,7 @@ export default class MacSysOcrProvider extends BaseOcrProvider {
     Logger.info(`[OCR] Starting OCR process for file: ${file.name}`)
     if (file.ext === '.pdf') {
       try {
-        const { pdf } = await import('pdf-to-img')
+        const { pdf } = await import('@cherrystudio/pdf-to-img-napi')
         const pdfBuffer = await fs.promises.readFile(file.path)
         const results = await pdf(pdfBuffer, {
           scale: 2

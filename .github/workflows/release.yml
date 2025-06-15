@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest, windows-11-arm]
+        os: [macos-latest, windows-latest, ubuntu-latest]
       fail-fast: false
 
     steps:
@@ -44,32 +44,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: macos-latest dependencies fix
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew update
-          brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman python-setuptools
-
-      - name: ubuntu-latest dependencies fix
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-      - name: windows-latest dependencies fix
-        if: matrix.os == 'windows-latest'
-        run: |
-          Invoke-WebRequest "https://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip" -OutFile "gtk.zip"
-          Expand-Archive gtk.zip -DestinationPath "C:\GTK"
-          Invoke-WebRequest "https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.4/libjpeg-turbo-2.0.4-vc64.exe" -OutFile "libjpeg.exe" -UserAgent NativeHost
-          .\libjpeg.exe /S
-          npm install -g node-gyp@8
-          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
-      - name: windows-11-arm dependencies fix
-        if: matrix.os == 'windows-11-arm'
-        run: |
-          Invoke-WebRequest "https://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip" -OutFile "gtk.zip"
-          Expand-Archive gtk.zip -DestinationPath "C:\GTK"
-          Invoke-WebRequest "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.1/libjpeg-turbo-3.1.1-vc-arm64.exe" -OutFile "libjpeg.exe" -UserAgent NativeHost
-          .\libjpeg.exe /S
       - name: Install corepack
         run: corepack enable && corepack prepare yarn@4.6.0 --activate
 
@@ -119,18 +93,8 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           MAIN_VITE_MINERU_API_KEY: ${{ vars.MAIN_VITE_MINERU_API_KEY }}
 
-      - name: Build canvas for Windows x64
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd node_modules/canvas && node-gyp rebuild --arch=x64 && cd ../..
-
-      - name: Build canvas for Windows ARM64
-        if: matrix.os == 'windows-11-arm'
-        run: |
-          cd node_modules/canvas && node-gyp rebuild --arch=arm64 && cd ../..
-
       - name: Build Windows
-        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
+        if: matrix.os == 'windows-latest'
         run: |
           yarn build:npm windows
           yarn build:win
