@@ -199,7 +199,6 @@ const Topics: FC<TopicsTabProps> = ({ style }) => {
               if (summaryText) {
                 const updatedTopic = { ...topic, name: summaryText, isNameManuallyEdited: false }
                 updateTopic(updatedTopic)
-                topic.id === activeTopic.id && setActiveTopic(updatedTopic)
               } else {
                 window.message?.error(t('message.error.fetchTopicName'))
               }
@@ -223,7 +222,6 @@ const Topics: FC<TopicsTabProps> = ({ style }) => {
           if (name && topic?.name !== name) {
             const updatedTopic = { ...topic, name, isNameManuallyEdited: true }
             updateTopic(updatedTopic)
-            topic.id === activeTopic.id && setActiveTopic(updatedTopic)
           }
         }
       },
