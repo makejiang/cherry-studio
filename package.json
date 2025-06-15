@@ -234,9 +234,7 @@
     "app-builder-lib@npm:26.0.13": "patch:app-builder-lib@npm%3A26.0.13#~/.yarn/patches/app-builder-lib-npm-26.0.13-a064c9e1d0.patch",
     "openai@npm:^4.87.3": "patch:openai@npm%3A5.1.0#~/.yarn/patches/openai-npm-5.1.0-0e7b3ccb07.patch",
     "app-builder-lib@npm:26.0.15": "patch:app-builder-lib@npm%3A26.0.15#~/.yarn/patches/app-builder-lib-npm-26.0.15-360e5b0476.patch",
-    "@langchain/core@npm:^0.3.26": "patch:@langchain/core@npm%3A0.3.44#~/.yarn/patches/@langchain-core-npm-0.3.44-41d5c3cb0a.patch",
-    "canvas@npm:3.1.0": "patch:canvas@npm%3A3.1.0#~/.yarn/patches/canvas-npm-3.1.0-88957473bd.patch",
-    "canvas@npm:^2.11.2": "patch:canvas@npm%3A3.1.0#~/.yarn/patches/canvas-npm-3.1.0-88957473bd.patch"
+    "@langchain/core@npm:^0.3.26": "patch:@langchain/core@npm%3A0.3.44#~/.yarn/patches/@langchain-core-npm-0.3.44-41d5c3cb0a.patch"
   },
   "packageManager": "yarn@4.9.1",
   "lint-staged": {
