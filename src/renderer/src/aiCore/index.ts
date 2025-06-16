@@ -2,13 +2,18 @@ import { ApiClientFactory } from '@renderer/aiCore/clients/ApiClientFactory'
 import { BaseApiClient } from '@renderer/aiCore/clients/BaseApiClient'
 import { isDedicatedImageGenerationModel, isFunctionCallingModel } from '@renderer/config/models'
 import type { GenerateImageParams, Model, Provider } from '@renderer/types'
+import { Chunk, ChunkType } from '@renderer/types/chunk'
+import { Message } from '@renderer/types/newMessage'
 import { RequestOptions, SdkModel } from '@renderer/types/sdk'
 import { isEnabledToolUse } from '@renderer/utils/mcp-tools'
+import { getMainTextContent } from '@renderer/utils/messageUtils/find'
+import { type CoreMessage } from 'ai'
 
 import { OpenAIAPIClient } from './clients'
 import { AihubmixAPIClient } from './clients/AihubmixAPIClient'
 import { AnthropicAPIClient } from './clients/anthropic/AnthropicAPIClient'
 import { OpenAIResponseAPIClient } from './clients/openai/OpenAIResponseAPIClient'
+import type { AiCoreRequest } from './clients/UniversalAiSdkClient'
 import { CompletionsMiddlewareBuilder } from './middleware/builder'
 import { MIDDLEWARE_NAME as AbortHandlerMiddlewareName } from './middleware/common/AbortHandlerMiddleware'
 import { MIDDLEWARE_NAME as FinalChunkConsumerMiddlewareName } from './middleware/common/FinalChunkConsumerMiddleware'
@@ -99,6 +104,76 @@ export default class AiProvider {
 
     // 4. Execute the wrapped method with the original params
     return wrappedCompletionMethod(params, options)
+  }
+
+  public async completionsAiSdk(params: CompletionsParams): Promise<CompletionsResult> {
+    if (!params.assistant?.model) {
+      throw new Error('Assistant model configuration is missing.')
+    }
+
+    // --- 1. Get Provider Info & API Key ---
+    // The provider type (e.g., 'openai') is on the model object.
+    const providerType = params.assistant.model.provider
+    // The API key is retrieved from the currently initialized apiClient on the instance.
+    // This assumes that a relevant apiClient has been set up before this call.
+    if (!this.apiClient) {
+      // If no client, create one based on the current assistant's provider info
+      this.apiClient = ApiClientFactory.create(params.assistant.model.provider)
+    }
+    const providerOptions = { apiKey: this.apiClient.apiKey }
+
+    // --- 2. Message Conversion ---
+    const extractTextFromMessage = (message: Message): string => getMainTextContent(message)
+
+    const coreMessages: CoreMessage[] = (Array.isArray(params.messages) ? params.messages : [])
+      .map((msg) => {
+        const content = extractTextFromMessage(msg)
+        console.log('content', content)
+        // Correctly handle the discriminated union for CoreMessage
+        if (msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system') {
+          return { role: msg.role, content }
+        }
+        // Handle other roles like 'tool' if they have a different structure,
+        // or filter them out if they are not meant for this call.
+        return null
+      })
+      .filter((msg): msg is CoreMessage => msg !== null && msg.content !== '')
+
+    if (coreMessages.length === 0) {
+      throw new Error('Could not extract any valid content from messages.')
+    }
+
+    // --- 3. Prepare and Execute Request ---
+    const client = await ApiClientFactory.createAiSdkClient('xai', providerOptions)
+
+    const request: AiCoreRequest = {
+      modelId: params.assistant.model.id,
+      messages: coreMessages
+    }
+
+    const request = async () => {
+      const result = await client.stream(request)
+      return result.fullStream
+    }
+
+    let fullText = ''
+
+    // --- 4. Process Stream ---
+    for await (const part of result.fullStream) {
+      if (part.type === 'text-delta' && params.onChunk) {
+        fullText += part.textDelta
+        const chunk: Chunk = {
+          type: ChunkType.TEXT_DELTA,
+          text: part.textDelta
+        }
+        params.onChunk(chunk)
+      }
+    }
+
+    // --- 5. Return Correct Result Shape ---
+    return {
+      getText: () => fullText
+    }
   }
 
   public async models(): Promise<SdkModel[]> {

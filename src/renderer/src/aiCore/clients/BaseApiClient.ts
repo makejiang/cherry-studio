@@ -61,7 +61,7 @@ export abstract class BaseApiClient<
   private static readonly SYSTEM_PROMPT_THRESHOLD: number = 128
   public provider: Provider
   protected host: string
-  protected apiKey: string
+  public apiKey: string
   protected sdkInstance?: TSdkInstance
   public useSystemPromptForTools: boolean = true
 

@@ -343,7 +343,7 @@ export async function fetchChatCompletion({
   if (enableWebSearch) {
     onChunkReceived({ type: ChunkType.LLM_WEB_SEARCH_IN_PROGRESS })
   }
-  await AI.completions(
+  await AI.completionsAiSdk(
     {
       callType: 'chat',
       messages: _messages,
