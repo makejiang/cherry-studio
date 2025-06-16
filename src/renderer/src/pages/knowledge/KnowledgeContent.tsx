@@ -298,7 +298,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
               </Tag>
             )}
             {base.preprocessOrOcrProvider && base.preprocessOrOcrProvider.type === 'preprocess' && (
-              <QuotaTag providerId={base.preprocessOrOcrProvider?.provider.id} quota={quota} />
+              <QuotaTag base={base} providerId={base.preprocessOrOcrProvider?.provider.id} quota={quota} />
             )}
           </div>
         </ModelInfo>

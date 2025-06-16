@@ -591,6 +591,23 @@ class KnowledgeService {
 
     return fileToProcess
   }
+
+  public checkQuota = async (
+    _: Electron.IpcMainInvokeEvent,
+    base: KnowledgeBaseParams,
+    userId: string
+  ): Promise<number> => {
+    try {
+      if (base.preprocessOrOcrProvider && base.preprocessOrOcrProvider.type === 'preprocess') {
+        const provider = new PreprocessProvider(base.preprocessOrOcrProvider.provider, userId)
+        return await provider.checkQuota()
+      }
+      throw new Error('No preprocess provider configured')
+    } catch (err) {
+      Logger.error(`Failed to check quota: ${err}`)
+      throw new Error(`Failed to check quota: ${err}`)
+    }
+  }
 }
 
 export default new KnowledgeService()

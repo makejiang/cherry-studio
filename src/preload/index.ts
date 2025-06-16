@@ -138,7 +138,9 @@ const api = {
     search: ({ search, base }: { search: string; base: KnowledgeBaseParams }) =>
       ipcRenderer.invoke(IpcChannel.KnowledgeBase_Search, { search, base }),
     rerank: ({ search, base, results }: { search: string; base: KnowledgeBaseParams; results: ExtractChunkData[] }) =>
-      ipcRenderer.invoke(IpcChannel.KnowledgeBase_Rerank, { search, base, results })
+      ipcRenderer.invoke(IpcChannel.KnowledgeBase_Rerank, { search, base, results }),
+    checkQuota: ({ base, userId }: { base: KnowledgeBaseParams; userId: string }) =>
+      ipcRenderer.invoke(IpcChannel.KnowledgeBase_Check_Quota, base, userId)
   },
   window: {
     setMinimumSize: (width: number, height: number) =>

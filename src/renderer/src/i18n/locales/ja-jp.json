@@ -580,7 +580,8 @@
       "dimensions_size_too_large": "埋め込み次元はモデルのコンテキスト制限（{{max_context}}）を超えてはなりません。",
       "dimensions_set_right": "⚠️ モデルが設定した埋め込み次元のサイズをサポートしていることを確認してください",
       "dimensions_default": "モデルはデフォルトの埋め込み次元を使用します",
-      "quota": "{{name}} 残りクォータ: {{quota}}"
+      "quota": "{{name}} 残りクォータ: {{quota}}",
+      "quota_infinity": "{{name}} クォータ: 無制限"
     },
     "languages": {
       "arabic": "アラビア語",

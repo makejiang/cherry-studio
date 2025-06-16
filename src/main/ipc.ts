@@ -282,6 +282,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.KnowledgeBase_Remove, KnowledgeService.remove)
   ipcMain.handle(IpcChannel.KnowledgeBase_Search, KnowledgeService.search)
   ipcMain.handle(IpcChannel.KnowledgeBase_Rerank, KnowledgeService.rerank)
+  ipcMain.handle(IpcChannel.KnowledgeBase_Check_Quota, KnowledgeService.checkQuota)
 
   // window
   ipcMain.handle(IpcChannel.Windows_SetMinimumSize, (_, width: number, height: number) => {

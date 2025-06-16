@@ -580,7 +580,8 @@
       "dimensions_size_too_large": "The embedding dimension cannot exceed the model's context limit ({{max_context}}).",
       "dimensions_set_right": "⚠️ Please ensure the model supports the set embedding dimension size",
       "dimensions_default": "The model will use default embedding dimensions",
-      "quota": "{{name}} Left Quota: {{quota}}"
+      "quota": "{{name}} Left Quota: {{quota}}",
+      "quota_infinity": "{{name}} Quota: Unlimited"
     },
     "languages": {
       "arabic": "Arabic",

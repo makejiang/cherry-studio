@@ -44,7 +44,7 @@ const PreprocessProviderSettings: FC<Props> = ({ provider: _provider }) => {
 
   const onUpdateApiKey = () => {
     if (apiKey !== preprocessProvider.apiKey) {
-      updatePreprocessProvider({ ...preprocessProvider, apiKey })
+      updatePreprocessProvider({ ...preprocessProvider, apiKey, quota: undefined })
     }
   }
 

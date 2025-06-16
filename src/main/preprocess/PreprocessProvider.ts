@@ -15,6 +15,10 @@ export default class PreprocessProvider {
     return this.sdk.parseFile(sourceId, file)
   }
 
+  public async checkQuota(): Promise<number> {
+    return this.sdk.checkQuota()
+  }
+
   /**
    * 检查文件是否已经被预处理过
    * @param file 文件信息
