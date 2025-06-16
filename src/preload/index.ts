@@ -106,6 +106,7 @@ const api = {
       ipcRenderer.invoke(IpcChannel.File_Download, url, isUseContentType),
     copy: (fileId: string, destPath: string) => ipcRenderer.invoke(IpcChannel.File_Copy, fileId, destPath),
     base64File: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_Base64File, fileId),
+    pdfInfo: (fileId: string) => ipcRenderer.invoke(IpcChannel.File_GetPdfInfo, fileId),
     getPathForFile: (file: File) => webUtils.getPathForFile(file)
   },
   fs: {
