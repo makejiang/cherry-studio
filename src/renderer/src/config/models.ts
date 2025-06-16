@@ -2169,7 +2169,8 @@ export const SYSTEM_MODELS: Record<string, Model[]> = {
       name: 'DeepSeek-R1满血版',
       group: 'DeepSeek'
     }
-  ]
+  ],
+  lanyun: []
 }
 
 export const TEXT_TO_IMAGES_MODELS = [
