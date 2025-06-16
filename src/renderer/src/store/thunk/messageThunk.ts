@@ -199,7 +199,7 @@ export const cleanupMultipleBlocks = (dispatch: AppDispatch, blockIds: string[])
     const files = blocks
       .filter((block) => block.type === MessageBlockType.FILE || block.type === MessageBlockType.IMAGE)
       .map((block) => block.file)
-      .filter((file): file is FileType => file !== undefined)
+      .filter((file): file is FileMetadata => file !== undefined)
     return isEmpty(files) ? [] : files
   }
 
