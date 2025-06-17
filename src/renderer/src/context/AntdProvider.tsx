@@ -69,6 +69,14 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
           },
           Switch: {
             colorTextQuaternary: 'rgba(153,153,153,0.15)'
+          },
+          Dropdown: {
+            controlPaddingHorizontal: 8,
+            borderRadiusLG: 10,
+            borderRadiusSM: 8
+          },
+          Popover: {
+            borderRadiusLG: 10
           }
         },
         token: {
