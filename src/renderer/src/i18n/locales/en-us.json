@@ -1852,7 +1852,8 @@
         "service_tier.auto": "auto",
         "service_tier.default": "default",
         "service_tier.flex": "flex"
-      }
+      },
+      "mineru.api_key": "Mineru now offers a daily free quota of 500 pages, and you do not need to enter a key."
     },
     "translate": {
       "any.language": "Any language",

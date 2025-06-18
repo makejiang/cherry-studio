@@ -1852,7 +1852,8 @@
           "content_limit_tooltip": "限制搜索结果的内容长度, 超过限制的内容将被截断"
         },
         "preprocessOrOcr.tooltip": "在设置 -> 工具中设置文档预处理服务商或OCR，文档预处理可以有效提升复杂格式文档与扫描版文档的检索效果，OCR仅可识别文档内图片或扫描版PDF的文本"
-      }
+      },
+      "mineru.api_key": "MinerU现在提供每日500页的免费额度，您不需要填写密钥。"
     },
     "translate": {
       "any.language": "任意语言",
