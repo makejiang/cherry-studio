@@ -340,10 +340,23 @@ const HomeWindow: FC = () => {
                   )
                 }
                 break
-              case ChunkType.ERROR:
+              case ChunkType.ERROR: {
+                const possibleBlockId = thinkingBlockId || blockId
+                if (possibleBlockId) {
+                  store.dispatch(
+                    updateOneBlock({
+                      id: possibleBlockId,
+                      changes: {
+                        status: isAbortError(chunk.error) ? MessageBlockStatus.PAUSED : MessageBlockStatus.ERROR
+                      }
+                    })
+                  )
+                }
                 if (!isAbortError(chunk.error)) {
                   throw new Error(chunk.error.message)
                 }
+                break
+              }
               //fall through
               case ChunkType.BLOCK_COMPLETE:
                 setIsLoading(false)
