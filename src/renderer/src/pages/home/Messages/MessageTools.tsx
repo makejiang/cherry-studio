@@ -184,16 +184,14 @@ const MessageTools: FC<Props> = ({ blocks }) => {
       />
       {isPending && (
         <ActionToolContainer>
-          <Tooltip title={t('common.cancel')} mouseEnterDelay={0.5}>
-            <ActionButton onClick={handleCancelTool}>
-              <CloseOutlined />
-            </ActionButton>
-          </Tooltip>
-          <Tooltip title={t('common.confirm')} mouseEnterDelay={0.5}>
-            <ActionButton onClick={handleConfirmTool}>
-              <EnterOutlined />
-            </ActionButton>
-          </Tooltip>
+          <ActionButton onClick={handleCancelTool}>
+            <CloseOutlined />
+            {t('common.cancel')}
+          </ActionButton>
+          <ActionButton onClick={handleConfirmTool}>
+            <EnterOutlined />
+            {t('common.confirm')}
+          </ActionButton>
         </ActionToolContainer>
       )}
     </ToolContainer>
@@ -324,6 +322,7 @@ const ActionButton = styled.button`
   opacity: 0.7;
   transition: all 0.2s;
   border-radius: 4px;
+  gap: 4px;
 
   &:hover {
     opacity: 1;
@@ -346,7 +345,7 @@ const ActionToolContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
   padding: 8px 4px 8px 8px;
 
