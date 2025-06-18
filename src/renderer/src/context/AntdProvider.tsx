@@ -94,6 +94,9 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
           },
           Modal: {
             colorBgElevated: 'var(--modal-background)'
+          },
+          Divider: {
+            colorSplit: 'rgba(128,128,128,0.15)'
           }
         },
         token: {
