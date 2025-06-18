@@ -91,6 +91,9 @@ const AntdProvider: FC<PropsWithChildren> = ({ children }) => {
             dotSize: 7,
             railSize: 5,
             colorBgElevated: '#ffffff'
+          },
+          Modal: {
+            colorBgElevated: 'var(--modal-background)'
           }
         },
         token: {
