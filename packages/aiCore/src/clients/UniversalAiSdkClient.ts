@@ -6,7 +6,7 @@
  *
  * ### 1. 官方提供商
  * ```typescript
- * import { UniversalAiSdkClient } from '@cherry-studio/ai-core'
+ * import { UniversalAiSdkClient } from '@cherrystudio/ai-core'
  *
  * // OpenAI
  * const openai = UniversalAiSdkClient.create('openai', {
@@ -75,7 +75,7 @@
  * ```
  */
 
-import { generateObject, generateText, streamObject, streamText } from 'ai'
+import { experimental_generateImage as generateImage, generateObject, generateText, streamObject, streamText } from 'ai'
 
 import { ApiClientFactory } from './ApiClientFactory'
 import { type ProviderId, type ProviderSettingsMap } from './types'
