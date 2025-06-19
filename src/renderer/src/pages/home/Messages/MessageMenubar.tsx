@@ -222,7 +222,7 @@ const MessageMenubar: FC<Props> = (props) => {
         icon: <Share size={16} color="var(--color-icon)" style={{ marginTop: 3 }} />,
         expandIcon: <ChevronRight size={16} style={{ position: 'absolute', insetInlineEnd: 5, marginTop: 3 }} />,
         children: [
-          {
+          exportMenuOptions.plain_text && {
             label: t('chat.topics.copy.plain_text'),
             key: 'copy_message_plain_text',
             onClick: () => copyMessageAsPlainText(message)
