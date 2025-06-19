@@ -15,7 +15,7 @@ import { uuid } from '@renderer/utils'
 
 import { WebDAVSyncState } from './backup'
 
-export type SendMessageShortcut = 'Enter' | 'Shift+Enter' | 'Ctrl+Enter' | 'Command+Enter'
+export type SendMessageShortcut = 'Enter' | 'Shift+Enter' | 'Ctrl+Enter' | 'Command+Enter' | 'Alt+Enter'
 
 export type SidebarIcon = 'assistants' | 'agents' | 'paintings' | 'translate' | 'minapp' | 'knowledge' | 'files'
 
@@ -169,6 +169,7 @@ export interface SettingsState {
     obsidian: boolean
     siyuan: boolean
     docx: boolean
+    plain_text: boolean
   }
   // OpenAI
   openAI: {
@@ -311,7 +312,8 @@ export const initialState: SettingsState = {
     joplin: true,
     obsidian: true,
     siyuan: true,
-    docx: true
+    docx: true,
+    plain_text: true
   },
   // OpenAI
   openAI: {
