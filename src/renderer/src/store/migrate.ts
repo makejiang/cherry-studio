@@ -1613,7 +1613,7 @@ const migrateConfig = {
       return state
     }
   },
-  '113': (state: RootState) => {
+  '115': (state: RootState) => {
     try {
       if (!state.settings.userId) {
         state.settings.userId = uuid()
