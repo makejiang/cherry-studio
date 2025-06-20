@@ -7,7 +7,6 @@ import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Logger from '@renderer/config/logger'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
-import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { FileMetadata, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
 import { formatFileSize, uuid } from '@renderer/utils'
@@ -378,7 +377,7 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                         key={item.id}
                         fileInfo={{
                           name: (
-                            <ClickableSpan onClick={() => window.api.file.openPath(FileManager.getFilePath(file))}>
+                            <ClickableSpan onClick={() => window.api.file.openPath(file.path)}>
                               <Ellipsis>
                                 <Tooltip title={file.origin_name}>{file.origin_name}</Tooltip>
                               </Ellipsis>
