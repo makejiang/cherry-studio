@@ -2,7 +2,7 @@ import { CheckOutlined, CloseOutlined, EnterOutlined, LoadingOutlined, WarningOu
 import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import { useSettings } from '@renderer/hooks/useSettings'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
-import { cancelUserAction, confirmUserAction } from '@renderer/utils/userConfirmation'
+import { cancelToolAction, confirmToolAction } from '@renderer/utils/userConfirmation'
 import { Collapse, message as antdMessage, Tooltip } from 'antd'
 import { FC, memo, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +16,7 @@ const MessageTools: FC<Props> = ({ blocks }) => {
   const [activeKeys, setActiveKeys] = useState<string[]>([])
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
   const { t } = useTranslation()
-  const { messageFont } = useSettings()
+  const { messageFont, fontSize } = useSettings()
 
   const toolResponse = blocks.metadata?.rawMcpToolResponse
 
@@ -63,11 +63,11 @@ const MessageTools: FC<Props> = ({ blocks }) => {
   }
 
   const handleConfirmTool = () => {
-    confirmUserAction()
+    confirmToolAction(id)
   }
 
   const handleCancelTool = () => {
-    cancelUserAction()
+    cancelToolAction(id)
   }
 
   // Format tool responses for collapse items
@@ -156,7 +156,7 @@ const MessageTools: FC<Props> = ({ blocks }) => {
           <ToolResponseContainer
             style={{
               fontFamily: messageFont === 'serif' ? 'var(--font-family-serif)' : 'var(--font-family)',
-              fontSize: '12px'
+              fontSize
             }}>
             <CollapsedContent isExpanded={activeKeys.includes(id)} resultString={resultString} />
           </ToolResponseContainer>
@@ -184,11 +184,21 @@ const MessageTools: FC<Props> = ({ blocks }) => {
       />
       {isPending && (
         <ActionToolContainer>
-          <ActionButton onClick={handleCancelTool}>
+          <ActionButton
+            style={{
+              fontFamily: messageFont === 'serif' ? 'var(--font-family-serif)' : 'var(--font-family)',
+              fontSize
+            }}
+            onClick={handleCancelTool}>
             <CloseOutlined />
             {t('common.cancel')}
           </ActionButton>
-          <ActionButton onClick={handleConfirmTool}>
+          <ActionButton
+            style={{
+              fontFamily: messageFont === 'serif' ? 'var(--font-family-serif)' : 'var(--font-family)',
+              fontSize
+            }}
+            onClick={handleConfirmTool}>
             <EnterOutlined />
             {t('common.confirm')}
           </ActionButton>

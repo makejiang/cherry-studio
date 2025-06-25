@@ -3,6 +3,7 @@ import {
   File,
   FileState,
   FunctionCall,
+  FunctionCallingConfigMode,
   GenerateContentConfig,
   GenerateImagesConfig,
   GoogleGenAI,
@@ -533,6 +534,11 @@ export class GeminiAPIClient extends BaseApiClient<
           topP: this.getTopP(assistant, model),
           maxOutputTokens: maxTokens,
           tools: tools,
+          toolConfig: {
+            functionCallingConfig: {
+              mode: FunctionCallingConfigMode.ANY
+            }
+          },
           ...(enableGenerateImage ? this.getGenerateImageParameter() : {}),
           ...this.getBudgetToken(assistant, model),
           ...this.getCustomParameters(assistant)

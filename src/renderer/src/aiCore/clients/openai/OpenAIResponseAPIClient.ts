@@ -403,6 +403,7 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
           stream: streamOutput,
           tools: !isEmpty(tools) ? tools : undefined,
           tool_choice: enableWebSearch ? toolChoices : undefined,
+          parallel_tool_calls: true,
           service_tier: this.getServiceTier(model),
           ...(this.getReasoningEffort(assistant, model) as OpenAI.Reasoning),
           ...this.getCustomParameters(assistant)
