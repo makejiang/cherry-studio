@@ -2541,6 +2541,10 @@ export function isReasoningModel(model?: Model): boolean {
     return false
   }
 
+  if (isEmbeddingModel(model)) {
+    return false
+  }
+
   if (model.provider === 'doubao') {
     return (
       REASONING_REGEX.test(model.name) ||
