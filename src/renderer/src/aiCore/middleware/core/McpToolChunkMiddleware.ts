@@ -124,8 +124,6 @@ function createToolHandlingTransform(
                   // 缓存执行结果
                   executedToolResults.push(...result.toolResults)
                   executedToolCalls.push(...result.confirmedToolCalls)
-
-                  Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executed tool call asynchronously:`, toolCall.id)
                 } catch (error) {
                   console.error(`🔧 [${MIDDLEWARE_NAME}] Error executing tool call asynchronously:`, error)
                 }
@@ -153,11 +151,6 @@ function createToolHandlingTransform(
 
                   // 缓存执行结果
                   executedToolResults.push(...result.toolResults)
-
-                  Logger.info(
-                    `🔧 [${MIDDLEWARE_NAME}] Executed tool use response asynchronously:`,
-                    toolUseResponse.tool.name
-                  )
                 } catch (error) {
                   console.error(`🔧 [${MIDDLEWARE_NAME}] Error executing tool use response asynchronously:`, error)
                   // 错误时不影响其他工具的执行
@@ -182,15 +175,7 @@ function createToolHandlingTransform(
         streamEnded = true
 
         try {
-          Logger.info(`🔧 [${MIDDLEWARE_NAME}] Waiting for ${executionPromises.length} tool executions to complete...`)
-
-          // 等待所有异步工具执行完成
           await Promise.all(executionPromises)
-
-          Logger.info(
-            `🔧 [${MIDDLEWARE_NAME}] All tool calls completed, starting recursion with ${executedToolResults.length} results`
-          )
-
           if (executedToolResults.length > 0) {
             const output = ctx._internal.toolProcessingState?.output
             const newParams = buildParamsWithToolResults(
