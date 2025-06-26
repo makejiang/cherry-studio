@@ -1,5 +1,5 @@
 diff --git a/client.js b/client.js
-index c2b9cd6e46f9f66f901af259661bc2d2f8b38936..9919ada4ff400f2f994187d9a6549bcf39321d9c 100644
+index c2b9cd6e46f9f66f901af259661bc2d2f8b38936..9b6b3af1a6573e1ccaf3a1c5f41b48df198cbbe0 100644
 --- a/client.js
 +++ b/client.js
 @@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
@@ -16,7 +16,7 @@ index c2b9cd6e46f9f66f901af259661bc2d2f8b38936..9919ada4ff400f2f994187d9a6549bcf
          }
          super({
 -            baseURL: baseURL || `https://${region}-aiplatform.googleapis.com/v1`,
-+            baseURL: baseURL || region === 'global' ? 'https://aiplatform.googleapis.com/v1' : `https://${region}-aiplatform.googleapis.com/v1`,
++            baseURL: baseURL || (region === 'global' ? 'https://aiplatform.googleapis.com/v1' : `https://${region}-aiplatform.googleapis.com/v1`),
              ...opts,
          });
          this.messages = makeMessagesResource(this);
@@ -56,7 +56,7 @@ index c2b9cd6e46f9f66f901af259661bc2d2f8b38936..9919ada4ff400f2f994187d9a6549bcf
          if ((0, values_1.isObj)(options.body)) {
              // create a shallow copy of the request body so that code that mutates it later
 diff --git a/client.mjs b/client.mjs
-index 70274cbf38f69f87cbcca9567e77e4a7b938cf90..6200077c1ddfa19eb6be80c89194199be154435b 100644
+index 70274cbf38f69f87cbcca9567e77e4a7b938cf90..4dea954b6f4afad565663426b7adfad5de973a7d 100644
 --- a/client.mjs
 +++ b/client.mjs
 @@ -1,6 +1,6 @@
@@ -72,7 +72,7 @@ index 70274cbf38f69f87cbcca9567e77e4a7b938cf90..6200077c1ddfa19eb6be80c89194199b
          }
          super({
 -            baseURL: baseURL || `https://${region}-aiplatform.googleapis.com/v1`,
-+            baseURL: baseURL || region === 'global' ? 'https://aiplatform.googleapis.com/v1' : `https://${region}-aiplatform.googleapis.com/v1`,
++            baseURL: baseURL || (region === 'global' ? 'https://aiplatform.googleapis.com/v1' : `https://${region}-aiplatform.googleapis.com/v1`),
              ...opts,
          });
          this.messages = makeMessagesResource(this);

@@ -236,11 +236,11 @@ __metadata:
 
 "@anthropic-ai/vertex-sdk@patch:@anthropic-ai/vertex-sdk@npm%3A0.11.4#~/.yarn/patches/@anthropic-ai-vertex-sdk-npm-0.11.4-c19cb41edb.patch":
   version: 0.11.4
-  resolution: "@anthropic-ai/vertex-sdk@patch:@anthropic-ai/vertex-sdk@npm%3A0.11.4#~/.yarn/patches/@anthropic-ai-vertex-sdk-npm-0.11.4-c19cb41edb.patch::version=0.11.4&hash=d57cde"
+  resolution: "@anthropic-ai/vertex-sdk@patch:@anthropic-ai/vertex-sdk@npm%3A0.11.4#~/.yarn/patches/@anthropic-ai-vertex-sdk-npm-0.11.4-c19cb41edb.patch::version=0.11.4&hash=4b385f"
   dependencies:
     "@anthropic-ai/sdk": "npm:>=0.50.3 <1"
     google-auth-library: "npm:^9.4.2"
-  checksum: 10c0/de21fb24c1de94053e1aaa35816779023aa85f3ad7323dc035cfea2c2aa3381a3c4486333e73972501a41e8f948bd8aff201eda5b273001b48042ac0cbdda26c
+  checksum: 10c0/bc52951fecddd6c110613c97152ba08bde0aaaa03d1892942e6a075d936908c46b9b8d0618c4cb1dcd95194be044281e4f76884191f06da1be9f82853af7e62a
   languageName: node
   linkType: hard
 

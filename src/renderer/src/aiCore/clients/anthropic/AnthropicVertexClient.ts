@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import AnthropicVertex from '@anthropic-ai/vertex-sdk'
 import { getVertexAILocation, getVertexAIProjectId, getVertexAIServiceAccount } from '@renderer/hooks/useVertexAI'
 import { Provider } from '@renderer/types'
+import { isEmpty } from 'lodash'
 
 import { AnthropicAPIClient } from './AnthropicAPIClient'
 
@@ -47,7 +48,7 @@ export class AnthropicVertexClient extends AnthropicAPIClient {
       region: location,
       dangerouslyAllowBrowser: true,
       defaultHeaders: authHeaders,
-      baseURL: this.getBaseURL()
+      baseURL: isEmpty(this.getBaseURL()) ? undefined : this.getBaseURL()
     })
 
     return this.sdkInstance
