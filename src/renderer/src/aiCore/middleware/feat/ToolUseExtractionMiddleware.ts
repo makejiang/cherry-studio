@@ -61,6 +61,7 @@ function createToolUseExtractionTransform(
   mcpTools: MCPTool[]
 ): TransformStream<GenericChunk, GenericChunk> {
   const tagExtractor = new TagExtractor(TOOL_USE_TAG_CONFIG)
+  let toolCounter = 0 // 用于生成唯一的工具ID
 
   return new TransformStream({
     async transform(chunk: GenericChunk, controller) {
@@ -69,12 +70,13 @@ function createToolUseExtractionTransform(
         if (chunk.type === ChunkType.TEXT_DELTA) {
           const textChunk = chunk as TextDeltaChunk
           const extractionResults = tagExtractor.processText(textChunk.text)
-
           for (const result of extractionResults) {
             if (result.complete && result.tagContentExtracted) {
+              console.log('🔧 [ToolUseExtractionMiddleware] result.tagContentExtracted:', result.tagContentExtracted)
               // 提取到完整的工具使用内容，解析并转换为 SDK ToolCall 格式
-              const toolUseResponses = parseToolUse(result.tagContentExtracted, mcpTools)
-
+              const toolUseResponses = parseToolUse(result.tagContentExtracted, mcpTools, toolCounter)
+              toolCounter += toolUseResponses.length
+              console.log(toolUseResponses)
               if (toolUseResponses.length > 0) {
                 // 生成 MCP_TOOL_CREATED chunk，复用现有的处理流程
                 const mcpToolCreatedChunk: MCPToolCreatedChunk = {
@@ -108,7 +110,7 @@ function createToolUseExtractionTransform(
       // 检查是否有未完成的标签内容
       const finalResult = tagExtractor.finalize()
       if (finalResult && finalResult.tagContentExtracted) {
-        const toolUseResponses = parseToolUse(finalResult.tagContentExtracted, mcpTools)
+        const toolUseResponses = parseToolUse(finalResult.tagContentExtracted, mcpTools, toolCounter)
         if (toolUseResponses.length > 0) {
           const mcpToolCreatedChunk: MCPToolCreatedChunk = {
             type: ChunkType.MCP_TOOL_CREATED,

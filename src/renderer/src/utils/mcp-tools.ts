@@ -459,7 +459,7 @@ export function getMcpServerByTool(tool: MCPTool) {
   return servers.find((s) => s.id === tool.serverId)
 }
 
-export function parseToolUse(content: string, mcpTools: MCPTool[]): ToolUseResponse[] {
+export function parseToolUse(content: string, mcpTools: MCPTool[], startIdx: number = 0): ToolUseResponse[] {
   if (!content || !mcpTools || mcpTools.length === 0) {
     return []
   }
@@ -479,7 +479,7 @@ export function parseToolUse(content: string, mcpTools: MCPTool[]): ToolUseRespo
     /<tool_use>([\s\S]*?)<name>([\s\S]*?)<\/name>([\s\S]*?)<arguments>([\s\S]*?)<\/arguments>([\s\S]*?)<\/tool_use>/g
   const tools: ToolUseResponse[] = []
   let match
-  let idx = 0
+  let idx = startIdx
   // Find all tool use blocks
   while ((match = toolUsePattern.exec(contentToProcess)) !== null) {
     // const fullMatch = match[0]
@@ -522,7 +522,8 @@ export async function parseAndCallTools<R>(
   onChunk: CompletionsParams['onChunk'],
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
-  mcpTools?: MCPTool[]
+  mcpTools?: MCPTool[],
+  abortSignal?: AbortSignal
 ): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }>
 
 export async function parseAndCallTools<R>(
@@ -531,7 +532,8 @@ export async function parseAndCallTools<R>(
   onChunk: CompletionsParams['onChunk'],
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
-  mcpTools?: MCPTool[]
+  mcpTools?: MCPTool[],
+  abortSignal?: AbortSignal
 ): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }>
 
 export async function parseAndCallTools<R>(
@@ -540,7 +542,8 @@ export async function parseAndCallTools<R>(
   onChunk: CompletionsParams['onChunk'],
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
-  mcpTools?: MCPTool[]
+  mcpTools?: MCPTool[],
+  abortSignal?: AbortSignal
 ): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }> {
   const toolResults: R[] = []
   let curToolResponses: MCPToolResponse[] = []
@@ -548,11 +551,12 @@ export async function parseAndCallTools<R>(
     curToolResponses = content
   } else {
     // process tool use
-    curToolResponses = parseToolUse(content, mcpTools || [])
+    curToolResponses = parseToolUse(content, mcpTools || [], 0)
   }
   if (!curToolResponses || curToolResponses.length === 0) {
     return { toolResults, confirmedToolResponses: [] }
   }
+
   for (const toolResponse of curToolResponses) {
     upsertMCPToolResponse(
       allToolResponses,
@@ -569,7 +573,7 @@ export async function parseAndCallTools<R>(
   const pendingPromises: Promise<void>[] = []
 
   curToolResponses.forEach((toolResponse) => {
-    const confirmationPromise = requestToolConfirmation(toolResponse.id)
+    const confirmationPromise = requestToolConfirmation(toolResponse.id, abortSignal)
 
     const processingPromise = confirmationPromise
       .then(async (confirmed) => {

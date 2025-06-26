@@ -89,6 +89,11 @@ function createToolHandlingTransform(
   let hasToolUseResponses = false
   let streamEnded = false
 
+  // 存储已执行的工具结果
+  const executedToolResults: SdkMessageParam[] = []
+  const executedToolCalls: SdkToolCall[] = []
+  const executionPromises: Promise<void>[] = []
+
   return new TransformStream({
     async transform(chunk: GenericChunk, controller) {
       try {
@@ -98,22 +103,73 @@ function createToolHandlingTransform(
 
           // 1. 处理Function Call方式的工具调用
           if (createdChunk.tool_calls && createdChunk.tool_calls.length > 0) {
-            toolCalls.push(...createdChunk.tool_calls)
             hasToolCalls = true
+
+            // 立即执行新收到的toolcalls
+            for (const toolCall of createdChunk.tool_calls) {
+              toolCalls.push(toolCall) // 立即保存原始toolCall
+
+              // 启动异步执行，但不等待
+              const executionPromise = (async () => {
+                try {
+                  const result = await executeToolCalls(
+                    ctx,
+                    [toolCall],
+                    mcpTools,
+                    allToolResponses,
+                    currentParams.onChunk,
+                    currentParams.assistant.model!
+                  )
+
+                  // 缓存执行结果
+                  executedToolResults.push(...result.toolResults)
+                  executedToolCalls.push(...result.confirmedToolCalls)
+
+                  Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executed tool call asynchronously:`, toolCall.id)
+                } catch (error) {
+                  console.error(`🔧 [${MIDDLEWARE_NAME}] Error executing tool call asynchronously:`, error)
+                }
+              })()
+
+              executionPromises.push(executionPromise)
+            }
           }
 
           // 2. 处理Tool Use方式的工具调用
           if (createdChunk.tool_use_responses && createdChunk.tool_use_responses.length > 0) {
-            toolUseResponses.push(...createdChunk.tool_use_responses)
             hasToolUseResponses = true
+            for (const toolUseResponse of createdChunk.tool_use_responses) {
+              toolUseResponses.push(toolUseResponse)
+              const executionPromise = (async () => {
+                try {
+                  const result = await executeToolUseResponses(
+                    ctx,
+                    [toolUseResponse], // 单个执行
+                    mcpTools,
+                    allToolResponses,
+                    currentParams.onChunk,
+                    currentParams.assistant.model!
+                  )
+
+                  // 缓存执行结果
+                  executedToolResults.push(...result.toolResults)
+
+                  Logger.info(
+                    `🔧 [${MIDDLEWARE_NAME}] Executed tool use response asynchronously:`,
+                    toolUseResponse.tool.name
+                  )
+                } catch (error) {
+                  console.error(`🔧 [${MIDDLEWARE_NAME}] Error executing tool use response asynchronously:`, error)
+                  // 错误时不影响其他工具的执行
+                }
+              })()
+
+              executionPromises.push(executionPromise)
+            }
           }
-
-          // 不转发MCP工具进展chunks，避免重复处理
-          return
+        } else {
+          controller.enqueue(chunk)
         }
-
-        // 转发其他所有chunk
-        controller.enqueue(chunk)
       } catch (error) {
         console.error(`🔧 [${MIDDLEWARE_NAME}] Error processing chunk:`, error)
         controller.error(error)
@@ -121,47 +177,29 @@ function createToolHandlingTransform(
     },
 
     async flush(controller) {
-      const shouldExecuteToolCalls = hasToolCalls && toolCalls.length > 0
-      const shouldExecuteToolUseResponses = hasToolUseResponses && toolUseResponses.length > 0
-
-      if (!streamEnded && (shouldExecuteToolCalls || shouldExecuteToolUseResponses)) {
+      // 在流结束时等待所有异步工具执行完成，然后进行递归调用
+      if (!streamEnded && (hasToolCalls || hasToolUseResponses)) {
         streamEnded = true
 
         try {
-          let toolResult: SdkMessageParam[] = []
-          let confirmedToolCalls: SdkToolCall[] = []
+          Logger.info(`🔧 [${MIDDLEWARE_NAME}] Waiting for ${executionPromises.length} tool executions to complete...`)
 
-          Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executing tool calls:`, toolCalls)
-          Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executing tool use responses:`, toolUseResponses)
+          // 等待所有异步工具执行完成
+          await Promise.all(executionPromises)
 
-          if (shouldExecuteToolCalls) {
-            const result = await executeToolCalls(
-              ctx,
-              toolCalls,
-              mcpTools,
-              allToolResponses,
-              currentParams.onChunk,
-              currentParams.assistant.model!
-            )
-            toolResult = result.toolResults
-            confirmedToolCalls = result.confirmedToolCalls
-          } else if (shouldExecuteToolUseResponses) {
-            const result = await executeToolUseResponses(
-              ctx,
-              toolUseResponses,
-              mcpTools,
-              allToolResponses,
-              currentParams.onChunk,
-              currentParams.assistant.model!
-            )
-            toolResult = result.toolResults
-            confirmedToolCalls = result.confirmedToolCalls
-          }
+          Logger.info(
+            `🔧 [${MIDDLEWARE_NAME}] All tool calls completed, starting recursion with ${executedToolResults.length} results`
+          )
 
-          if (toolResult.length > 0) {
+          if (executedToolResults.length > 0) {
             const output = ctx._internal.toolProcessingState?.output
-
-            const newParams = buildParamsWithToolResults(ctx, currentParams, output, toolResult, confirmedToolCalls)
+            const newParams = buildParamsWithToolResults(
+              ctx,
+              currentParams,
+              output,
+              executedToolResults,
+              executedToolCalls
+            )
             await executeWithToolHandling(newParams, depth + 1)
           }
         } catch (error) {
@@ -211,16 +249,20 @@ async function executeToolCalls(
       return ctx.apiClientInstance.convertMcpToolResponseToSdkMessageParam(mcpToolResponse, resp, model)
     },
     model,
-    mcpTools
+    mcpTools,
+    ctx._internal?.flowControl?.abortSignal
   )
-
+  console.log('🔧 [McpToolChunkMiddleware] confirmedToolResponses:', confirmedToolResponses)
+  console.log('🔧 [McpToolChunkMiddleware] toolCalls:', toolCalls)
   // 找出已确认工具对应的原始toolCalls
   const confirmedToolCalls = toolCalls.filter((toolCall) => {
     return confirmedToolResponses.find((confirmed) => {
       // 根据不同的ID字段匹配原始toolCall
-      return ('name' in toolCall && confirmed.tool.name === toolCall.name) || confirmed.tool.name === toolCall.id
+      return ('name' in toolCall && toolCall.name?.includes(confirmed.tool.name)) || confirmed.tool.name === toolCall.id
     })
   })
+
+  console.log('🔧 [McpToolChunkMiddleware] Final confirmedToolCalls:', confirmedToolCalls)
 
   return { toolResults, confirmedToolCalls }
 }
@@ -236,9 +278,9 @@ async function executeToolUseResponses(
   allToolResponses: MCPToolResponse[],
   onChunk: CompletionsParams['onChunk'],
   model: Model
-): Promise<{ toolResults: SdkMessageParam[]; confirmedToolCalls: SdkToolCall[] }> {
+): Promise<{ toolResults: SdkMessageParam[] }> {
   // 直接使用parseAndCallTools函数处理已经解析好的ToolUseResponse
-  const { toolResults, confirmedToolResponses } = await parseAndCallTools(
+  const { toolResults } = await parseAndCallTools(
     toolUseResponses,
     allToolResponses,
     onChunk,
@@ -246,21 +288,11 @@ async function executeToolUseResponses(
       return ctx.apiClientInstance.convertMcpToolResponseToSdkMessageParam(mcpToolResponse, resp, model)
     },
     model,
-    mcpTools
+    mcpTools,
+    ctx._internal?.flowControl?.abortSignal
   )
 
-  // 为确认的Tool Use创建对应的SdkToolCall对象（主要用于Anthropic风格的tool use）
-  const confirmedToolCalls: SdkToolCall[] = confirmedToolResponses.map((confirmed) => {
-    // 创建Tool Use Block格式的toolCall
-    return {
-      type: 'tool_use',
-      id: confirmed.id,
-      name: confirmed.tool.name || confirmed.tool.id,
-      input: confirmed.arguments
-    } as SdkToolCall
-  })
-
-  return { toolResults, confirmedToolCalls }
+  return { toolResults }
 }
 
 /**
