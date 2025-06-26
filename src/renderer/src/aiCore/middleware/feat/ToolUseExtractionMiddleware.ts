@@ -72,11 +72,9 @@ function createToolUseExtractionTransform(
           const extractionResults = tagExtractor.processText(textChunk.text)
           for (const result of extractionResults) {
             if (result.complete && result.tagContentExtracted) {
-              console.log('🔧 [ToolUseExtractionMiddleware] result.tagContentExtracted:', result.tagContentExtracted)
               // 提取到完整的工具使用内容，解析并转换为 SDK ToolCall 格式
               const toolUseResponses = parseToolUse(result.tagContentExtracted, mcpTools, toolCounter)
               toolCounter += toolUseResponses.length
-              console.log(toolUseResponses)
               if (toolUseResponses.length > 0) {
                 // 生成 MCP_TOOL_CREATED chunk，复用现有的处理流程
                 const mcpToolCreatedChunk: MCPToolCreatedChunk = {

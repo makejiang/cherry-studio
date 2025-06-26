@@ -553,9 +553,6 @@ const fetchAndProcessAssistantResponseImpl = async (
         const targetBlockId = toolCallIdToBlockIdMap.get(toolResponse.id)
 
         if (targetBlockId && toolResponse.status === 'invoking') {
-          console.log(
-            `🔧 [messageThunk] Updating tool block ${targetBlockId} for tool ${toolResponse.id} to invoking status`
-          )
           const changes = {
             status: MessageBlockStatus.PROCESSING,
             metadata: { rawMcpToolResponse: toolResponse }
@@ -1096,7 +1093,6 @@ export const resendMessageThunk =
         // 没有相关的助手消息就创建一个或多个
 
         if (userMessageToResend?.mentions?.length) {
-          console.log('userMessageToResend.mentions', userMessageToResend.mentions)
           for (const mention of userMessageToResend.mentions) {
             const assistantMessage = createAssistantMessage(assistant.id, topicId, {
               askId: userMessageToResend.id,

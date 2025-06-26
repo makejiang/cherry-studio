@@ -260,8 +260,7 @@ async function executeToolCalls(
     mcpTools,
     ctx._internal?.flowControl?.abortSignal
   )
-  console.log('🔧 [McpToolChunkMiddleware] confirmedToolResponses:', confirmedToolResponses)
-  console.log('🔧 [McpToolChunkMiddleware] toolCalls:', toolCalls)
+
   // 找出已确认工具对应的原始toolCalls
   const confirmedToolCalls = toolCalls.filter((toolCall) => {
     return confirmedToolResponses.find((confirmed) => {
@@ -274,8 +273,6 @@ async function executeToolCalls(
       )
     })
   })
-
-  console.log('🔧 [McpToolChunkMiddleware] Final confirmedToolCalls:', confirmedToolCalls)
 
   return { toolResults, confirmedToolCalls }
 }
