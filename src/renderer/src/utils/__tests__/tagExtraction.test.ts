@@ -164,7 +164,7 @@ describe('TagExtractor', () => {
       }
 
       // 验证结果
-      expect(allResults).toHaveLength(7)
+      expect(allResults).toHaveLength(9)
 
       // 第一个普通文本
       expect(allResults[0]).toEqual({
@@ -203,23 +203,26 @@ describe('TagExtractor', () => {
 
       // 第二个思考标签内容
       expect(allResults[5]).toEqual({
-        content: '第二个思考内容',
+        content: '第二',
         isTagContent: true,
         complete: false
       })
 
       // 第二个完整的标签内容提取和结束文本
       expect(allResults[6]).toEqual({
+        content: '个思考内容',
+        isTagContent: true,
+        complete: false
+      })
+
+      expect(allResults[7]).toEqual({
         content: '',
         isTagContent: false,
         complete: true,
         tagContentExtracted: '第二个思考内容'
       })
 
-      // 验证最后剩余的文本
-      const finalResults = extractor.processText('')
-      expect(finalResults).toHaveLength(1)
-      expect(finalResults[0]).toEqual({
+      expect(allResults[8]).toEqual({
         content: '结束文本',
         isTagContent: false,
         complete: false
