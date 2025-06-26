@@ -1,7 +1,7 @@
 import { SELECTION_FINETUNED_LIST, SELECTION_PREDEFINED_BLACKLIST } from '@main/configs/SelectionConfig'
-import { isDev, isWin } from '@main/constant'
+import { isDev, isMac, isWin } from '@main/constant'
 import { IpcChannel } from '@shared/IpcChannel'
-import { BrowserWindow, ipcMain, screen } from 'electron'
+import { BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
 import Logger from 'electron-log'
 import { join } from 'path'
 import type {
@@ -16,9 +16,12 @@ import type { ActionItem } from '../../renderer/src/types/selectionTypes'
 import { ConfigKeys, configManager } from './ConfigManager'
 import storeSyncService from './StoreSyncService'
 
+const isSupportedOS = isWin || isMac
+
 let SelectionHook: SelectionHookConstructor | null = null
 try {
-  if (isWin) {
+  //since selection-hook v1.0.0, it supports macOS
+  if (isSupportedOS) {
     SelectionHook = require('selection-hook')
   }
 } catch (error) {
@@ -118,7 +121,7 @@ export class SelectionService {
   }
 
   public static getInstance(): SelectionService | null {
-    if (!isWin) return null
+    if (!isSupportedOS) return null
 
     if (!SelectionService.instance) {
       SelectionService.instance = new SelectionService()
@@ -213,6 +216,8 @@ export class SelectionService {
       blacklist: SelectionHook!.FilterMode.EXCLUDE_LIST
     }
 
+    const predefinedBlacklist = isWin ? SELECTION_PREDEFINED_BLACKLIST.WINDOWS : SELECTION_PREDEFINED_BLACKLIST.MAC
+
     let combinedList: string[] = list
     let combinedMode = mode
 
@@ -221,7 +226,7 @@ export class SelectionService {
       switch (mode) {
         case 'blacklist':
           //combine the predefined blacklist with the user-defined blacklist
-          combinedList = [...new Set([...list, ...SELECTION_PREDEFINED_BLACKLIST.WINDOWS])]
+          combinedList = [...new Set([...list, ...predefinedBlacklist])]
           break
         case 'whitelist':
           combinedList = [...list]
@@ -229,7 +234,7 @@ export class SelectionService {
         case 'default':
         default:
           //use the predefined blacklist as the default filter list
-          combinedList = [...SELECTION_PREDEFINED_BLACKLIST.WINDOWS]
+          combinedList = [...predefinedBlacklist]
           combinedMode = 'blacklist'
           break
       }
@@ -243,14 +248,21 @@ export class SelectionService {
   private setHookFineTunedList() {
     if (!this.selectionHook) return
 
+    const excludeClipboardCursorDetectList = isWin
+      ? SELECTION_FINETUNED_LIST.EXCLUDE_CLIPBOARD_CURSOR_DETECT.WINDOWS
+      : SELECTION_FINETUNED_LIST.EXCLUDE_CLIPBOARD_CURSOR_DETECT.MAC
+    const includeClipboardDelayReadList = isWin
+      ? SELECTION_FINETUNED_LIST.INCLUDE_CLIPBOARD_DELAY_READ.WINDOWS
+      : SELECTION_FINETUNED_LIST.INCLUDE_CLIPBOARD_DELAY_READ.MAC
+
     this.selectionHook.setFineTunedList(
       SelectionHook!.FineTunedListType.EXCLUDE_CLIPBOARD_CURSOR_DETECT,
-      SELECTION_FINETUNED_LIST.EXCLUDE_CLIPBOARD_CURSOR_DETECT.WINDOWS
+      excludeClipboardCursorDetectList
     )
 
     this.selectionHook.setFineTunedList(
       SelectionHook!.FineTunedListType.INCLUDE_CLIPBOARD_DELAY_READ,
-      SELECTION_FINETUNED_LIST.INCLUDE_CLIPBOARD_DELAY_READ.WINDOWS
+      includeClipboardDelayReadList
     )
   }
 
@@ -259,9 +271,26 @@ export class SelectionService {
    * @returns {boolean} Success status of service start
    */
   public start(): boolean {
-    if (!this.selectionHook || this.started) {
-      this.logError(new Error('SelectionService start(): instance is null or already started'))
+    if (!this.selectionHook) {
+      this.logError(new Error('SelectionService start(): instance is null'))
       return false
+    }
+
+    if (this.started) {
+      this.logError(new Error('SelectionService start(): already started'))
+      return false
+    }
+
+    //On macOS, we need to check if the process is trusted
+    if (isMac) {
+      if (!systemPreferences.isTrustedAccessibilityClient(false)) {
+        this.logError(
+          new Error(
+            'SelectionSerice not started: process is not trusted on macOS, please turn on the Accessibility permission'
+          )
+        )
+        return false
+      }
     }
 
     try {
@@ -306,6 +335,7 @@ export class SelectionService {
     if (!this.selectionHook) return false
 
     this.selectionHook.stop()
+
     this.selectionHook.cleanup() //already remove all listeners
 
     //reset the listener states
@@ -316,6 +346,7 @@ export class SelectionService {
       this.toolbarWindow.close()
       this.toolbarWindow = null
     }
+
     this.closePreloadedActionWindows()
 
     this.started = false
@@ -374,12 +405,16 @@ export class SelectionService {
       minimizable: false,
       maximizable: false,
       movable: true,
-      focusable: false,
       hasShadow: false,
       thickFrame: false,
       roundedCorners: true,
       backgroundMaterial: 'none',
-      type: 'toolbar',
+
+      // Platform specific settings
+      //   [macOS] DO NOT set type to 'panel', it will not work because it conflicts with other settings
+      //   [macOS] DO NOT set focusable to false, it will make other windows bring to front together
+      ...(isWin ? { type: 'toolbar', focusable: false } : {}),
+
       show: false,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
@@ -406,6 +441,11 @@ export class SelectionService {
     // Add show/hide event listeners
     this.toolbarWindow.on('show', () => {
       this.toolbarWindow?.webContents.send(IpcChannel.Selection_ToolbarVisibilityChange, true)
+
+      // [macOS] force the toolbar window to be visible on current desktop
+      if (isMac) {
+        this.toolbarWindow!.setVisibleOnAllWorkspaces(false)
+      }
     })
 
     this.toolbarWindow.on('hide', () => {
@@ -460,11 +500,19 @@ export class SelectionService {
     //set the window to always on top (highest level)
     //should set every time the window is shown
     this.toolbarWindow!.setAlwaysOnTop(true, 'screen-saver')
-    this.toolbarWindow!.show()
+
+    // [macOS] force the toolbar window to be visible on current desktop
+    if (isMac) {
+      this.toolbarWindow!.setVisibleOnAllWorkspaces(true)
+    }
+
+    // [macOS] must use showInactive() to prevent other windows bring to front together
+    this.toolbarWindow!.showInactive()
 
     /**
-     * In Windows 10, setOpacity(1) will make the window completely transparent
-     * It's a strange behavior, so we don't use it for compatibility
+     * [Windows]
+     *   In Windows 10, setOpacity(1) will make the window completely transparent
+     *   It's a strange behavior, so we don't use it for compatibility
      */
     // this.toolbarWindow!.setOpacity(1)
 
@@ -773,8 +821,11 @@ export class SelectionService {
     }
 
     if (!isLogical) {
+      //mac don't need to convert by screenToDipPoint
+      if (!isMac) {
+        refPoint = screen.screenToDipPoint(refPoint)
+      }
       //screenToDipPoint can be float, so we need to round it
-      refPoint = screen.screenToDipPoint(refPoint)
       refPoint = { x: Math.round(refPoint.x), y: Math.round(refPoint.y) }
     }
 
@@ -832,8 +883,8 @@ export class SelectionService {
       return
     }
 
-    //data point is physical coordinates, convert to logical coordinates
-    const mousePoint = screen.screenToDipPoint({ x: data.x, y: data.y })
+    //data point is physical coordinates, convert to logical coordinates(only for windows/linux)
+    const mousePoint = isMac ? { x: data.x, y: data.y } : screen.screenToDipPoint({ x: data.x, y: data.y })
 
     const bounds = this.toolbarWindow!.getBounds()
 
@@ -967,6 +1018,7 @@ export class SelectionService {
       transparent: true,
       autoHideMenuBar: true,
       titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 12, y: 9 },
       hasShadow: false,
       thickFrame: false,
       show: false,
@@ -1096,6 +1148,7 @@ export class SelectionService {
       }
 
       actionWindow.show()
+      // actionWindow.focus()
       this.hideToolbar()
       return
     }
@@ -1214,7 +1267,7 @@ export class SelectionService {
       selectionService?.hideToolbar()
     })
 
-    ipcMain.handle(IpcChannel.Selection_WriteToClipboard, (_, text: string) => {
+    ipcMain.handle(IpcChannel.Selection_WriteToClipboard, (_, text: string): boolean => {
       return selectionService?.writeToClipboard(text) ?? false
     })
 
@@ -1291,7 +1344,7 @@ export class SelectionService {
  * @returns {boolean} Success status of initialization
  */
 export function initSelectionService(): boolean {
-  if (!isWin) return false
+  if (!isSupportedOS) return false
 
   configManager.subscribe(ConfigKeys.SelectionAssistantEnabled, (enabled: boolean) => {
     //avoid closure
