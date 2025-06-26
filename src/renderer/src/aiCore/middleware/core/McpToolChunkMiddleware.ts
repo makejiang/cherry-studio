@@ -200,6 +200,14 @@ function createToolHandlingTransform(
               executedToolResults,
               executedToolCalls
             )
+
+            // 在递归调用前通知UI开始新的LLM响应处理
+            if (currentParams.onChunk) {
+              currentParams.onChunk({
+                type: ChunkType.LLM_RESPONSE_CREATED
+              })
+            }
+
             await executeWithToolHandling(newParams, depth + 1)
           }
         } catch (error) {
@@ -258,7 +266,12 @@ async function executeToolCalls(
   const confirmedToolCalls = toolCalls.filter((toolCall) => {
     return confirmedToolResponses.find((confirmed) => {
       // 根据不同的ID字段匹配原始toolCall
-      return ('name' in toolCall && toolCall.name?.includes(confirmed.tool.name)) || confirmed.tool.name === toolCall.id
+      return (
+        ('name' in toolCall &&
+          (toolCall.name?.includes(confirmed.tool.name) || toolCall.name?.includes(confirmed.tool.id))) ||
+        confirmed.tool.name === toolCall.id ||
+        confirmed.tool.id === toolCall.id
+      )
     })
   })
 
