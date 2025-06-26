@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 import { getVertexAILocation, getVertexAIProjectId, getVertexAIServiceAccount } from '@renderer/hooks/useVertexAI'
 import { Model, Provider } from '@renderer/types'
+import { isEmpty } from 'lodash'
 
 import { AnthropicVertexClient } from '../anthropic/AnthropicVertexClient'
 import { GeminiAPIClient } from './GeminiAPIClient'
@@ -20,6 +21,19 @@ export class VertexAPIClient extends GeminiAPIClient {
       return this.anthropicVertexClient
     }
     return this
+  }
+
+  private formatApiHost(baseUrl: string) {
+    if (baseUrl.endsWith('/v1/')) {
+      baseUrl = baseUrl.slice(0, -4)
+    } else if (baseUrl.endsWith('/v1')) {
+      baseUrl = baseUrl.slice(0, -3)
+    }
+    return baseUrl
+  }
+
+  override getBaseURL() {
+    return this.formatApiHost(this.provider.apiHost)
   }
 
   override async getSdkInstance() {
@@ -43,7 +57,8 @@ export class VertexAPIClient extends GeminiAPIClient {
       location: location,
       httpOptions: {
         apiVersion: this.getApiVersion(),
-        headers: authHeaders
+        headers: authHeaders,
+        baseUrl: isEmpty(this.getBaseURL()) ? undefined : this.getBaseURL()
       }
     })
 
