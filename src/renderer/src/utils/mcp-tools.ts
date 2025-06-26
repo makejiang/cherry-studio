@@ -15,7 +15,6 @@ import {
 } from '@renderer/types'
 import type { MCPToolCompleteChunk, MCPToolInProgressChunk, MCPToolPendingChunk } from '@renderer/types/chunk'
 import { ChunkType } from '@renderer/types/chunk'
-import { SdkMessageParam } from '@renderer/types/sdk'
 import { isArray, isObject, pull, transform } from 'lodash'
 import { nanoid } from 'nanoid'
 import OpenAI from 'openai'
@@ -524,7 +523,7 @@ export async function parseAndCallTools<R>(
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
   mcpTools?: MCPTool[]
-): Promise<SdkMessageParam[]>
+): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }>
 
 export async function parseAndCallTools<R>(
   content: string,
@@ -533,7 +532,7 @@ export async function parseAndCallTools<R>(
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
   mcpTools?: MCPTool[]
-): Promise<SdkMessageParam[]>
+): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }>
 
 export async function parseAndCallTools<R>(
   content: string | MCPToolResponse[],
@@ -542,7 +541,7 @@ export async function parseAndCallTools<R>(
   convertToMessage: (mcpToolResponse: MCPToolResponse, resp: MCPCallToolResponse, model: Model) => R | undefined,
   model: Model,
   mcpTools?: MCPTool[]
-): Promise<R[]> {
+): Promise<{ toolResults: R[]; confirmedToolResponses: MCPToolResponse[] }> {
   const toolResults: R[] = []
   let curToolResponses: MCPToolResponse[] = []
   if (Array.isArray(content)) {
@@ -552,7 +551,7 @@ export async function parseAndCallTools<R>(
     curToolResponses = parseToolUse(content, mcpTools || [])
   }
   if (!curToolResponses || curToolResponses.length === 0) {
-    return toolResults
+    return { toolResults, confirmedToolResponses: [] }
   }
   for (const toolResponse of curToolResponses) {
     upsertMCPToolResponse(
@@ -704,7 +703,7 @@ export async function parseAndCallTools<R>(
 
   Logger.info(`🔧 [MCP] All tools processed. Confirmed tools: ${confirmedTools.length}`)
 
-  return toolResults
+  return { toolResults, confirmedToolResponses: confirmedTools }
 }
 
 export function mcpToolCallResponseToOpenAICompatibleMessage(

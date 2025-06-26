@@ -129,10 +129,13 @@ function createToolHandlingTransform(
 
         try {
           let toolResult: SdkMessageParam[] = []
+          let confirmedToolCalls: SdkToolCall[] = []
+
           Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executing tool calls:`, toolCalls)
           Logger.info(`🔧 [${MIDDLEWARE_NAME}] Executing tool use responses:`, toolUseResponses)
+
           if (shouldExecuteToolCalls) {
-            toolResult = await executeToolCalls(
+            const result = await executeToolCalls(
               ctx,
               toolCalls,
               mcpTools,
@@ -140,8 +143,10 @@ function createToolHandlingTransform(
               currentParams.onChunk,
               currentParams.assistant.model!
             )
+            toolResult = result.toolResults
+            confirmedToolCalls = result.confirmedToolCalls
           } else if (shouldExecuteToolUseResponses) {
-            toolResult = await executeToolUseResponses(
+            const result = await executeToolUseResponses(
               ctx,
               toolUseResponses,
               mcpTools,
@@ -149,12 +154,14 @@ function createToolHandlingTransform(
               currentParams.onChunk,
               currentParams.assistant.model!
             )
+            toolResult = result.toolResults
+            confirmedToolCalls = result.confirmedToolCalls
           }
 
           if (toolResult.length > 0) {
             const output = ctx._internal.toolProcessingState?.output
 
-            const newParams = buildParamsWithToolResults(ctx, currentParams, output, toolResult, toolCalls)
+            const newParams = buildParamsWithToolResults(ctx, currentParams, output, toolResult, confirmedToolCalls)
             await executeWithToolHandling(newParams, depth + 1)
           }
         } catch (error) {
@@ -179,8 +186,7 @@ async function executeToolCalls(
   allToolResponses: MCPToolResponse[],
   onChunk: CompletionsParams['onChunk'],
   model: Model
-): Promise<SdkMessageParam[]> {
-  // 转换为MCPToolResponse格式
+): Promise<{ toolResults: SdkMessageParam[]; confirmedToolCalls: SdkToolCall[] }> {
   const mcpToolResponses: ToolCallResponse[] = toolCalls
     .map((toolCall) => {
       const mcpTool = ctx.apiClientInstance.convertSdkToolCallToMcp(toolCall, mcpTools)
@@ -193,11 +199,11 @@ async function executeToolCalls(
 
   if (mcpToolResponses.length === 0) {
     console.warn(`🔧 [${MIDDLEWARE_NAME}] No valid MCP tool responses to execute`)
-    return []
+    return { toolResults: [], confirmedToolCalls: [] }
   }
 
   // 使用现有的parseAndCallTools函数执行工具
-  const toolResults = await parseAndCallTools(
+  const { toolResults, confirmedToolResponses } = await parseAndCallTools(
     mcpToolResponses,
     allToolResponses,
     onChunk,
@@ -208,7 +214,15 @@ async function executeToolCalls(
     mcpTools
   )
 
-  return toolResults
+  // 找出已确认工具对应的原始toolCalls
+  const confirmedToolCalls = toolCalls.filter((toolCall) => {
+    return confirmedToolResponses.find((confirmed) => {
+      // 根据不同的ID字段匹配原始toolCall
+      return ('name' in toolCall && confirmed.tool.name === toolCall.name) || confirmed.tool.name === toolCall.id
+    })
+  })
+
+  return { toolResults, confirmedToolCalls }
 }
 
 /**
@@ -222,9 +236,9 @@ async function executeToolUseResponses(
   allToolResponses: MCPToolResponse[],
   onChunk: CompletionsParams['onChunk'],
   model: Model
-): Promise<SdkMessageParam[]> {
+): Promise<{ toolResults: SdkMessageParam[]; confirmedToolCalls: SdkToolCall[] }> {
   // 直接使用parseAndCallTools函数处理已经解析好的ToolUseResponse
-  const toolResults = await parseAndCallTools(
+  const { toolResults, confirmedToolResponses } = await parseAndCallTools(
     toolUseResponses,
     allToolResponses,
     onChunk,
@@ -235,7 +249,18 @@ async function executeToolUseResponses(
     mcpTools
   )
 
-  return toolResults
+  // 为确认的Tool Use创建对应的SdkToolCall对象（主要用于Anthropic风格的tool use）
+  const confirmedToolCalls: SdkToolCall[] = confirmedToolResponses.map((confirmed) => {
+    // 创建Tool Use Block格式的toolCall
+    return {
+      type: 'tool_use',
+      id: confirmed.id,
+      name: confirmed.tool.name || confirmed.tool.id,
+      input: confirmed.arguments
+    } as SdkToolCall
+  })
+
+  return { toolResults, confirmedToolCalls }
 }
 
 /**
@@ -246,7 +271,7 @@ function buildParamsWithToolResults(
   currentParams: CompletionsParams,
   output: SdkRawOutput | string | undefined,
   toolResults: SdkMessageParam[],
-  toolCalls: SdkToolCall[]
+  confirmedToolCalls: SdkToolCall[]
 ): CompletionsParams {
   // 获取当前已经转换好的reqMessages，如果没有则使用原始messages
   const currentReqMessages = getCurrentReqMessages(ctx)
@@ -254,7 +279,7 @@ function buildParamsWithToolResults(
   const apiClient = ctx.apiClientInstance
 
   // 从回复中构建助手消息
-  const newReqMessages = apiClient.buildSdkMessages(currentReqMessages, output, toolResults, toolCalls)
+  const newReqMessages = apiClient.buildSdkMessages(currentReqMessages, output, toolResults, confirmedToolCalls)
 
   if (output && ctx._internal.toolProcessingState) {
     ctx._internal.toolProcessingState.output = undefined

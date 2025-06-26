@@ -549,13 +549,24 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onToolCallInProgress: (toolResponse: MCPToolResponse) => {
-        if (toolBlockId && toolResponse.status === 'invoking') {
+        // 根据 toolResponse.id 查找对应的块ID
+        const targetBlockId = toolCallIdToBlockIdMap.get(toolResponse.id)
+
+        if (targetBlockId && toolResponse.status === 'invoking') {
+          console.log(
+            `🔧 [messageThunk] Updating tool block ${targetBlockId} for tool ${toolResponse.id} to invoking status`
+          )
           const changes = {
             status: MessageBlockStatus.PROCESSING,
             metadata: { rawMcpToolResponse: toolResponse }
           }
-          dispatch(updateOneBlock({ id: toolBlockId, changes }))
-          saveUpdatedBlockToDB(toolBlockId, assistantMsgId, topicId, getState)
+          dispatch(updateOneBlock({ id: targetBlockId, changes }))
+          saveUpdatedBlockToDB(targetBlockId, assistantMsgId, topicId, getState)
+        } else if (!targetBlockId) {
+          console.warn(
+            `[onToolCallInProgress] No block ID found for tool ID: ${toolResponse.id}. Available mappings:`,
+            Array.from(toolCallIdToBlockIdMap.entries())
+          )
         } else {
           console.warn(
             `[onToolCallInProgress] Received unhandled tool status: ${toolResponse.status} for ID: ${toolResponse.id}`
