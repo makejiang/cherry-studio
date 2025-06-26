@@ -192,7 +192,7 @@ export class AnthropicAPIClient extends BaseApiClient<
     const parts: MessageParam['content'] = [
       {
         type: 'text',
-        text: getMainTextContent(message)
+        text: await this.getMessageContent(message)
       }
     ]
 
