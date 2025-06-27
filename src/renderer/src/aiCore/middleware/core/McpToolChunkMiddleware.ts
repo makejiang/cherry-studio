@@ -105,11 +105,9 @@ function createToolHandlingTransform(
           if (createdChunk.tool_calls && createdChunk.tool_calls.length > 0) {
             hasToolCalls = true
 
-            // 立即执行新收到的toolcalls
             for (const toolCall of createdChunk.tool_calls) {
-              toolCalls.push(toolCall) // 立即保存原始toolCall
+              toolCalls.push(toolCall)
 
-              // 启动异步执行，但不等待
               const executionPromise = (async () => {
                 try {
                   const result = await executeToolCalls(

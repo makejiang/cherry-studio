@@ -4,6 +4,9 @@ import { useSettings } from '@renderer/hooks/useSettings'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
 import { cancelToolAction, confirmToolAction } from '@renderer/utils/userConfirmation'
 import { Collapse, message as antdMessage, Tooltip } from 'antd'
+import { message } from 'antd'
+import Logger from 'electron-log/renderer'
+import { PauseCircle } from 'lucide-react'
 import { FC, memo, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -23,6 +26,7 @@ const MessageTools: FC<Props> = ({ blocks }) => {
   const { id, tool, status, response } = toolResponse!
 
   const isPending = status === 'pending'
+  const isInvoking = status === 'invoking'
   const isDone = status === 'done'
 
   const argsString = useMemo(() => {
@@ -68,6 +72,22 @@ const MessageTools: FC<Props> = ({ blocks }) => {
 
   const handleCancelTool = () => {
     cancelToolAction(id)
+  }
+
+  const handleAbortTool = async () => {
+    if (toolResponse?.id) {
+      try {
+        const success = await window.api.mcp.abortTool(toolResponse.id)
+        if (success) {
+          message.success({ content: t('message.tools.aborted'), key: 'abort-tool' })
+        } else {
+          message.error({ content: t('message.tools.abort_failed'), key: 'abort-tool' })
+        }
+      } catch (error) {
+        Logger.error('Failed to abort tool:', error)
+        message.error({ content: t('message.tools.abort_failed'), key: 'abort-tool' })
+      }
+    }
   }
 
   // Format tool responses for collapse items
@@ -156,6 +176,19 @@ const MessageTools: FC<Props> = ({ blocks }) => {
                   </ActionButton>
                 </Tooltip>
               </>
+            )}
+            {isInvoking && toolResponse?.id && (
+              <Tooltip title={t('chat.input.pause')} mouseEnterDelay={0.3}>
+                <ActionButton
+                  className="abort-button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleAbortTool()
+                  }}
+                  aria-label={t('chat.input.pause')}>
+                  <PauseCircle color="var(--color-error)" size={14} />
+                </ActionButton>
+              </Tooltip>
             )}
             {isDone && response && (
               <>

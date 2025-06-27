@@ -686,6 +686,8 @@
       "tools": {
         "completed": "完了",
         "invoking": "呼び出し中",
+        "aborted": "ツール呼び出し中断",
+        "abort_failed": "ツール呼び出し中断失敗",
         "error": "エラーが発生しました",
         "raw": "生データ",
         "preview": "プレビュー",

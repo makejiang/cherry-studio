@@ -686,6 +686,8 @@
       "success.yuque.export": "成功匯出到語雀",
       "switch.disabled": "請等待當前回覆完成",
       "tools": {
+        "aborted": "工具調用已中斷",
+        "abort_failed": "工具調用中斷失敗",
         "completed": "已完成",
         "invoking": "調用中",
         "error": "發生錯誤",

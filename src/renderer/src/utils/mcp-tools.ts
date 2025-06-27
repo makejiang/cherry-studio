@@ -277,7 +277,8 @@ export async function callMCPTool(toolResponse: MCPToolResponse): Promise<MCPCal
     const resp = await window.api.mcp.callTool({
       server,
       name: toolResponse.tool.name,
-      args: toolResponse.arguments
+      args: toolResponse.arguments,
+      callId: toolResponse.id
     })
     if (toolResponse.tool.serverName === MCP_AUTO_INSTALL_SERVER_NAME) {
       if (resp.data) {

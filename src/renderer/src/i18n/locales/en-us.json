@@ -690,6 +690,8 @@
         "cancelled": "Cancelled",
         "completed": "Completed",
         "invoking": "Invoking",
+        "aborted": "Tool call aborted",
+        "abort_failed": "Tool call abort failed",
         "error": "Error occurred",
         "raw": "Raw",
         "preview": "Preview"
