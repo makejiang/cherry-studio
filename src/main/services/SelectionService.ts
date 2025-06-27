@@ -397,6 +397,7 @@ export class SelectionService {
     this.toolbarWindow = new BrowserWindow({
       width: toolbarWidth,
       height: toolbarHeight,
+      show: false,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
@@ -404,6 +405,7 @@ export class SelectionService {
       resizable: false,
       minimizable: false,
       maximizable: false,
+      fullscreenable: false, // [macOS] must be false
       movable: true,
       hasShadow: false,
       thickFrame: false,
@@ -414,8 +416,9 @@ export class SelectionService {
       //   [macOS] DO NOT set type to 'panel', it will not work because it conflicts with other settings
       //   [macOS] DO NOT set focusable to false, it will make other windows bring to front together
       ...(isWin ? { type: 'toolbar', focusable: false } : {}),
+      hiddenInMissionControl: true, // [macOS only]
+      acceptFirstMouse: true, // [macOS only]
 
-      show: false,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         contextIsolation: true,
@@ -503,10 +506,11 @@ export class SelectionService {
 
     // [macOS] force the toolbar window to be visible on current desktop
     if (isMac) {
-      this.toolbarWindow!.setVisibleOnAllWorkspaces(true)
+      this.toolbarWindow!.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     }
 
-    // [macOS] must use showInactive() to prevent other windows bring to front together
+    // [macOS] MUST use `showInactive()` to prevent other windows bring to front together
+    // [Windows] is OK for both `show()` and `showInactive()` because of `focusable: false`
     this.toolbarWindow!.showInactive()
 
     /**

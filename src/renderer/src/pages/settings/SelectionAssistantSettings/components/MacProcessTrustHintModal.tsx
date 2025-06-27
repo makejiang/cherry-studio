@@ -1,4 +1,4 @@
-import { Button, Modal, Space, Typography } from 'antd'
+import { Button, Modal, Typography } from 'antd'
 import { FC } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -29,14 +29,14 @@ const MacProcessTrustHintModal: FC<MacProcessTrustHintModalProps> = ({ open, onC
       open={open}
       onCancel={onClose}
       footer={
-        <Space>
-          <Button onClick={handleOpenAccessibility}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Button type="link" style={{ color: 'var(--color-text-3)', fontSize: 12 }} onClick={handleOpenAccessibility}>
             {t('selection.settings.enable.mac_process_trust_hint.button.open_accessibility_settings')}
           </Button>
           <Button type="primary" onClick={handleConfirm}>
             {t('selection.settings.enable.mac_process_trust_hint.button.go_to_settings')}
           </Button>
-        </Space>
+        </div>
       }
       centered
       destroyOnClose>
