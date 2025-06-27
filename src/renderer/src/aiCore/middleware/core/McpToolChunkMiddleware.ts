@@ -196,7 +196,7 @@ function createToolHandlingTransform(
             await executeWithToolHandling(newParams, depth + 1)
           }
         } catch (error) {
-          console.error(`🔧 [${MIDDLEWARE_NAME}] Error in tool processing:`, error)
+          Logger.error(`🔧 [${MIDDLEWARE_NAME}] Error in tool processing:`, error)
           controller.error(error)
         } finally {
           hasToolCalls = false

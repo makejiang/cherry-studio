@@ -600,6 +600,7 @@ const fetchAndProcessAssistantResponseImpl = async (
             `[onToolCallComplete] Received unhandled tool status: ${toolResponse.status} for ID: ${toolResponse.id}`
           )
         }
+        toolBlockId = null
       },
       onExternalToolInProgress: async () => {
         const citationBlock = createCitationBlock(assistantMsgId, {}, { status: MessageBlockStatus.PROCESSING })
@@ -749,7 +750,14 @@ const fetchAndProcessAssistantResponseImpl = async (
           })
         }
         const possibleBlockId =
-          mainTextBlockId || thinkingBlockId || toolBlockId || imageBlockId || citationBlockId || lastBlockId
+          mainTextBlockId ||
+          thinkingBlockId ||
+          toolBlockId ||
+          imageBlockId ||
+          citationBlockId ||
+          initialPlaceholderBlockId ||
+          lastBlockId
+
         if (possibleBlockId) {
           // 更改上一个block的状态为ERROR
           const changes: Partial<MessageBlock> = {
@@ -788,7 +796,13 @@ const fetchAndProcessAssistantResponseImpl = async (
           const finalContextWithAssistant = [...contextForUsage, finalAssistantMsg]
 
           const possibleBlockId =
-            mainTextBlockId || thinkingBlockId || toolBlockId || imageBlockId || citationBlockId || lastBlockId
+            mainTextBlockId ||
+            thinkingBlockId ||
+            toolBlockId ||
+            imageBlockId ||
+            citationBlockId ||
+            initialPlaceholderBlockId ||
+            lastBlockId
           if (possibleBlockId) {
             const changes: Partial<MessageBlock> = {
               status: MessageBlockStatus.SUCCESS

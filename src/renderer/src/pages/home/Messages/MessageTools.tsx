@@ -240,7 +240,18 @@ const CollapseContainer = styled(Collapse)`
   .ant-collapse-header {
     background-color: var(--color-bg-2);
     transition: background-color 0.2s;
-
+    display: flex;
+    align-items: center;
+    .ant-collapse-expand-icon {
+      height: 100% !important;
+    }
+    .ant-collapse-arrow {
+      height: 28px !important;
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
     &:hover {
       background-color: var(--color-bg-3);
     }
