@@ -1,4 +1,4 @@
-import { CheckOutlined, CloseOutlined, EnterOutlined, LoadingOutlined, WarningOutlined } from '@ant-design/icons'
+import { CheckOutlined, CloseOutlined, LoadingOutlined, WarningOutlined } from '@ant-design/icons'
 import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import { useSettings } from '@renderer/hooks/useSettings'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
@@ -132,6 +132,31 @@ const MessageTools: FC<Props> = ({ blocks }) => {
             </StatusIndicator>
           </TitleContent>
           <ActionButtonsContainer>
+            {isPending && (
+              <>
+                <Tooltip title={t('common.cancel')} mouseEnterDelay={0.3}>
+                  <ActionButton
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCancelTool()
+                    }}
+                    aria-label={t('common.cancel')}>
+                    <CloseOutlined style={{ fontSize: '14px' }} />
+                  </ActionButton>
+                </Tooltip>
+                <Tooltip title={t('common.confirm')} mouseEnterDelay={0.3}>
+                  <ActionButton
+                    className="confirm-button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleConfirmTool()
+                    }}
+                    aria-label={t('common.confirm')}>
+                    <CheckOutlined style={{ fontSize: '14px' }} />
+                  </ActionButton>
+                </Tooltip>
+              </>
+            )}
             {isDone && response && (
               <>
                 <Tooltip title={t('common.copy')} mouseEnterDelay={0.5}>
@@ -182,28 +207,6 @@ const MessageTools: FC<Props> = ({ blocks }) => {
         items={getCollapseItems()}
         expandIconPosition="end"
       />
-      {isPending && (
-        <ActionToolContainer>
-          <ActionButton
-            style={{
-              fontFamily: messageFont === 'serif' ? 'var(--font-family-serif)' : 'var(--font-family)',
-              fontSize
-            }}
-            onClick={handleCancelTool}>
-            <CloseOutlined />
-            {t('common.cancel')}
-          </ActionButton>
-          <ActionButton
-            style={{
-              fontFamily: messageFont === 'serif' ? 'var(--font-family-serif)' : 'var(--font-family)',
-              fontSize
-            }}
-            onClick={handleConfirmTool}>
-            <EnterOutlined />
-            {t('common.confirm')}
-          </ActionButton>
-        </ActionToolContainer>
-      )}
     </ToolContainer>
   )
 }
@@ -325,7 +328,7 @@ const ActionButton = styled.button`
   border: none;
   color: var(--color-text-2);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -333,11 +336,22 @@ const ActionButton = styled.button`
   transition: all 0.2s;
   border-radius: 4px;
   gap: 4px;
+  min-width: 28px;
+  height: 28px;
 
   &:hover {
     opacity: 1;
     color: var(--color-text);
-    background-color: var(--color-bg-1);
+    background-color: var(--color-bg-3);
+  }
+
+  &.confirm-button {
+    color: var(--color-primary);
+
+    &:hover {
+      background-color: var(--color-primary-bg);
+      color: var(--color-primary);
+    }
   }
 
   &:focus-visible {
@@ -348,38 +362,6 @@ const ActionButton = styled.button`
 
   .iconfont {
     font-size: 14px;
-  }
-`
-
-const ActionToolContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  padding: 8px 4px 8px 8px;
-
-  > .anticon {
-    cursor: pointer;
-    padding: 4px 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.7;
-    transition: all 0.2s;
-    border-radius: 4px;
-
-    &:hover {
-      opacity: 1;
-      color: var(--color-text);
-      background-color: var(--color-bg-1);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--color-primary);
-      outline-offset: 2px;
-      opacity: 1;
-    }
   }
 `
 
