@@ -402,6 +402,7 @@ export class SelectionService {
       transparent: true,
       alwaysOnTop: true,
       skipTaskbar: true,
+      autoHideMenuBar: true,
       resizable: false,
       minimizable: false,
       maximizable: false,
@@ -446,9 +447,11 @@ export class SelectionService {
       this.toolbarWindow?.webContents.send(IpcChannel.Selection_ToolbarVisibilityChange, true)
 
       // [macOS] force the toolbar window to be visible on current desktop
-      if (isMac) {
-        this.toolbarWindow!.setVisibleOnAllWorkspaces(false)
-      }
+      // but it will make docker icon flash. And we found that it's not necessary now.
+      // will remove after testing
+      // if (isMac) {
+      //   this.toolbarWindow!.setVisibleOnAllWorkspaces(false)
+      // }
     })
 
     this.toolbarWindow.on('hide', () => {
@@ -505,9 +508,11 @@ export class SelectionService {
     this.toolbarWindow!.setAlwaysOnTop(true, 'screen-saver')
 
     // [macOS] force the toolbar window to be visible on current desktop
-    if (isMac) {
-      this.toolbarWindow!.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    }
+    // but it will make docker icon flash. And we found that it's not necessary now.
+    // will remove after testing
+    // if (isMac) {
+    //   this.toolbarWindow!.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    // }
 
     // [macOS] MUST use `showInactive()` to prevent other windows bring to front together
     // [Windows] is OK for both `show()` and `showInactive()` because of `focusable: false`
@@ -572,71 +577,71 @@ export class SelectionService {
   /**
    * Calculate optimal toolbar position based on selection context
    * Ensures toolbar stays within screen boundaries and follows selection direction
-   * @param point Reference point for positioning, must be INTEGER
+   * @param refPoint Reference point for positioning, must be INTEGER
    * @param orientation Preferred position relative to reference point
    * @returns Calculated screen coordinates for toolbar, INTEGER
    */
-  private calculateToolbarPosition(point: Point, orientation: RelativeOrientation): Point {
+  private calculateToolbarPosition(refPoint: Point, orientation: RelativeOrientation): Point {
     // Calculate initial position based on the specified anchor
-    let posX: number, posY: number
+    const posPoint: Point = { x: 0, y: 0 }
 
     const { toolbarWidth, toolbarHeight } = this.getToolbarRealSize()
 
     switch (orientation) {
       case 'topLeft':
-        posX = point.x - toolbarWidth
-        posY = point.y - toolbarHeight
+        posPoint.x = refPoint.x - toolbarWidth
+        posPoint.y = refPoint.y - toolbarHeight
         break
       case 'topRight':
-        posX = point.x
-        posY = point.y - toolbarHeight
+        posPoint.x = refPoint.x
+        posPoint.y = refPoint.y - toolbarHeight
         break
       case 'topMiddle':
-        posX = point.x - toolbarWidth / 2
-        posY = point.y - toolbarHeight
+        posPoint.x = refPoint.x - toolbarWidth / 2
+        posPoint.y = refPoint.y - toolbarHeight
         break
       case 'bottomLeft':
-        posX = point.x - toolbarWidth
-        posY = point.y
+        posPoint.x = refPoint.x - toolbarWidth
+        posPoint.y = refPoint.y
         break
       case 'bottomRight':
-        posX = point.x
-        posY = point.y
+        posPoint.x = refPoint.x
+        posPoint.y = refPoint.y
         break
       case 'bottomMiddle':
-        posX = point.x - toolbarWidth / 2
-        posY = point.y
+        posPoint.x = refPoint.x - toolbarWidth / 2
+        posPoint.y = refPoint.y
         break
       case 'middleLeft':
-        posX = point.x - toolbarWidth
-        posY = point.y - toolbarHeight / 2
+        posPoint.x = refPoint.x - toolbarWidth
+        posPoint.y = refPoint.y - toolbarHeight / 2
         break
       case 'middleRight':
-        posX = point.x
-        posY = point.y - toolbarHeight / 2
+        posPoint.x = refPoint.x
+        posPoint.y = refPoint.y - toolbarHeight / 2
         break
       case 'center':
-        posX = point.x - toolbarWidth / 2
-        posY = point.y - toolbarHeight / 2
+        posPoint.x = refPoint.x - toolbarWidth / 2
+        posPoint.y = refPoint.y - toolbarHeight / 2
         break
       default:
         // Default to 'topMiddle' if invalid position
-        posX = point.x - toolbarWidth / 2
-        posY = point.y - toolbarHeight / 2
+        posPoint.x = refPoint.x - toolbarWidth / 2
+        posPoint.y = refPoint.y - toolbarHeight / 2
     }
 
     //use original point to get the display
-    const display = screen.getDisplayNearestPoint({ x: point.x, y: point.y })
+    const display = screen.getDisplayNearestPoint(refPoint)
 
     // Ensure toolbar stays within screen boundaries
-    posX = Math.round(
-      Math.max(display.workArea.x, Math.min(posX, display.workArea.x + display.workArea.width - toolbarWidth))
+    posPoint.x = Math.round(
+      Math.max(display.workArea.x, Math.min(posPoint.x, display.workArea.x + display.workArea.width - toolbarWidth))
     )
-    posY = Math.round(
-      Math.max(display.workArea.y, Math.min(posY, display.workArea.y + display.workArea.height - toolbarHeight))
+    posPoint.y = Math.round(
+      Math.max(display.workArea.y, Math.min(posPoint.y, display.workArea.y + display.workArea.height - toolbarHeight))
     )
 
-    return { x: posX, y: posY }
+    return posPoint
   }
 
   private isSamePoint(point1: Point, point2: Point): boolean {
@@ -825,7 +830,7 @@ export class SelectionService {
     }
 
     if (!isLogical) {
-      //mac don't need to convert by screenToDipPoint
+      // [macOS] don't need to convert by screenToDipPoint
       if (!isMac) {
         refPoint = screen.screenToDipPoint(refPoint)
       }
@@ -1021,8 +1026,8 @@ export class SelectionService {
       frame: false,
       transparent: true,
       autoHideMenuBar: true,
-      titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 12, y: 9 },
+      titleBarStyle: 'hidden', // [macOS]
+      trafficLightPosition: { x: 12, y: 9 }, // [macOS]
       hasShadow: false,
       thickFrame: false,
       show: false,
