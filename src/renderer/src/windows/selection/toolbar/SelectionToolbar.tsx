@@ -337,6 +337,7 @@ const ActionButton = styled.div`
   will-change: color, background-color;
   &:last-child {
     border-radius: 0 var(--selection-toolbar-border-radius) var(--selection-toolbar-border-radius) 0;
+    padding: var(--selection-toolbar-button-last-padding);
   }
 
   .btn-icon {

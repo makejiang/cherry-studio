@@ -46,7 +46,8 @@ html {
   --selection-toolbar-button-direction: row; // default: row | column
   --selection-toolbar-button-text-margin: 0 0 0 0; // default: 0 0 0 0
   --selection-toolbar-button-margin: 0; // default: 0
-  --selection-toolbar-button-padding: 0 8px; // default: 0 6px
+  --selection-toolbar-button-padding: 0 8px; // default: 0 8px
+  --selection-toolbar-button-last-padding: 0 12px 0 8px;
   --selection-toolbar-button-border-radius: 0; // default: 0
   --selection-toolbar-button-border: none; // default: none
   --selection-toolbar-button-box-shadow: none; // default: none
