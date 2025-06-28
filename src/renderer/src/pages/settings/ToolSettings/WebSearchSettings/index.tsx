@@ -7,9 +7,9 @@ import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SettingContainer, SettingDivider, SettingGroup, SettingRow, SettingRowTitle, SettingTitle } from '../..'
-import CompressionSettings from '../../WebSearchSettings/CompressionSettings'
 import BasicSettings from './BasicSettings'
 import BlacklistSettings from './BlacklistSettings'
+import CompressionSettings from './CompressionSettings'
 import WebSearchProviderSetting from './WebSearchProviderSetting'
 
 const WebSearchSettings: FC = () => {
