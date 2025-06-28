@@ -277,7 +277,7 @@ const LogoWrapper = styled.div<{ $draggable: boolean }>`
   justify-content: center;
   margin: var(--selection-toolbar-logo-margin);
   background-color: transparent;
-  ${({ $draggable }) => $draggable && ' -webkit-app-region: drag;'}
+  ${({ $draggable }) => $draggable && ' -webkit-app-region: drag;'};
 `
 
 const Logo = styled(Avatar)`
