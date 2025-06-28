@@ -1,8 +1,9 @@
-import { CheckOutlined, DeleteOutlined, HistoryOutlined, SendOutlined } from '@ant-design/icons'
+import { CheckOutlined, DeleteOutlined, HistoryOutlined, RedoOutlined, SendOutlined } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel } from '@renderer/config/models'
+import { TRANSLATE_PROMPT } from '@renderer/config/prompts'
 import { translateLanguageOptions } from '@renderer/config/translate'
 import db from '@renderer/databases'
 import { useDefaultModel } from '@renderer/hooks/useAssistant'
@@ -11,6 +12,8 @@ import { useSettings } from '@renderer/hooks/useSettings'
 import { fetchTranslate } from '@renderer/services/ApiService'
 import { getDefaultTranslateAssistant } from '@renderer/services/AssistantService'
 import { getModelUniqId, hasModel } from '@renderer/services/ModelService'
+import { useAppDispatch } from '@renderer/store'
+import { setTranslateModelPrompt } from '@renderer/store/settings'
 import type { Model, TranslateHistory } from '@renderer/types'
 import { runAsyncFunction, uuid } from '@renderer/utils'
 import {
@@ -67,6 +70,7 @@ const TranslateSettings: FC<{
 }) => {
   const { t } = useTranslation()
   const { translateModelPrompt } = useSettings()
+  const dispatch = useAppDispatch()
   const [localPair, setLocalPair] = useState<[string, string]>(bidirectionalPair)
   const [showPrompt, setShowPrompt] = useState(false)
   const [localPrompt, setLocalPrompt] = useState(translateModelPrompt)
@@ -94,6 +98,7 @@ const TranslateSettings: FC<{
     db.settings.put({ id: 'translate:scroll:sync', value: isScrollSyncEnabled })
     db.settings.put({ id: 'translate:markdown:enabled', value: enableMarkdown })
     db.settings.put({ id: 'translate:model:prompt', value: localPrompt })
+    dispatch(setTranslateModelPrompt(localPrompt))
     window.message.success({
       content: t('message.save.success.title'),
       key: 'translate-settings-save'
@@ -243,16 +248,26 @@ const TranslateSettings: FC<{
                 }}
               />
             </div>
+            {localPrompt !== TRANSLATE_PROMPT && (
+              <Tooltip title={t('common.reset')}>
+                <Button
+                  icon={<RedoOutlined />}
+                  size="small"
+                  type="text"
+                  onClick={() => setLocalPrompt(TRANSLATE_PROMPT)}
+                />
+              </Tooltip>
+            )}
           </Flex>
         </div>
 
         <div style={{ display: showPrompt ? 'block' : 'none' }}>
-          <TextArea
-            rows={10}
-            value={translateModelPrompt}
+          <Textarea
+            rows={8}
+            value={localPrompt}
             onChange={(e) => setLocalPrompt(e.target.value)}
-            placeholder={t('settings.models.translate_model_prompt_placeholder')}
-            style={{ width: '100%', marginBottom: 10 }}
+            placeholder={t('settings.models.translate_model_prompt_message')}
+            style={{ borderRadius: '8px' }}
           />
         </div>
       </Flex>
