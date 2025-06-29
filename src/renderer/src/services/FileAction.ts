@@ -3,7 +3,7 @@ import Logger from '@renderer/config/logger'
 import db from '@renderer/databases'
 import FileManager from '@renderer/services/FileManager'
 import store from '@renderer/store'
-import { FileType } from '@renderer/types'
+import { FileMetadata } from '@renderer/types'
 import { Message } from '@renderer/types/newMessage'
 import dayjs from 'dayjs'
 
@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 export type SortField = 'created_at' | 'size' | 'name'
 export type SortOrder = 'asc' | 'desc'
 
-export function tempFilesSort(files: FileType[]): FileType[] {
+export function tempFilesSort(files: FileMetadata[]): FileMetadata[] {
   return files.sort((a, b) => {
     const aIsTemp = a.origin_name.startsWith('temp_file')
     const bIsTemp = b.origin_name.startsWith('temp_file')
@@ -21,7 +21,7 @@ export function tempFilesSort(files: FileType[]): FileType[] {
   })
 }
 
-export function sortFiles(files: FileType[], sortField: SortField, sortOrder: SortOrder): FileType[] {
+export function sortFiles(files: FileMetadata[], sortField: SortField, sortOrder: SortOrder): FileMetadata[] {
   return [...files].sort((a, b) => {
     let comparison = 0
     switch (sortField) {
