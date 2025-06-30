@@ -9,116 +9,116 @@ export interface TranslateLanguageOption {
 
 export const TranslateLanguageOptions: TranslateLanguageOption[] = [
   {
-    value: 'English',
+    value: 'english',
     langCode: 'en-us',
     label: i18n.t('languages.english'),
     emoji: '🇬🇧'
   },
   {
-    value: 'Chinese (Simplified)',
+    value: 'chinese',
     langCode: 'zh-cn',
     label: i18n.t('languages.chinese'),
     emoji: '🇨🇳'
   },
   {
-    value: 'Chinese (Traditional)',
+    value: 'chinese-traditional',
     langCode: 'zh-tw',
     label: i18n.t('languages.chinese-traditional'),
     emoji: '🇭🇰'
   },
   {
-    value: 'Japanese',
+    value: 'japanese',
     langCode: 'ja-jp',
     label: i18n.t('languages.japanese'),
     emoji: '🇯🇵'
   },
   {
-    value: 'Korean',
+    value: 'korean',
     langCode: 'ko-kr',
     label: i18n.t('languages.korean'),
     emoji: '🇰🇷'
   },
 
   {
-    value: 'French',
+    value: 'french',
     langCode: 'fr-fr',
     label: i18n.t('languages.french'),
     emoji: '🇫🇷'
   },
   {
-    value: 'German',
+    value: 'german',
     langCode: 'de-de',
     label: i18n.t('languages.german'),
     emoji: '🇩🇪'
   },
   {
-    value: 'Italian',
+    value: 'italian',
     langCode: 'it-it',
     label: i18n.t('languages.italian'),
     emoji: '🇮🇹'
   },
   {
-    value: 'Spanish',
+    value: 'spanish',
     langCode: 'es-es',
     label: i18n.t('languages.spanish'),
     emoji: '🇪🇸'
   },
   {
-    value: 'Portuguese',
+    value: 'portuguese',
     langCode: 'pt-pt',
     label: i18n.t('languages.portuguese'),
     emoji: '🇵🇹'
   },
   {
-    value: 'Russian',
+    value: 'russian',
     langCode: 'ru-ru',
     label: i18n.t('languages.russian'),
     emoji: '🇷🇺'
   },
   {
-    value: 'Polish',
+    value: 'polish',
     langCode: 'pl-pl',
     label: i18n.t('languages.polish'),
     emoji: '🇵🇱'
   },
   {
-    value: 'Arabic',
+    value: 'arabic',
     langCode: 'ar-ar',
     label: i18n.t('languages.arabic'),
     emoji: '🇸🇦'
   },
   {
-    value: 'Turkish',
+    value: 'turkish',
     langCode: 'tr-tr',
     label: i18n.t('languages.turkish'),
     emoji: '🇹🇷'
   },
   {
-    value: 'Thai',
+    value: 'thai',
     langCode: 'th-th',
     label: i18n.t('languages.thai'),
     emoji: '🇹🇭'
   },
   {
-    value: 'Vietnamese',
+    value: 'vietnamese',
     langCode: 'vi-vn',
     label: i18n.t('languages.vietnamese'),
     emoji: '🇻🇳'
   },
   {
-    value: 'Indonesian',
+    value: 'indonesian',
     langCode: 'id-id',
     label: i18n.t('languages.indonesian'),
     emoji: '🇮🇩'
   },
   {
-    value: 'Urdu',
+    value: 'urdu',
     langCode: 'ur-pk',
     label: i18n.t('languages.urdu'),
     emoji: '🇵🇰'
   },
   {
-    value: 'Malay',
+    value: 'malay',
     langCode: 'ms-my',
     label: i18n.t('languages.malay'),
     emoji: '🇲🇾'
@@ -129,7 +129,7 @@ export const translateLanguageOptions = (): typeof TranslateLanguageOptions => {
   return TranslateLanguageOptions.map((option) => {
     return {
       value: option.value,
-      label: option.label,
+      label: i18n.t(`languages.${option.value}`),
       emoji: option.emoji
     }
   })
