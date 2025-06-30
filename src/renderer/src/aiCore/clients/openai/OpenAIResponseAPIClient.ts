@@ -2,6 +2,7 @@ import { GenericChunk } from '@renderer/aiCore/middleware/schemas'
 import { CompletionsContext } from '@renderer/aiCore/middleware/types'
 import {
   isOpenAIChatCompletionOnlyModel,
+  isOpenAIDeepResearchModel,
   isSupportedReasoningEffortOpenAIModel,
   isVisionModel
 } from '@renderer/config/models'
@@ -373,7 +374,7 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
           reqMessages = [systemMessage, ...userMessage].filter(Boolean) as OpenAI.Responses.EasyInputMessage[]
         }
 
-        if (enableWebSearch) {
+        if (enableWebSearch || isOpenAIDeepResearchModel(model)) {
           tools.push({
             type: 'web_search_preview'
           })
@@ -384,10 +385,6 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
             type: 'image_generation',
             partial_images: streamOutput ? 2 : undefined
           })
-        }
-
-        const toolChoices: OpenAI.Responses.ToolChoiceTypes = {
-          type: 'web_search_preview'
         }
 
         tools = tools.concat(extraTools)
@@ -402,7 +399,6 @@ export class OpenAIResponseAPIClient extends OpenAIBaseClient<
           max_output_tokens: maxTokens,
           stream: streamOutput,
           tools: !isEmpty(tools) ? tools : undefined,
-          tool_choice: enableWebSearch ? toolChoices : undefined,
           service_tier: this.getServiceTier(model),
           ...(this.getReasoningEffort(assistant, model) as OpenAI.Reasoning),
           ...this.getCustomParameters(assistant)

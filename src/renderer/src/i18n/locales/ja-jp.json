@@ -2366,6 +2366,16 @@
       "not_configured_title": "メモリが設定されていません",
       "not_configured_desc": "メモリ機能を有効にするには、メモリ設定で埋め込みとLLMモデルを設定してください。",
       "go_to_memory_page": "メモリページに移動"
+    },
+    "research": {
+      "clarification": {
+        "title": "研究の明確化"
+      },
+      "ready_to_start": "深い研究を開始する準備ができました",
+      "retry": "再明確化",
+      "continue_research": "研究を続ける",
+      "supplement_info_label": "補足情報 (任意)",
+      "supplement_info_placeholder": "ここに補足情報を提供して、より良く理解してください..."
     }
   }
 }

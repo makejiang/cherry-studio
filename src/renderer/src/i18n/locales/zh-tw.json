@@ -2427,6 +2427,16 @@
       "not_configured_title": "記憶未配置",
       "not_configured_desc": "請在記憶設定中配置嵌入和LLM模型以啟用記憶功能。",
       "go_to_memory_page": "前往記憶頁面"
+    },
+    "research": {
+      "clarification": {
+        "title": "研究澄清"
+      },
+      "ready_to_start": "準備開始深度研究",
+      "retry": "重新澄清",
+      "continue_research": "繼續研究",
+      "supplement_info_label": "補充資訊 (可選)",
+      "supplement_info_placeholder": "您可以在此處提供補充資訊，幫助我們更好地理解您的需求..."
     }
   }
 }
