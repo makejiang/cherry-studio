@@ -766,6 +766,7 @@ export async function checkApi(provider: Provider, model: Model): Promise<void> 
         messages: 'hi',
         assistant,
         streamOutput: true,
+        enableReasoning: false,
         shouldThrow: true
       }
 
