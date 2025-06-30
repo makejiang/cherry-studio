@@ -1,6 +1,7 @@
+import Logger from '@renderer/config/logger'
+import { isOpenAIDeepResearchModel } from '@renderer/config/models'
 import db from '@renderer/databases'
 import { autoRenameTopic } from '@renderer/hooks/useTopic'
-import { isOpenAIDeepResearchModel } from '@renderer/config/models'
 import { fetchChatCompletion } from '@renderer/services/ApiService'
 import { fetchDeepResearch } from '@renderer/services/DeepResearchService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
@@ -12,7 +13,6 @@ import store from '@renderer/store'
 import type { Assistant, ExternalToolResult, FileType, MCPToolResponse, Model, Topic } from '@renderer/types'
 import type {
   CitationMessageBlock,
-  DeepResearchMessageBlock,
   FileMessageBlock,
   ImageMessageBlock,
   Message,
@@ -49,7 +49,6 @@ import { LRUCache } from 'lru-cache'
 import type { AppDispatch, RootState } from '../index'
 import { removeManyBlocks, updateOneBlock, upsertManyBlocks, upsertOneBlock } from '../messageBlock'
 import { newMessagesActions, selectMessagesForTopic } from '../newMessage'
-import Logger from '@renderer/config/logger'
 
 // const handleChangeLoadingOfTopic = async (topicId: string) => {
 //   await waitForTopicQueue(topicId)
