@@ -81,6 +81,48 @@ class DxtService {
     }
   }
 
+  private async moveDirectory(source: string, destination: string): Promise<void> {
+    try {
+      // Try rename first (works if on same filesystem)
+      fs.renameSync(source, destination)
+    } catch (error) {
+      // If rename fails (cross-filesystem), use copy + remove
+      logger.info('[DxtService] Cross-filesystem move detected, using copy + remove')
+
+      // Ensure parent directory exists
+      const parentDir = path.dirname(destination)
+      if (!fs.existsSync(parentDir)) {
+        fs.mkdirSync(parentDir, { recursive: true })
+      }
+
+      // Recursively copy directory
+      await this.copyDirectory(source, destination)
+
+      // Remove source directory
+      fs.rmSync(source, { recursive: true, force: true })
+    }
+  }
+
+  private async copyDirectory(source: string, destination: string): Promise<void> {
+    // Create destination directory
+    fs.mkdirSync(destination, { recursive: true })
+
+    // Read source directory
+    const entries = fs.readdirSync(source, { withFileTypes: true })
+
+    // Copy each entry
+    for (const entry of entries) {
+      const sourcePath = path.join(source, entry.name)
+      const destPath = path.join(destination, entry.name)
+
+      if (entry.isDirectory()) {
+        await this.copyDirectory(sourcePath, destPath)
+      } else {
+        fs.copyFileSync(sourcePath, destPath)
+      }
+    }
+  }
+
   public async uploadDxt(_: Electron.IpcMainInvokeEvent, filePath: string): Promise<DxtUploadResult> {
     const tempExtractDir = path.join(this.tempDir, `dxt_${uuidv4()}`)
 
@@ -130,7 +172,9 @@ class DxtService {
       }
 
       // Use server name as the final extract directory for automatic version management
-      const serverDirName = `server-${manifest.name}`
+      // Sanitize the name to prevent creating subdirectories
+      const sanitizedName = manifest.name.replace(/\//g, '-')
+      const serverDirName = `server-${sanitizedName}`
       const finalExtractDir = path.join(this.mcpDir, serverDirName)
 
       // Clean up any existing version of this server
@@ -140,7 +184,8 @@ class DxtService {
       }
 
       // Move the temporary directory to the final location
-      fs.renameSync(tempExtractDir, finalExtractDir)
+      // Use recursive copy + remove instead of rename to handle cross-filesystem moves
+      await this.moveDirectory(tempExtractDir, finalExtractDir)
       logger.info('[DxtService] DXT server extracted to:', finalExtractDir)
 
       // Clean up the uploaded DXT file if it's in temp directory
@@ -174,15 +219,28 @@ class DxtService {
 
   public cleanupDxtServer(serverName: string): boolean {
     try {
-      const serverDirName = `server-${serverName}`
+      // Handle server names that might contain slashes (e.g., "anthropic/sequential-thinking")
+      // by replacing slashes with the same separator used during installation
+      const sanitizedName = serverName.replace(/\//g, '-')
+      const serverDirName = `server-${sanitizedName}`
       const serverDir = path.join(this.mcpDir, serverDirName)
 
+      // First try the sanitized path
       if (fs.existsSync(serverDir)) {
         logger.info('[DxtService] Removing DXT server directory:', serverDir)
         fs.rmSync(serverDir, { recursive: true, force: true })
         return true
       }
 
+      // Fallback: try with original name in case it was stored differently
+      const originalServerDir = path.join(this.mcpDir, `server-${serverName}`)
+      if (fs.existsSync(originalServerDir)) {
+        logger.info('[DxtService] Removing DXT server directory:', originalServerDir)
+        fs.rmSync(originalServerDir, { recursive: true, force: true })
+        return true
+      }
+
+      logger.warn('[DxtService] Server directory not found:', serverDir)
       return false
     } catch (error) {
       logger.error('[DxtService] Failed to cleanup DXT server:', error)
