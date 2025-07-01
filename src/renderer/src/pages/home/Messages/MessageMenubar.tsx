@@ -39,6 +39,8 @@ import {
   Languages,
   ListChecks,
   Menu,
+  Pause,
+  Play,
   RefreshCw,
   Save,
   Share,
