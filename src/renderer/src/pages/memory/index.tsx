@@ -29,7 +29,6 @@ import {
   Empty,
   Form,
   Input,
-  message,
   Modal,
   Pagination,
   Select,
@@ -247,6 +246,8 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ visible, onCancel, onAdd, e
       width={500}
       centered
       transitionName="animation-move-down"
+      onOk={() => form.submit()}
+      okButtonProps={{ loading: loading }}
       styles={{
         header: {
           borderBottom: '0.5px solid var(--color-border)',
@@ -263,15 +264,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ visible, onCancel, onAdd, e
           <UserAddOutlined style={{ color: 'var(--color-primary)' }} />
           <span>{t('memory.add_user')}</span>
         </Space>
-      }
-      footer={[
-        <Button key="cancel" size="large" onClick={onCancel}>
-          {t('common.cancel')}
-        </Button>,
-        <Button key="submit" type="primary" size="large" loading={loading} onClick={() => form.submit()}>
-          {t('common.add')}
-        </Button>
-      ]}>
+      }>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item label={t('memory.new_user_id')} name="userId" rules={[{ validator: validateUserId }]}>
           <Input
@@ -357,7 +350,7 @@ const MemoriesPage = () => {
         setAllMemories(result.results || [])
       } catch (error) {
         console.error('Failed to load memories:', error)
-        message.error(t('memory.load_failed'))
+        window.message.error(t('memory.load_failed'))
       } finally {
         setLoading(false)
       }
@@ -420,25 +413,25 @@ const MemoriesPage = () => {
     try {
       // The memory service will automatically use the current user from its state
       await memoryService.add(memory, {})
-      message.success(t('memory.add_success'))
+      window.message.success(t('memory.add_success'))
       // Go to first page to see the newly added memory
       setCurrentPage(1)
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to add memory:', error)
-      message.error(t('memory.add_failed'))
+      window.message.error(t('memory.add_failed'))
     }
   }
 
   const handleDeleteMemory = async (id: string) => {
     try {
       await memoryService.delete(id)
-      message.success(t('memory.delete_success'))
+      window.message.success(t('memory.delete_success'))
       // Reload all memories
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to delete memory:', error)
-      message.error(t('memory.delete_failed'))
+      window.message.error(t('memory.delete_failed'))
     }
   }
 
@@ -449,13 +442,13 @@ const MemoriesPage = () => {
   const handleUpdateMemory = async (id: string, memory: string, metadata?: Record<string, any>) => {
     try {
       await memoryService.update(id, memory, metadata)
-      message.success(t('memory.update_success'))
+      window.message.success(t('memory.update_success'))
       setEditingMemory(null)
       // Reload all memories
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to update memory:', error)
-      message.error(t('memory.update_failed'))
+      window.message.error(t('memory.update_failed'))
     }
   }
 
@@ -475,12 +468,12 @@ const MemoriesPage = () => {
       // Explicitly load memories for the new user
       await loadMemories(userId)
 
-      message.success(
+      window.message.success(
         t('memory.user_switched', { user: userId === DEFAULT_USER_ID ? t('memory.default_user') : userId })
       )
     } catch (error) {
       console.error('Failed to switch user:', error)
-      message.error(t('memory.user_switch_failed'))
+      window.message.error(t('memory.user_switch_failed'))
     }
   }
 
@@ -496,11 +489,11 @@ const MemoriesPage = () => {
 
       // Switch to the newly created user
       await handleUserSwitch(userId)
-      message.success(t('memory.user_created', { user: userId }))
+      window.message.success(t('memory.user_created', { user: userId }))
       setAddUserModalVisible(false)
     } catch (error) {
       console.error('Failed to add user:', error)
-      message.error(t('memory.add_user_failed'))
+      window.message.error(t('memory.add_user_failed'))
     }
   }
 
@@ -526,13 +519,13 @@ const MemoriesPage = () => {
       onOk: async () => {
         try {
           await memoryService.deleteAllMemoriesForUser(userId)
-          message.success(t('memory.memories_reset_success', { user: getUserDisplayName(userId) }))
+          window.message.success(t('memory.memories_reset_success', { user: getUserDisplayName(userId) }))
 
           // Reload memories to show the empty state
           await loadMemories(currentUser)
         } catch (error) {
           console.error('Failed to reset memories:', error)
-          message.error(t('memory.reset_memories_failed'))
+          window.message.error(t('memory.reset_memories_failed'))
         }
       }
     })
@@ -540,7 +533,7 @@ const MemoriesPage = () => {
 
   const handleDeleteUser = async (userId: string) => {
     if (userId === DEFAULT_USER_ID) {
-      message.error(t('memory.cannot_delete_default_user'))
+      window.message.error(t('memory.cannot_delete_default_user'))
       return
     }
 
@@ -555,7 +548,7 @@ const MemoriesPage = () => {
       onOk: async () => {
         try {
           await memoryService.deleteUser(userId)
-          message.success(t('memory.user_deleted', { user: userId }))
+          window.message.success(t('memory.user_deleted', { user: userId }))
 
           // Refresh the users list from database after deletion
           await loadUniqueUsers()
@@ -568,7 +561,7 @@ const MemoriesPage = () => {
           }
         } catch (error) {
           console.error('Failed to delete user:', error)
-          message.error(t('memory.delete_user_failed'))
+          window.message.error(t('memory.delete_user_failed'))
         }
       }
     })
@@ -576,7 +569,9 @@ const MemoriesPage = () => {
 
   const handleGlobalMemoryToggle = (enabled: boolean) => {
     dispatch(setGlobalMemoryEnabled(enabled))
-    message.success(enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled'))
+    window.window.message.success(
+      enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled_title')
+    )
   }
 
   return (
