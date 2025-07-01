@@ -2226,6 +2226,10 @@
       }
     },
     "memory": {
+      "settings": "设置",
+      "statistics": "统计",
+      "search": "搜索",
+      "actions": "操作",
       "add_memory": "添加记忆",
       "edit_memory": "编辑记忆",
       "memory_content": "记忆内容",
@@ -2267,6 +2271,7 @@
       "add_new_user": "添加新用户",
       "new_user_id": "新用户ID",
       "new_user_id_placeholder": "输入唯一的用户ID",
+      "user_management": "用户管理",
       "user_id_required": "用户ID为必填项",
       "user_id_reserved": "'default-user' 为保留字，请使用其他ID",
       "user_id_exists": "该用户ID已存在",

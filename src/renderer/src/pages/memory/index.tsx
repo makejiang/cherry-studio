@@ -20,7 +20,7 @@ import {
   setCurrentUserId,
   setGlobalMemoryEnabled
 } from '@renderer/store/memory'
-import { MemoryItem } from '@types'
+import { MemoryItem, ThemeMode } from '@types'
 import {
   Avatar,
   Button,
@@ -45,6 +45,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { SettingDivider, SettingRow, SettingRowTitle, SettingTitle } from '../settings'
 import MemoriesSettingsModal from './settings-modal'
 
 dayjs.extend(relativeTime)
@@ -580,152 +581,165 @@ const MemoriesPage = () => {
       </Navbar>
       <ContentContainer id="content-container">
         <SideNav>
-          <SideNavScrollContainer>
-            <SideNavContent>
-              <div className="section-title">{t('memory.settings')}</div>
+          <ScrollContainer>
+            <SettingContainer>
+              <SettingGroup style={{ marginTop: 5 }}>
+                <SettingTitle>{t('memory.settings', 'Settings')}</SettingTitle>
+                <SettingDivider />
+                <SettingRow>
+                  <SettingRowTitle>{t('memory.global_memory', 'Global Memory')}</SettingRowTitle>
+                  <Switch checked={globalMemoryEnabled} onChange={handleGlobalMemoryToggle} size="small" />
+                </SettingRow>
+              </SettingGroup>
 
-              <div className="global-memory-toggle">
-                <span className="toggle-label">{t('memory.global_memory')}</span>
-                <Switch checked={globalMemoryEnabled} onChange={handleGlobalMemoryToggle} size="small" />
-              </div>
+              <SettingGroup style={{ marginTop: 5 }}>
+                <SettingTitle>{t('memory.user_management', 'User Management')}</SettingTitle>
+                <SettingDivider />
+                <Select
+                  value={currentUser}
+                  onChange={handleUserSwitch}
+                  style={{ width: '100%' }}
+                  placeholder={t('memory.select_user')}
+                  size="middle"
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <div style={{ padding: '8px 0', borderTop: '1px solid #f0f0f0' }}>
+                        <Button
+                          type="text"
+                          icon={<UserAddOutlined />}
+                          onClick={() => setAddUserModalVisible(true)}
+                          style={{ width: '100%', textAlign: 'left' }}>
+                          {t('memory.add_new_user')}
+                        </Button>
+                      </div>
+                    </>
+                  )}>
+                  <Option value={DEFAULT_USER_ID}>
+                    <Space>
+                      <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
+                        {getUserAvatar(DEFAULT_USER_ID)}
+                      </Avatar>
+                      <span>{t('memory.default_user')}</span>
+                    </Space>
+                  </Option>
+                  {uniqueUsers
+                    .filter((user) => user !== DEFAULT_USER_ID)
+                    .map((user) => (
+                      <Option key={user} value={user}>
+                        <Space>
+                          <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
+                            {getUserAvatar(user)}
+                          </Avatar>
+                          <span>{user}</span>
+                        </Space>
+                      </Option>
+                    ))}
+                </Select>
+              </SettingGroup>
 
-              <div className="section-title">{t('memory.user_management')}</div>
+              <SettingGroup style={{ marginTop: 5 }}>
+                <SettingTitle>{t('memory.statistics', 'Statistics')}</SettingTitle>
+                <SettingDivider />
+                <SettingRow>
+                  <SettingRowTitle>
+                    <UserOutlined style={{ marginRight: 8 }} />
+                    {getUserDisplayName(currentUser)}
+                  </SettingRowTitle>
+                </SettingRow>
+                <SettingRow>
+                  <SettingRowTitle>
+                    <Brain size={14} style={{ marginRight: 8 }} />
+                    {allMemories.length} {allMemories.length === 1 ? t('memory.memory') : t('memory.title')}
+                  </SettingRowTitle>
+                </SettingRow>
+                <SettingRow>
+                  <SettingRowTitle>
+                    <Users size={14} style={{ marginRight: 8 }} />
+                    {uniqueUsers.length} {t('memory.users', 'Users')}
+                  </SettingRowTitle>
+                </SettingRow>
+              </SettingGroup>
 
-              <Select
-                value={currentUser}
-                onChange={handleUserSwitch}
-                className="user-selector"
-                placeholder={t('memory.select_user')}
-                size="middle"
-                dropdownRender={(menu) => (
-                  <>
-                    {menu}
-                    <div style={{ padding: '8px 0', borderTop: '1px solid #f0f0f0' }}>
-                      <Button
-                        type="text"
-                        icon={<UserAddOutlined />}
-                        onClick={() => setAddUserModalVisible(true)}
-                        style={{ width: '100%', textAlign: 'left' }}>
-                        {t('memory.add_new_user')}
-                      </Button>
-                    </div>
-                  </>
-                )}>
-                <Option value={DEFAULT_USER_ID}>
-                  <Space>
-                    <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
-                      {getUserAvatar(DEFAULT_USER_ID)}
-                    </Avatar>
-                    <span>{t('memory.default_user')}</span>
-                  </Space>
-                </Option>
-                {uniqueUsers
-                  .filter((user) => user !== DEFAULT_USER_ID)
-                  .map((user) => (
-                    <Option key={user} value={user}>
-                      <Space>
-                        <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
-                          {getUserAvatar(user)}
-                        </Avatar>
-                        <span>{user}</span>
-                      </Space>
-                    </Option>
-                  ))}
-              </Select>
+              <SettingGroup>
+                <SettingTitle>{t('memory.search', 'Search')}</SettingTitle>
+                <SettingDivider />
+                <Input.Search
+                  placeholder={t('memory.search_placeholder')}
+                  size="middle"
+                  value={searchText}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  allowClear
+                  style={{ width: '100%' }}
+                />
+              </SettingGroup>
 
-              <div className="section-title">{t('memory.statistics')}</div>
-
-              <div className="stat-item">
-                <UserOutlined className="stat-icon" />
-                <span className="stat-text">{getUserDisplayName(currentUser)}</span>
-              </div>
-
-              <div className="stat-item">
-                <Brain size={14} className="stat-icon" />
-                <span className="stat-text">
-                  {allMemories.length} {allMemories.length === 1 ? t('memory.memory') : t('memory.title')}
-                </span>
-              </div>
-
-              <div className="stat-item">
-                <Users size={14} className="stat-icon" />
-                <span className="stat-text">
-                  {uniqueUsers.length} {t('memory.users')}
-                </span>
-              </div>
-
-              <div className="section-title">{t('memory.search')}</div>
-
-              <Input.Search
-                className="search-input"
-                placeholder={t('memory.search_placeholder')}
-                size="middle"
-                value={searchText}
-                onChange={(e) => handleSearch(e.target.value)}
-                allowClear
-              />
-
-              <div className="actions-section">
-                <Button
-                  className="action-button primary-action"
-                  icon={<PlusOutlined />}
-                  onClick={() => setAddMemoryModalVisible(true)}>
-                  {t('memory.add_memory')}
-                </Button>
-
-                <Button
-                  className="action-button secondary-action"
-                  icon={<SettingOutlined />}
-                  onClick={() => setSettingsModalVisible(true)}>
-                  {t('memory.settings')}
-                </Button>
-
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 'refresh',
-                        label: t('common.refresh'),
-                        icon: <ReloadOutlined />,
-                        onClick: () => loadMemories(currentUser)
-                      },
-                      {
-                        key: 'divider-reset',
-                        type: 'divider' as const
-                      },
-                      {
-                        key: 'reset',
-                        label: t('memory.reset_memories'),
-                        icon: <DeleteOutlined />,
-                        danger: true,
-                        onClick: () => handleResetMemories(currentUser)
-                      },
-                      ...(currentUser !== DEFAULT_USER_ID
-                        ? [
-                            {
-                              key: 'divider-1',
-                              type: 'divider' as const
-                            },
-                            {
-                              key: 'deleteUser',
-                              label: t('memory.delete_user'),
-                              icon: <UserDeleteOutlined />,
-                              danger: true,
-                              onClick: () => handleDeleteUser(currentUser)
-                            }
-                          ]
-                        : [])
-                    ]
-                  }}
-                  trigger={['click']}
-                  placement="bottomRight">
-                  <Button className="action-button secondary-action" icon={<MoreOutlined />}>
-                    {t('common.more')}
+              <SettingGroup>
+                <SettingTitle>{t('memory.actions', 'Actions')}</SettingTitle>
+                <SettingDivider />
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setAddMemoryModalVisible(true)}
+                    style={{ width: '100%' }}>
+                    {t('memory.add_memory')}
                   </Button>
-                </Dropdown>
-              </div>
-            </SideNavContent>
-          </SideNavScrollContainer>
+
+                  <Button
+                    icon={<SettingOutlined />}
+                    onClick={() => setSettingsModalVisible(true)}
+                    style={{ width: '100%' }}>
+                    {t('memory.settings', 'Settings')}
+                  </Button>
+
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 'refresh',
+                          label: t('common.refresh'),
+                          icon: <ReloadOutlined />,
+                          onClick: () => loadMemories(currentUser)
+                        },
+                        {
+                          key: 'divider-reset',
+                          type: 'divider' as const
+                        },
+                        {
+                          key: 'reset',
+                          label: t('memory.reset_memories'),
+                          icon: <DeleteOutlined />,
+                          danger: true,
+                          onClick: () => handleResetMemories(currentUser)
+                        },
+                        ...(currentUser !== DEFAULT_USER_ID
+                          ? [
+                              {
+                                key: 'divider-1',
+                                type: 'divider' as const
+                              },
+                              {
+                                key: 'deleteUser',
+                                label: t('memory.delete_user'),
+                                icon: <UserDeleteOutlined />,
+                                danger: true,
+                                onClick: () => handleDeleteUser(currentUser)
+                              }
+                            ]
+                          : [])
+                      ]
+                    }}
+                    trigger={['click']}
+                    placement="bottomRight">
+                    <Button icon={<MoreOutlined />} style={{ width: '100%' }}>
+                      {t('common.more', 'More')}
+                    </Button>
+                  </Dropdown>
+                </Space>
+              </SettingGroup>
+            </SettingContainer>
+          </ScrollContainer>
         </SideNav>
 
         {allMemories.length === 0 && !loading ? (
@@ -865,7 +879,7 @@ const MemoriesPage = () => {
   )
 }
 
-// Styled Components
+// Simplified Styled Components - keeping only essential ones
 const Container = styled.div`
   display: flex;
   flex: 1;
@@ -886,135 +900,28 @@ const SideNav = styled.div`
   padding: 12px 10px;
   display: flex;
   flex-direction: column;
-  background: var(--color-background);
 `
 
-const SideNavScrollContainer = styled(Scrollbar)`
+const ScrollContainer = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
   flex: 1;
-
-  > div {
-    margin-bottom: 8px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+  background-color: var(--color-background);
 `
 
-const SideNavContent = styled.div`
-  padding: 16px 0;
+const SettingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 5px;
+`
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    padding: 0 8px;
-  }
-
-  .global-memory-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    background: var(--color-background-soft);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: var(--color-background-hover);
-    }
-
-    .toggle-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--color-text);
-    }
-  }
-
-  .user-selector {
-    width: 100%;
-    margin-bottom: 16px;
-
-    .ant-select-selector {
-      border-radius: 8px;
-      background: var(--color-background-soft);
-      border: 1px solid var(--color-border);
-    }
-  }
-
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: var(--color-background-soft);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border: 1px solid var(--color-border);
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: var(--color-background-hover);
-    }
-
-    .stat-icon {
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-
-    .stat-text {
-      font-size: 13px;
-      color: var(--color-text);
-    }
-  }
-
-  .actions-section {
-    margin-top: 20px;
-
-    .action-button {
-      width: 100%;
-      margin-bottom: 8px;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-
-      &.primary-action {
-        background: var(--color-primary);
-        border: none;
-
-        &:hover {
-          background: var(--color-primary-hover);
-        }
-      }
-
-      &.secondary-action {
-        background: var(--color-background-soft);
-        border: 1px solid var(--color-border);
-        color: var(--color-text);
-
-        &:hover {
-          background: var(--color-background-hover);
-          border-color: var(--color-primary);
-        }
-      }
-    }
-  }
-
-  .search-input {
-    width: 100%;
-
-    .ant-input {
-      border-radius: 6px;
-      background: var(--color-background-soft);
-      border: 1px solid var(--color-border);
-    }
-  }
+const SettingGroup = styled.div<{ theme?: ThemeMode }>`
+  padding: 0 5px;
+  width: 100%;
+  margin-top: 0;
+  border-radius: 8px;
+  margin-bottom: 10px;
 `
 
 const MainContent = styled(Scrollbar)`

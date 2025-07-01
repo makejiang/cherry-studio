@@ -79,7 +79,7 @@ async function fetchExternalTool(
   const shouldSearchMemory = globalMemoryEnabled && assistant.enableMemory
 
   // 在工具链开始时发送进度通知
-  const willUseTools = shouldWebSearch || shouldKnowledgeSearch || shouldSearchMemory
+  const willUseTools = shouldWebSearch || shouldKnowledgeSearch
   if (willUseTools) {
     onChunkReceived({ type: ChunkType.EXTERNEL_TOOL_IN_PROGRESS })
   }
