@@ -12,6 +12,7 @@ import {
   Settings2,
   SquareTerminal,
   TextCursorInput,
+  Volume2,
   Zap
 } from 'lucide-react'
 // 导入useAppSelector
@@ -32,6 +33,7 @@ import QuickPhraseSettings from './QuickPhraseSettings'
 import SelectionAssistantSettings from './SelectionAssistantSettings/SelectionAssistantSettings'
 import ShortcutSettings from './ShortcutSettings'
 import ToolSettings from './ToolSettings'
+import TTSSettings from './TTSSettings'
 
 const SettingsPage: FC = () => {
   const { pathname } = useLocation()
@@ -63,6 +65,12 @@ const SettingsPage: FC = () => {
             <MenuItem className={isRoute('/settings/tool')}>
               <PencilRuler size={18} />
               {t('settings.tool.title')}
+            </MenuItem>
+          </MenuItemLink>
+          <MenuItemLink to="/settings/tts">
+            <MenuItem className={isRoute('/settings/tts')}>
+              <Volume2 size={18} />
+              {t('settings.tts.title')}
             </MenuItem>
           </MenuItemLink>
           <MenuItemLink to="/settings/mcp">
@@ -125,6 +133,7 @@ const SettingsPage: FC = () => {
             <Route path="provider" element={<ProvidersList />} />
             <Route path="model" element={<ModelSettings />} />
             <Route path="tool/*" element={<ToolSettings />} />
+            <Route path="tts" element={<TTSSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
             <Route path="general/*" element={<GeneralSettings />} />
             <Route path="display" element={<DisplaySettings />} />
