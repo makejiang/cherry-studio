@@ -106,7 +106,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
       label: p.isSystem ? t(`provider.${p.id}`) : p.name,
       title: p.name,
       options: sortBy(p.models, 'name')
-        .filter((model) => !isEmbeddingModel(model) && p.type === 'openai')
+        .filter((model) => !isEmbeddingModel(model) && !isRerankModel(model) && p.type === 'openai')
         .map((m) => ({
           label: m.name,
           value: getModelUniqId(m)

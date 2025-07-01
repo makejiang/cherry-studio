@@ -12,6 +12,7 @@ import {
   UserOutlined
 } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { Center } from '@renderer/components/Layout'
 import Scrollbar from '@renderer/components/Scrollbar'
 import MemoryService from '@renderer/services/MemoryService'
 import {
@@ -46,7 +47,6 @@ import styled from 'styled-components'
 
 import { SettingDivider, SettingRow, SettingRowTitle, SettingTitle } from '../settings'
 import MemoriesSettingsModal from './settings-modal'
-import { Center } from '@renderer/components/Layout'
 
 dayjs.extend(relativeTime)
 
@@ -379,10 +379,7 @@ const MemoriesPage = () => {
   const filteredMemories = useMemo(() => {
     return allMemories.filter((memory) => {
       // Search text filter
-      if (debouncedSearchText && !memory.memory.toLowerCase().includes(debouncedSearchText.toLowerCase())) {
-        return false
-      }
-      return true
+      return !(debouncedSearchText && !memory.memory.toLowerCase().includes(debouncedSearchText.toLowerCase()))
     })
   }, [allMemories, debouncedSearchText])
 
