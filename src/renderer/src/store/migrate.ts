@@ -1682,7 +1682,6 @@ const migrateConfig = {
           state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory']
         }
       }
-      s
       return state
     } catch (error) {
       return state
