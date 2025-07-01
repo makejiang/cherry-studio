@@ -260,11 +260,17 @@ export class MemoryProcessor {
    * @param userId - Optional user ID
    * @returns Memory processor configuration
    */
-  static getProcessorConfig(memoryConfig: MemoryConfig, assistantId?: string, userId?: string): MemoryProcessorConfig {
+  static getProcessorConfig(
+    memoryConfig: MemoryConfig,
+    assistantId?: string,
+    userId?: string,
+    lastMessageId?: string
+  ): MemoryProcessorConfig {
     return {
       memoryConfig,
       assistantId,
-      userId
+      userId,
+      lastMessageId
     }
   }
 }

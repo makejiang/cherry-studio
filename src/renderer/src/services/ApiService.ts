@@ -482,7 +482,13 @@ async function processConversationMemory(messages: Message[], assistant: Assista
       embedderModel
     }
 
-    const processorConfig = MemoryProcessor.getProcessorConfig(updatedMemoryConfig, assistant.id, currentUserId)
+    const lastUserMessage = findLast(messages, (m) => m.role === 'user')
+    const processorConfig = MemoryProcessor.getProcessorConfig(
+      updatedMemoryConfig,
+      assistant.id,
+      currentUserId,
+      lastUserMessage?.id
+    )
 
     console.log('Starting memory processing for conversation with', conversationMessages.length, 'messages')
     console.log('Using LLM model:', llmModel?.name, 'Embedding model:', embedderModel?.name)
