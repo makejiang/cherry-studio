@@ -135,7 +135,20 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
       onOk={form.submit}
       onCancel={onCancel}
       width={600}
-      confirmLoading={loading}>
+      centered
+      transitionName="animation-move-down"
+      confirmLoading={loading}
+      styles={{
+        header: {
+          borderBottom: '0.5px solid var(--color-border)',
+          paddingBottom: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0
+        },
+        body: {
+          paddingTop: 24
+        }
+      }}>
       <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
         <Form.Item
           label={t('memory.llm_model')}

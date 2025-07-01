@@ -47,6 +47,7 @@ import styled from 'styled-components'
 
 import { SettingDivider, SettingRow, SettingRowTitle, SettingTitle } from '../settings'
 import MemoriesSettingsModal from './settings-modal'
+import { Center } from '@renderer/components/Layout'
 
 dayjs.extend(relativeTime)
 
@@ -93,32 +94,30 @@ const AddMemoryModal: React.FC<AddMemoryModalProps> = ({ visible, onCancel, onAd
 
   return (
     <Modal
+      open={visible}
+      onCancel={onCancel}
+      width={600}
+      centered
+      transitionName="animation-move-down"
+      onOk={() => form.submit()}
+      okButtonProps={{ loading: loading }}
       title={
         <Space>
           <PlusOutlined style={{ color: 'var(--color-primary)' }} />
           <span>{t('memory.add_memory')}</span>
         </Space>
       }
-      open={visible}
-      onCancel={onCancel}
-      width={600}
       styles={{
         header: {
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 16
+          borderBottom: '0.5px solid var(--color-border)',
+          paddingBottom: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0
         },
         body: {
-          paddingTop: 24
+          paddingTop: 20
         }
-      }}
-      footer={[
-        <Button key="cancel" size="large" onClick={onCancel}>
-          {t('common.cancel')}
-        </Button>,
-        <Button key="submit" type="primary" size="large" loading={loading} onClick={() => form.submit()}>
-          {t('common.add')}
-        </Button>
-      ]}>
+      }}>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label={t('memory.memory_content')}
@@ -174,7 +173,7 @@ const EditMemoryModal: React.FC<EditMemoryModalProps> = ({ visible, memory, onCa
       width={600}
       styles={{
         header: {
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '0.5px solid var(--color-border)',
           paddingBottom: 16
         },
         body: {
@@ -243,24 +242,28 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ visible, onCancel, onAdd, e
 
   return (
     <Modal
+      open={visible}
+      onCancel={onCancel}
+      width={500}
+      centered
+      transitionName="animation-move-down"
+      styles={{
+        header: {
+          borderBottom: '0.5px solid var(--color-border)',
+          paddingBottom: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0
+        },
+        body: {
+          paddingTop: 24
+        }
+      }}
       title={
         <Space>
           <UserAddOutlined style={{ color: 'var(--color-primary)' }} />
           <span>{t('memory.add_user')}</span>
         </Space>
       }
-      open={visible}
-      onCancel={onCancel}
-      width={500}
-      styles={{
-        header: {
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 16
-        },
-        body: {
-          paddingTop: 24
-        }
-      }}
       footer={[
         <Button key="cancel" size="large" onClick={onCancel}>
           {t('common.cancel')}
@@ -512,7 +515,8 @@ const MemoriesPage = () => {
   }
 
   const handleResetMemories = async (userId: string) => {
-    Modal.confirm({
+    window.modal.confirm({
+      centered: true,
       title: t('memory.reset_memories_confirm_title'),
       content: t('memory.reset_memories_confirm_content', { user: getUserDisplayName(userId) }),
       icon: <ExclamationCircleOutlined />,
@@ -540,7 +544,8 @@ const MemoriesPage = () => {
       return
     }
 
-    Modal.confirm({
+    window.modal.confirm({
+      centered: true,
       title: t('memory.delete_user_confirm_title'),
       content: t('memory.delete_user_confirm_content', { user: userId }),
       icon: <ExclamationCircleOutlined />,
@@ -604,12 +609,17 @@ const MemoriesPage = () => {
                   dropdownRender={(menu) => (
                     <>
                       {menu}
-                      <div style={{ padding: '8px 0', borderTop: '1px solid #f0f0f0' }}>
+                      <div style={{ padding: '8px 0' }}>
                         <Button
                           type="text"
                           icon={<UserAddOutlined />}
                           onClick={() => setAddUserModalVisible(true)}
-                          style={{ width: '100%', textAlign: 'left' }}>
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start'
+                          }}>
                           {t('memory.add_new_user')}
                         </Button>
                       </div>
@@ -744,24 +754,26 @@ const MemoriesPage = () => {
 
         {allMemories.length === 0 && !loading ? (
           <MainContent>
-            <EmptyView>
-              <Brain size={48} className="empty-icon" />
-              <div className="empty-title">
-                {allMemories.length === 0 ? t('memory.no_memories') : t('memory.no_matching_memories')}
-              </div>
-              <div className="empty-description">
-                {allMemories.length === 0 ? t('memory.no_memories_description') : t('memory.try_different_filters')}
-              </div>
-              {allMemories.length === 0 && (
-                <Button
-                  type="primary"
-                  size="large"
-                  icon={<PlusOutlined />}
-                  onClick={() => setAddMemoryModalVisible(true)}>
-                  {t('memory.add_first_memory')}
-                </Button>
-              )}
-            </EmptyView>
+            <Center style={{ flex: 1 }}>
+              <EmptyView>
+                <Brain size={48} className="empty-icon" />
+                <div className="empty-title">
+                  {allMemories.length === 0 ? t('memory.no_memories') : t('memory.no_matching_memories')}
+                </div>
+                <div className="empty-description">
+                  {allMemories.length === 0 ? t('memory.no_memories_description') : t('memory.try_different_filters')}
+                </div>
+                {allMemories.length === 0 && (
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon={<PlusOutlined />}
+                    onClick={() => setAddMemoryModalVisible(true)}>
+                    {t('memory.add_first_memory')}
+                  </Button>
+                )}
+              </EmptyView>
+            </Center>
           </MainContent>
         ) : (
           <MainContent>
@@ -808,7 +820,8 @@ const MemoriesPage = () => {
                           icon: <DeleteOutlined />,
                           danger: true,
                           onClick: () => {
-                            Modal.confirm({
+                            window.modal.confirm({
+                              centered: true,
                               title: t('memory.delete_confirm'),
                               content: t('memory.delete_confirm_single'),
                               onOk: () => handleDeleteMemory(memory.id),
