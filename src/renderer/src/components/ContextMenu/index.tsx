@@ -1,40 +1,14 @@
 import { Dropdown } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
 interface ContextMenuProps {
   children: React.ReactNode
-  onContextMenu?: (e: React.MouseEvent) => void
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ children, onContextMenu }) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ children }) => {
   const { t } = useTranslation()
-  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null)
   const [selectedText, setSelectedText] = useState<string | undefined>(undefined)
-
-  const handleContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      const _selectedText = window.getSelection()?.toString()
-      if (_selectedText) {
-        setContextMenuPosition({ x: e.clientX, y: e.clientY })
-        setSelectedText(_selectedText)
-      }
-      onContextMenu?.(e)
-    },
-    [onContextMenu]
-  )
-
-  useEffect(() => {
-    const handleClick = () => {
-      setContextMenuPosition(null)
-    }
-    document.addEventListener('click', handleClick)
-    return () => {
-      document.removeEventListener('click', handleClick)
-    }
-  }, [])
 
   const contextMenuItems = useMemo(() => {
     if (!selectedText) return []
@@ -76,16 +50,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ children, onContextMenu }) =>
   }
 
   return (
-    <ContextContainer onContextMenu={handleContextMenu} className="context-menu-container">
-      {contextMenuPosition && (
-        <Dropdown onOpenChange={onOpenChange} menu={{ items: contextMenuItems }} trigger={['contextMenu']}>
-          {children}
-        </Dropdown>
-      )}
-    </ContextContainer>
+    <Dropdown onOpenChange={onOpenChange} menu={{ items: contextMenuItems }} trigger={['contextMenu']}>
+      {children}
+    </Dropdown>
   )
 }
-
-const ContextContainer = styled.div``
 
 export default ContextMenu
