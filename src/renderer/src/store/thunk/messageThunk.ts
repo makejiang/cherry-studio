@@ -594,6 +594,7 @@ const fetchAndProcessAssistantResponseImpl = async (
           const changes: Partial<CitationMessageBlock> = {
             response: externalToolResult.webSearch,
             knowledge: externalToolResult.knowledge,
+            memories: externalToolResult.memories,
             status: MessageBlockStatus.SUCCESS
           }
           dispatch(updateOneBlock({ id: citationBlockId, changes }))
