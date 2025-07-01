@@ -2108,9 +2108,7 @@
         "pause_support": {
           "title": "Enable Pause Function",
           "description": "Enable pause/resume for streaming audio (increases memory usage)"
-        },
-        "pause": "Pause",
-        "resume": "Resume"
+        }
       }
     },
     "translate": {
@@ -2463,7 +2461,15 @@
       "global_memory_disabled_desc": "To use memory features, please enable global memory in assistant settings first.",
       "not_configured_title": "Memory Not Configured",
       "not_configured_desc": "Please configure embedding and LLM models in memory settings to enable memory functionality.",
-      "go_to_memory_page": "Go to Memory Page"
+      "go_to_memory_page": "Go to Memory Page",
+      "settings_title": "Memory Settings",
+      "llm_model": "LLM Model",
+      "select_llm_model_required": "Please select an LLM model",
+      "select_llm_model_placeholder": "Select LLM Model",
+      "embedding_model": "Embedding Model",
+      "select_embedding_model_required": "Please select an embedding model",
+      "select_embedding_model_placeholder": "Select Embedding Model",
+      "embedding_dimensions": "Embedding Dimensions"
     }
   }
 }

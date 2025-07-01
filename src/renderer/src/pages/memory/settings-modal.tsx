@@ -5,9 +5,9 @@ import { getModelUniqId } from '@renderer/services/ModelService'
 import { selectMemoryConfig, updateMemoryConfig } from '@renderer/store/memory'
 import { getErrorMessage } from '@renderer/utils/error'
 import { Form, InputNumber, Modal, Select, Switch } from 'antd'
-import { t } from 'i18next'
 import { sortBy } from 'lodash'
 import { FC, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface MemoriesSettingsModalProps {
@@ -18,6 +18,7 @@ interface MemoriesSettingsModalProps {
 }
 
 const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubmit, onCancel, form }) => {
+  const { t } = useTranslation()
   const { providers } = useProviders()
   const dispatch = useDispatch()
   const memoryConfig = useSelector(selectMemoryConfig)
@@ -130,7 +131,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
   return (
     <Modal
-      title="Memory Settings"
+      title={t('memory.settings_title', 'Memory Settings')}
       open={visible}
       onOk={form.submit}
       onCancel={onCancel}
@@ -138,16 +139,24 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
       confirmLoading={loading}>
       <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
         <Form.Item
-          label="LLM Model"
+          label={t('memory.llm_model', 'LLM Model')}
           name="llmModel"
-          rules={[{ required: true, message: 'Please select an LLM model' }]}>
-          <Select placeholder="Select LLM Model" options={llmSelectOptions} />
+          rules={[{ required: true, message: t('memory.select_llm_model_required', 'Please select an LLM model') }]}>
+          <Select
+            placeholder={t('memory.select_llm_model_placeholder', 'Select LLM Model')}
+            options={llmSelectOptions}
+          />
         </Form.Item>
         <Form.Item
-          label="Embedding Model"
+          label={t('memory.embedding_model', 'Embedding Model')}
           name="embedderModel"
-          rules={[{ required: true, message: 'Please select an embedding model' }]}>
-          <Select placeholder="Select Embedding Model" options={embeddingSelectOptions} />
+          rules={[
+            { required: true, message: t('memory.select_embedding_model_required', 'Please select an embedding model') }
+          ]}>
+          <Select
+            placeholder={t('memory.select_embedding_model_placeholder', 'Select Embedding Model')}
+            options={embeddingSelectOptions}
+          />
         </Form.Item>
         <Form.Item
           label={t('knowledge.dimensions_auto_set')}
@@ -168,7 +177,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
         {!autoDims && (
           <Form.Item
-            label="Embedding Dimensions"
+            label={t('memory.embedding_dimensions', 'Embedding Dimensions')}
             name="embedderDimensions"
             rules={[
               {

@@ -2461,7 +2461,15 @@
       "statistics": "統計",
       "search": "搜尋",
       "actions": "操作",
-      "user_management": "使用者管理"
+      "user_management": "使用者管理",
+      "settings_title": "記憶設定",
+      "llm_model": "LLM 模型",
+      "select_llm_model_required": "請選擇一個 LLM 模型",
+      "select_llm_model_placeholder": "選擇 LLM 模型",
+      "embedding_model": "嵌入模型",
+      "select_embedding_model_required": "請選擇一個嵌入模型",
+      "select_embedding_model_placeholder": "選擇嵌入模型",
+      "embedding_dimensions": "嵌入維度"
     }
   }
 }

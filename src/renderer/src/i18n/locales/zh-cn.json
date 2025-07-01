@@ -2108,9 +2108,7 @@
         "pause_support": {
           "title": "启用暂停功能",
           "description": "为流式语音启用暂停/恢复功能（会增加内存使用）"
-        },
-        "pause": "暂停",
-        "resume": "恢复"
+        }
       }
     },
     "translate": {
@@ -2463,7 +2461,15 @@
       "global_memory_disabled_desc": "要使用记忆功能，请先在助手设置中启用全局记忆。",
       "not_configured_title": "记忆未配置",
       "not_configured_desc": "请在记忆设置中配置嵌入和LLM模型以启用记忆功能。",
-      "go_to_memory_page": "前往记忆页面"
+      "go_to_memory_page": "前往记忆页面",
+      "settings_title": "记忆设置",
+      "llm_model": "LLM 模型",
+      "select_llm_model_required": "请选择一个 LLM 模型",
+      "select_llm_model_placeholder": "选择 LLM 模型",
+      "embedding_model": "嵌入模型",
+      "select_embedding_model_required": "请选择一个嵌入模型",
+      "select_embedding_model_placeholder": "选择嵌入模型",
+      "embedding_dimensions": "嵌入维度"
     }
   }
 }

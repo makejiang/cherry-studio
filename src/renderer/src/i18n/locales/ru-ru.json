@@ -2461,7 +2461,15 @@
       "statistics": "Статистика",
       "search": "Поиск",
       "actions": "Действия",
-      "user_management": "Управление пользователями"
+      "user_management": "Управление пользователями",
+      "settings_title": "Настройки памяти",
+      "llm_model": "LLM модель",
+      "select_llm_model_required": "Пожалуйста, выберите LLM модель",
+      "select_llm_model_placeholder": "Выберите LLM модель",
+      "embedding_model": "Модель встраивания",
+      "select_embedding_model_required": "Пожалуйста, выберите модель встраивания",
+      "select_embedding_model_placeholder": "Выберите модель встраивания",
+      "embedding_dimensions": "Размер встраивания"
     }
   }
 }
