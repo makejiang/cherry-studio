@@ -130,7 +130,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
   return (
     <Modal
-      title="Memory Settings"
+      title={t('memory.settings_title')}
       open={visible}
       onOk={form.submit}
       onCancel={onCancel}
@@ -138,16 +138,16 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
       confirmLoading={loading}>
       <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
         <Form.Item
-          label="LLM Model"
+          label={t('memory.llm_model')}
           name="llmModel"
-          rules={[{ required: true, message: 'Please select an LLM model' }]}>
-          <Select placeholder="Select LLM Model" options={llmSelectOptions} />
+          rules={[{ required: true, message: t('memory.please_select_llm_model') }]}>
+          <Select placeholder={t('memory.select_llm_model_placeholder')} options={llmSelectOptions} />
         </Form.Item>
         <Form.Item
-          label="Embedding Model"
+          label={t('memory.embedding_model')}
           name="embedderModel"
-          rules={[{ required: true, message: 'Please select an embedding model' }]}>
-          <Select placeholder="Select Embedding Model" options={embeddingSelectOptions} />
+          rules={[{ required: true, message: t('memory.please_select_embedding_model') }]}>
+          <Select placeholder={t('memory.select_embedding_model_placeholder')} options={embeddingSelectOptions} />
         </Form.Item>
         <Form.Item
           label={t('knowledge.dimensions_auto_set')}
@@ -168,7 +168,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
         {!autoDims && (
           <Form.Item
-            label="Embedding Dimensions"
+            label={t('memory.embedding_dimensions')}
             name="embedderDimensions"
             rules={[
               {

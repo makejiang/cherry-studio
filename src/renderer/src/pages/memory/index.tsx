@@ -570,11 +570,7 @@ const MemoriesPage = () => {
 
   const handleGlobalMemoryToggle = (enabled: boolean) => {
     dispatch(setGlobalMemoryEnabled(enabled))
-    message.success(
-      enabled
-        ? t('memory.global_memory_enabled', 'Global memory has been enabled')
-        : t('memory.global_memory_disabled', 'Global memory has been disabled')
-    )
+    message.success(enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled'))
   }
 
   return (
@@ -586,14 +582,14 @@ const MemoriesPage = () => {
         <SideNav>
           <SideNavScrollContainer>
             <SideNavContent>
-              <div className="section-title">{t('memory.settings', 'Settings')}</div>
+              <div className="section-title">{t('memory.settings')}</div>
 
               <div className="global-memory-toggle">
-                <span className="toggle-label">{t('memory.global_memory', 'Global Memory')}</span>
+                <span className="toggle-label">{t('memory.global_memory')}</span>
                 <Switch checked={globalMemoryEnabled} onChange={handleGlobalMemoryToggle} size="small" />
               </div>
 
-              <div className="section-title">{t('memory.user_management', 'User Management')}</div>
+              <div className="section-title">{t('memory.user_management')}</div>
 
               <Select
                 value={currentUser}
@@ -637,7 +633,7 @@ const MemoriesPage = () => {
                   ))}
               </Select>
 
-              <div className="section-title">{t('memory.statistics', 'Statistics')}</div>
+              <div className="section-title">{t('memory.statistics')}</div>
 
               <div className="stat-item">
                 <UserOutlined className="stat-icon" />
@@ -654,11 +650,11 @@ const MemoriesPage = () => {
               <div className="stat-item">
                 <Users size={14} className="stat-icon" />
                 <span className="stat-text">
-                  {uniqueUsers.length} {t('memory.users', 'Users')}
+                  {uniqueUsers.length} {t('memory.users')}
                 </span>
               </div>
 
-              <div className="section-title">{t('memory.search', 'Search')}</div>
+              <div className="section-title">{t('memory.search')}</div>
 
               <Input.Search
                 className="search-input"
@@ -681,7 +677,7 @@ const MemoriesPage = () => {
                   className="action-button secondary-action"
                   icon={<SettingOutlined />}
                   onClick={() => setSettingsModalVisible(true)}>
-                  {t('memory.settings', 'Settings')}
+                  {t('memory.settings')}
                 </Button>
 
                 <Dropdown
@@ -724,7 +720,7 @@ const MemoriesPage = () => {
                   trigger={['click']}
                   placement="bottomRight">
                   <Button className="action-button secondary-action" icon={<MoreOutlined />}>
-                    {t('common.more', 'More')}
+                    {t('common.more')}
                   </Button>
                 </Dropdown>
               </div>
@@ -825,7 +821,7 @@ const MemoriesPage = () => {
                   total={filteredMemories.length}
                   onChange={handlePageChange}
                   showSizeChanger
-                  showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} memories`}
+                  showTotal={(total, range) => t('memory.pagination_total', { start: range[0], end: range[1], total })}
                   pageSizeOptions={['20', '50', '100', '200']}
                   defaultPageSize={50}
                 />

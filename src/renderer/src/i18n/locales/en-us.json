@@ -2312,7 +2312,22 @@
       "global_memory_disabled_desc": "To use memory features, please enable global memory in assistant settings first.",
       "not_configured_title": "Memory Not Configured",
       "not_configured_desc": "Please configure embedding and LLM models in memory settings to enable memory functionality.",
-      "go_to_memory_page": "Go to Memory Page"
+      "go_to_memory_page": "Go to Memory Page",
+      "settings": "Settings",
+      "user_management": "User Management",
+      "statistics": "Statistics",
+      "search": "Search",
+      "initial_memory_content": "Welcome! This is your first memory.",
+      "loading": "Loading memories...",
+      "settings_title": "Memory Settings",
+      "llm_model": "LLM Model",
+      "please_select_llm_model": "Please select an LLM model",
+      "select_llm_model_placeholder": "Select LLM Model",
+      "embedding_model": "Embedding Model",
+      "please_select_embedding_model": "Please select an embedding model",
+      "select_embedding_model_placeholder": "Select Embedding Model",
+      "embedding_dimensions": "Embedding Dimensions",
+      "stored_memories": "Stored Memories"
     }
   }
 }

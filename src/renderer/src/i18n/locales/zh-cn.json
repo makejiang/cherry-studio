@@ -2312,7 +2312,22 @@
       "global_memory_disabled_desc": "要使用记忆功能，请先在助手设置中启用全局记忆。",
       "not_configured_title": "记忆未配置",
       "not_configured_desc": "请在记忆设置中配置嵌入和LLM模型以启用记忆功能。",
-      "go_to_memory_page": "前往记忆页面"
+      "go_to_memory_page": "前往记忆页面",
+      "settings": "设置",
+      "user_management": "用户管理",
+      "statistics": "统计",
+      "search": "搜索",
+      "initial_memory_content": "欢迎！这是您的第一条记忆。",
+      "loading": "正在加载记忆...",
+      "settings_title": "记忆设置",
+      "llm_model": "LLM 模型",
+      "please_select_llm_model": "请选择 LLM 模型",
+      "select_llm_model_placeholder": "选择 LLM 模型",
+      "embedding_model": "嵌入模型",
+      "please_select_embedding_model": "请选择嵌入模型",
+      "select_embedding_model_placeholder": "选择嵌入模型",
+      "embedding_dimensions": "嵌入维度",
+      "stored_memories": "已存储记忆"
     }
   }
 }

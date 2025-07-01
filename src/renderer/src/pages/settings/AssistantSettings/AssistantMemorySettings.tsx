@@ -72,12 +72,8 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
     <Container>
       <HeaderContainer>
         <Box style={{ fontWeight: 'bold', fontSize: '14px' }}>
-          {t('memory.title', 'Memory')}
-          <Tooltip
-            title={t(
-              'memory.description',
-              'Enable memory to help the assistant remember facts and context from conversations'
-            )}>
+          {t('memory.title')}
+          <Tooltip title={t('memory.description')}>
             <InfoIcon />
           </Tooltip>
         </Box>
@@ -88,9 +84,9 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
           <Tooltip
             title={
               !globalMemoryEnabled
-                ? t('memory.enable_global_memory_first', 'Please enable global memory in the Memory page first')
+                ? t('memory.enable_global_memory_first')
                 : !isMemoryConfigured
-                  ? t('memory.configure_memory_first', 'Please configure memory models first')
+                  ? t('memory.configure_memory_first')
                   : ''
             }>
             <Switch
@@ -105,16 +101,13 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
       {!globalMemoryEnabled && (
         <Alert
           type="warning"
-          message={t('memory.global_memory_disabled_title', 'Global Memory Disabled')}
-          description={t(
-            'memory.global_memory_disabled_desc',
-            'Global memory is currently disabled. Please enable it in the Memory page to use memory functionality.'
-          )}
+          message={t('memory.global_memory_disabled_title')}
+          description={t('memory.global_memory_disabled_desc')}
           showIcon
           style={{ marginBottom: 16 }}
           action={
             <Button size="small" onClick={handleNavigateToMemory}>
-              {t('memory.go_to_memory_page', 'Go to Memory Page')}
+              {t('memory.go_to_memory_page')}
             </Button>
           }
         />
@@ -123,11 +116,8 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
       {globalMemoryEnabled && !isMemoryConfigured && (
         <Alert
           type="warning"
-          message={t('memory.not_configured_title', 'Memory Not Configured')}
-          description={t(
-            'memory.not_configured_desc',
-            'Please configure embedding and LLM models in memory settings to enable memory functionality.'
-          )}
+          message={t('memory.not_configured_title')}
+          description={t('memory.not_configured_desc')}
           showIcon
           style={{ marginBottom: 16 }}
         />
@@ -136,18 +126,18 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
       <Card size="small" style={{ marginBottom: 16 }}>
         <Space direction="vertical" style={{ width: '100%' }}>
           <div>
-            <Text strong>{t('memory.stored_memories', 'Stored Memories')}: </Text>
+            <Text strong>{t('memory.stored_memories')}: </Text>
             <Text>{memoryStats.loading ? t('common.loading') : memoryStats.count}</Text>
           </div>
           {memoryConfig.embedderModel && (
             <div>
-              <Text strong>{t('memory.embedding_model', 'Embedding Model')}: </Text>
+              <Text strong>{t('memory.embedding_model')}: </Text>
               <Text code>{memoryConfig.embedderModel.name}</Text>
             </div>
           )}
           {memoryConfig.llmModel && (
             <div>
-              <Text strong>{t('memory.llm_model', 'LLM Model')}: </Text>
+              <Text strong>{t('memory.llm_model')}: </Text>
               <Text code>{memoryConfig.llmModel.name}</Text>
             </div>
           )}
