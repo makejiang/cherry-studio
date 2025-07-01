@@ -1,7 +1,7 @@
 import { type MCPTool } from '@renderer/types'
 import { describe, expect, it } from 'vitest'
 
-import { AvailableTools, buildSystemPrompt } from '../prompt'
+import { AvailableTools, buildSystemPromptWithTools } from '../prompt'
 
 describe('prompt', () => {
   describe('AvailableTools', () => {
@@ -34,7 +34,7 @@ describe('prompt', () => {
       const tools = [
         { id: 'test-tool', description: 'Test tool description', inputSchema: { type: 'object' } } as MCPTool
       ]
-      const result = await buildSystemPrompt(userPrompt, tools)
+      const result = await buildSystemPromptWithTools(userPrompt, tools)
 
       expect(result).toContain(userPrompt)
       expect(result).toContain('test-tool')
@@ -43,7 +43,7 @@ describe('prompt', () => {
 
     it('should return user prompt without tools', async () => {
       const userPrompt = 'Custom user system prompt'
-      const result = await buildSystemPrompt(userPrompt, [])
+      const result = await buildSystemPromptWithTools(userPrompt, [])
 
       expect(result).toBe(userPrompt)
     })
@@ -54,12 +54,12 @@ describe('prompt', () => {
       ]
 
       // 测试 userPrompt 为 null 的情况
-      const resultNull = buildSystemPrompt(null as any, tools)
+      const resultNull = buildSystemPromptWithTools(null as any, tools)
       expect(resultNull).toBeDefined()
       expect(resultNull).not.toContain('{{ USER_SYSTEM_PROMPT }}')
 
       // 测试 userPrompt 为 undefined 的情况
-      const resultUndefined = buildSystemPrompt(undefined as any, tools)
+      const resultUndefined = buildSystemPromptWithTools(undefined as any, tools)
       expect(resultUndefined).toBeDefined()
       expect(resultUndefined).not.toContain('{{ USER_SYSTEM_PROMPT }}')
     })
