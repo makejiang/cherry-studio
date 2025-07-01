@@ -1721,6 +1721,20 @@ const migrateConfig = {
       return state
     }
   },
+  '118': (state: RootState) => {
+    try {
+      // migrate to enable memory feature on sidebar
+      if (state.settings && state.settings.sidebarIcons) {
+        // Check if 'memory' is not already in visible icons
+        if (!state.settings.sidebarIcons.visible.includes('memory')) {
+          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory']
+        }
+      }
+      return state
+    } catch (error) {
+      return state
+    }
+  },
   '119': (state: RootState) => {
     try {
       // 完整的 TTS 功能初始化和所有提供商添加
