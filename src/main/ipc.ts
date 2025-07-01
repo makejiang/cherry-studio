@@ -32,6 +32,7 @@ import { searchService } from './services/SearchService'
 import { SelectionService } from './services/SelectionService'
 import { registerShortcuts, unregisterAllShortcuts } from './services/ShortcutService'
 import storeSyncService from './services/StoreSyncService'
+import { TencentCloudTTSService } from './services/TencentCloudTTSService'
 import { themeService } from './services/ThemeService'
 import VertexAIService from './services/VertexAIService'
 import { setOpenLinkExternal } from './services/WebviewService'
@@ -45,6 +46,7 @@ const fileManager = new FileStorage()
 const backupManager = new BackupManager()
 const exportService = new ExportService(fileManager)
 const obsidianVaultService = new ObsidianVaultService()
+const tencentCloudTTSService = new TencentCloudTTSService()
 const vertexAIService = VertexAIService.getInstance()
 const memoryService = MemoryService.getInstance()
 const dxtService = new DxtService()
@@ -580,6 +582,23 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
 
   // store sync
   storeSyncService.registerIpcHandler()
+
+  // Tencent Cloud TTS
+  ipcMain.handle(IpcChannel.TencentTTS_SynthesizeSpeech, async (_, options) => {
+    return await tencentCloudTTSService.synthesizeSpeech(options)
+  })
+  ipcMain.handle(
+    IpcChannel.TencentTTS_TestConnection,
+    async (_, secretId: string, secretKey: string, region: string) => {
+      return await tencentCloudTTSService.testConnection(secretId, secretKey, region)
+    }
+  )
+  ipcMain.handle(IpcChannel.TencentTTS_GetVoices, () => {
+    return tencentCloudTTSService.getSupportedVoices()
+  })
+  ipcMain.handle(IpcChannel.TencentTTS_GetRegions, () => {
+    return tencentCloudTTSService.getSupportedRegions()
+  })
 
   // selection assistant
   SelectionService.registerIpcHandler()
