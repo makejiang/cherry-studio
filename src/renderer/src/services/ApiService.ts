@@ -1,4 +1,5 @@
 import { CompletionsParams } from '@renderer/aiCore/middleware/schemas'
+import { SYSTEM_PROMPT_THRESHOLD } from '@renderer/config/constant'
 import Logger from '@renderer/config/logger'
 import {
   isEmbeddingModel,
@@ -34,6 +35,7 @@ import { removeSpecialCharactersForTopicName } from '@renderer/utils'
 import { isAbortError } from '@renderer/utils/error'
 import { extractInfoFromXML, ExtractResults } from '@renderer/utils/extract'
 import { findFileBlocks, getMainTextContent } from '@renderer/utils/messageUtils/find'
+import { buildSystemPromptWithThinkTool, buildSystemPromptWithTools } from '@renderer/utils/prompt'
 import { findLast, isEmpty, takeRight } from 'lodash'
 
 import AiProvider from '../aiCore'
@@ -256,7 +258,7 @@ async function fetchExternalTool(
     }
 
     // Get MCP tools (Fix duplicate declaration)
-    let mcpTools: MCPTool[] = [] // Initialize as empty array
+    let mcpTools: MCPTool[] = []
     const allMcpServers = store.getState().mcp.servers || []
     const activedMcpServers = allMcpServers.filter((s) => s.isActive)
     const assistantMcpServers = assistant.mcpServers || []
@@ -279,6 +281,15 @@ async function fetchExternalTool(
           .filter((result): result is PromiseFulfilledResult<MCPTool[]> => result.status === 'fulfilled')
           .map((result) => result.value)
           .flat()
+        // 添加内置工具
+        const { BUILT_IN_TOOLS } = await import('../tools')
+        mcpTools.push(...BUILT_IN_TOOLS)
+        assistant.prompt = buildSystemPromptWithThinkTool(assistant.prompt)
+
+        // 将系统提示词的修改提前到这里，避免重复代码
+        if (assistant.settings?.toolUseMode === 'prompt' || mcpTools.length > SYSTEM_PROMPT_THRESHOLD) {
+          assistant.prompt = buildSystemPromptWithTools(assistant.prompt, mcpTools)
+        }
       } catch (toolError) {
         console.error('Error fetching MCP tools:', toolError)
       }

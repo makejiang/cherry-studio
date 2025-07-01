@@ -67,7 +67,6 @@ import {
   mcpToolsToAnthropicTools
 } from '@renderer/utils/mcp-tools'
 import { findFileBlocks, findImageBlocks } from '@renderer/utils/messageUtils/find'
-import { buildSystemPrompt } from '@renderer/utils/prompt'
 
 import { BaseApiClient } from '../BaseApiClient'
 import { AnthropicStreamListener, RawStreamListener, RequestTransformer, ResponseChunkTransformer } from '../types'
@@ -446,7 +445,7 @@ export class AnthropicAPIClient extends BaseApiClient<
       }> => {
         const { messages, mcpTools, maxTokens, streamOutput, enableWebSearch } = coreRequest
         // 1. 处理系统消息
-        let systemPrompt = assistant.prompt
+        const systemPrompt = assistant.prompt
 
         // 2. 设置工具
         const { tools } = this.setupToolsConfig({
@@ -454,10 +453,6 @@ export class AnthropicAPIClient extends BaseApiClient<
           model,
           enableToolUse: isEnabledToolUse(assistant)
         })
-
-        if (this.useSystemPromptForTools) {
-          systemPrompt = await buildSystemPrompt(systemPrompt, mcpTools, assistant)
-        }
 
         const systemMessage: TextBlockParam | undefined = systemPrompt
           ? { type: 'text', text: systemPrompt }
