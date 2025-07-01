@@ -172,7 +172,7 @@ const TranslateSettings: FC<{
         </div>
 
         <div>
-          <Flex align="center" justify="space-between" style={{ marginBottom: 8 }}>
+          <Flex align="center" justify="space-between">
             <div style={{ fontWeight: 500 }}>
               <HStack alignItems="center" gap={5}>
                 {t('translate.settings.bidirectional')}
@@ -185,8 +185,8 @@ const TranslateSettings: FC<{
             </div>
             <Switch checked={isBidirectional} onChange={setIsBidirectional} />
           </Flex>
-          <Space direction="vertical" style={{ width: '100%' }}>
-            {isBidirectional && (
+          {isBidirectional && (
+            <Space direction="vertical" style={{ width: '100%', marginTop: 8 }}>
               <Flex align="center" justify="space-between" gap={10}>
                 <Select
                   style={{ flex: 1 }}
@@ -224,8 +224,8 @@ const TranslateSettings: FC<{
                   suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
                 />
               </Flex>
-            )}
-          </Space>
+            </Space>
+          )}
         </div>
 
         <div>
