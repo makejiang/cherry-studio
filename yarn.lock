@@ -3198,6 +3198,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendal/lib-darwin-arm64@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-darwin-arm64@npm:0.47.11"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-darwin-x64@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-darwin-x64@npm:0.47.11"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-linux-arm64-gnu@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-linux-arm64-gnu@npm:0.47.11"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-linux-arm64-musl@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-linux-arm64-musl@npm:0.47.11"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-linux-x64-gnu@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-linux-x64-gnu@npm:0.47.11"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-win32-arm64-msvc@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-win32-arm64-msvc@npm:0.47.11"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@opendal/lib-win32-x64-msvc@npm:0.47.11":
+  version: 0.47.11
+  resolution: "@opendal/lib-win32-x64-msvc@npm:0.47.11"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@parcel/watcher-android-arm64@npm:2.5.1":
   version: 2.5.1
   resolution: "@parcel/watcher-android-arm64@npm:2.5.1"
@@ -4747,6 +4796,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/word-extractor@npm:^1":
+  version: 1.0.6
+  resolution: "@types/word-extractor@npm:1.0.6"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/84f89c458213db5aec4d6badad14e0f2c07ac4b92f16165d19a95548f2b98fd5fff00419d49547464cb75c9432b5e9cb3b452d75eb5f07d808e31b44be390453
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.4":
   version: 8.18.1
   resolution: "@types/ws@npm:8.18.1"
@@ -5635,6 +5693,7 @@ __metadata:
     "@types/react-infinite-scroll-component": "npm:^5.0.0"
     "@types/react-window": "npm:^1"
     "@types/tinycolor2": "npm:^1"
+    "@types/word-extractor": "npm:^1"
     "@uiw/codemirror-extensions-langs": "npm:^4.23.12"
     "@uiw/codemirror-themes-all": "npm:^4.23.12"
     "@uiw/react-codemirror": "npm:^4.23.12"
@@ -5644,12 +5703,13 @@ __metadata:
     "@vitest/ui": "npm:^3.1.4"
     "@vitest/web-worker": "npm:^3.1.4"
     "@xyflow/react": "npm:^12.4.4"
-    antd: "npm:^5.22.5"
+    antd: "patch:antd@npm%3A5.24.7#~/.yarn/patches/antd-npm-5.24.7-356a553ae5.patch"
     archiver: "npm:^7.0.1"
     async-mutex: "npm:^0.5.0"
     axios: "npm:^1.7.3"
     browser-image-compression: "npm:^2.0.2"
     color: "npm:^5.0.0"
+    country-flag-emoji-polyfill: "npm:0.1.8"
     dayjs: "npm:^1.11.11"
     dexie: "npm:^4.0.8"
     dexie-react-hooks: "npm:^1.1.7"
@@ -5695,6 +5755,7 @@ __metadata:
     npx-scope-finder: "npm:^1.2.0"
     officeparser: "npm:^4.1.1"
     openai: "patch:openai@npm%3A5.1.0#~/.yarn/patches/openai-npm-5.1.0-0e7b3ccb07.patch"
+    opendal: "npm:0.47.11"
     os-proxy-config: "npm:^1.1.2"
     p-queue: "npm:^8.1.0"
     playwright: "npm:^1.52.0"
@@ -5706,7 +5767,7 @@ __metadata:
     react-hotkeys-hook: "npm:^4.6.1"
     react-i18next: "npm:^14.1.2"
     react-infinite-scroll-component: "npm:^6.1.0"
-    react-markdown: "npm:^9.0.1"
+    react-markdown: "npm:^10.1.0"
     react-redux: "npm:^9.1.2"
     react-router: "npm:^7.6.2"
     react-router-dom: "npm:^7.6.2"
@@ -5715,10 +5776,10 @@ __metadata:
     redux: "npm:^5.0.1"
     redux-persist: "npm:^6.0.0"
     rehype-katex: "npm:^7.0.1"
-    rehype-mathjax: "npm:^7.0.0"
+    rehype-mathjax: "npm:^7.1.0"
     rehype-raw: "npm:^7.0.0"
-    remark-cjk-friendly: "npm:^1.1.0"
-    remark-gfm: "npm:^4.0.0"
+    remark-cjk-friendly: "npm:^1.2.0"
+    remark-gfm: "npm:^4.0.1"
     remark-math: "npm:^6.0.0"
     remove-markdown: "npm:^0.6.2"
     rollup-plugin-visualizer: "npm:^5.12.0"
@@ -5729,13 +5790,14 @@ __metadata:
     styled-components: "npm:^6.1.11"
     tar: "npm:^7.4.3"
     tiny-pinyin: "npm:^1.3.2"
-    tokenx: "npm:^0.4.1"
+    tokenx: "npm:^1.1.0"
     turndown: "npm:7.2.0"
     typescript: "npm:^5.6.2"
     uuid: "npm:^10.0.0"
     vite: "npm:6.2.6"
     vitest: "npm:^3.1.4"
     webdav: "npm:^5.8.0"
+    word-extractor: "npm:^1.0.4"
     zipread: "npm:^1.3.3"
   languageName: unknown
   linkType: soft
@@ -5933,7 +5995,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"antd@npm:^5.22.5":
+"antd@npm:5.24.7":
   version: 5.24.7
   resolution: "antd@npm:5.24.7"
   dependencies:
@@ -5990,6 +6052,66 @@ __metadata:
     react: ">=16.9.0"
     react-dom: ">=16.9.0"
   checksum: 10c0/d9b6d24cf0c74c3d22b5f799158694aba946e1971b0c1602b3319c85663b5ba6fc7b2135c91a0839d13ecd28a1643c5eb84de8a2586b8362e5a3a166c709b1ed
+  languageName: node
+  linkType: hard
+
+"antd@patch:antd@npm%3A5.24.7#~/.yarn/patches/antd-npm-5.24.7-356a553ae5.patch":
+  version: 5.24.7
+  resolution: "antd@patch:antd@npm%3A5.24.7#~/.yarn/patches/antd-npm-5.24.7-356a553ae5.patch::version=5.24.7&hash=ff9154"
+  dependencies:
+    "@ant-design/colors": "npm:^7.2.0"
+    "@ant-design/cssinjs": "npm:^1.23.0"
+    "@ant-design/cssinjs-utils": "npm:^1.1.3"
+    "@ant-design/fast-color": "npm:^2.0.6"
+    "@ant-design/icons": "npm:^5.6.1"
+    "@ant-design/react-slick": "npm:~1.1.2"
+    "@babel/runtime": "npm:^7.26.0"
+    "@rc-component/color-picker": "npm:~2.0.1"
+    "@rc-component/mutate-observer": "npm:^1.1.0"
+    "@rc-component/qrcode": "npm:~1.0.0"
+    "@rc-component/tour": "npm:~1.15.1"
+    "@rc-component/trigger": "npm:^2.2.6"
+    classnames: "npm:^2.5.1"
+    copy-to-clipboard: "npm:^3.3.3"
+    dayjs: "npm:^1.11.11"
+    rc-cascader: "npm:~3.33.1"
+    rc-checkbox: "npm:~3.5.0"
+    rc-collapse: "npm:~3.9.0"
+    rc-dialog: "npm:~9.6.0"
+    rc-drawer: "npm:~7.2.0"
+    rc-dropdown: "npm:~4.2.1"
+    rc-field-form: "npm:~2.7.0"
+    rc-image: "npm:~7.11.1"
+    rc-input: "npm:~1.8.0"
+    rc-input-number: "npm:~9.5.0"
+    rc-mentions: "npm:~2.20.0"
+    rc-menu: "npm:~9.16.1"
+    rc-motion: "npm:^2.9.5"
+    rc-notification: "npm:~5.6.3"
+    rc-pagination: "npm:~5.1.0"
+    rc-picker: "npm:~4.11.3"
+    rc-progress: "npm:~4.0.0"
+    rc-rate: "npm:~2.13.1"
+    rc-resize-observer: "npm:^1.4.3"
+    rc-segmented: "npm:~2.7.0"
+    rc-select: "npm:~14.16.6"
+    rc-slider: "npm:~11.1.8"
+    rc-steps: "npm:~6.0.1"
+    rc-switch: "npm:~4.1.0"
+    rc-table: "npm:~7.50.4"
+    rc-tabs: "npm:~15.5.2"
+    rc-textarea: "npm:~1.10.0"
+    rc-tooltip: "npm:~6.4.0"
+    rc-tree: "npm:~5.13.1"
+    rc-tree-select: "npm:~5.27.0"
+    rc-upload: "npm:~4.8.1"
+    rc-util: "npm:^5.44.4"
+    scroll-into-view-if-needed: "npm:^3.1.0"
+    throttle-debounce: "npm:^5.0.2"
+  peerDependencies:
+    react: ">=16.9.0"
+    react-dom: ">=16.9.0"
+  checksum: 10c0/e46e36f151ba0f2eef1190aaf772cbe2ab947de7d832aef2d872f6a28203a134e4ee71aa6f7a7c4c57979bf1955f1b4adfae733aca06f0e740a6b54a59d45a19
   languageName: node
   linkType: hard
 
@@ -7317,6 +7439,13 @@ __metadata:
   dependencies:
     layout-base: "npm:^2.0.0"
   checksum: 10c0/14b9f8100ac322a00777ffb1daeb3321af368bbc9cabe3103943361273baee2003202ffe38e4ab770960b600214224e9c196195a78d589521540aa694df7cdec
+  languageName: node
+  linkType: hard
+
+"country-flag-emoji-polyfill@npm:0.1.8":
+  version: 0.1.8
+  resolution: "country-flag-emoji-polyfill@npm:0.1.8"
+  checksum: 10c0/aac74de7df236bfc64d33438e29ab4c9eec314370b48f2e7aabb052a57fd3bc939e41afdcad0069987f18509aaf4b34d9e44327d0284fa2afabe97129f25cd89
   languageName: node
   linkType: hard
 
@@ -12760,9 +12889,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromark-extension-cjk-friendly-util@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "micromark-extension-cjk-friendly-util@npm:1.1.0"
+"micromark-extension-cjk-friendly-util@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "micromark-extension-cjk-friendly-util@npm:2.0.0"
   dependencies:
     get-east-asian-width: "npm:^1.3.0"
     micromark-util-character: "npm:^2.0.0"
@@ -12770,16 +12899,16 @@ __metadata:
   peerDependenciesMeta:
     micromark-util-types:
       optional: true
-  checksum: 10c0/3ae1d4fd92f03a6c8e34e314c14a42b35cdd1bcbe043fceb1d2d45cd1a7b364e77643a3ca181910666cb11cc3606a1595fae9a15e87b0a4988fc57d5e4f65f67
+  checksum: 10c0/194c799d88982ebf785e65a1c29cbded17d5dd3510a1769123ec30ddb7e256502b97753f63e8994d91ebafa1e9b96aa2dc2a90aa4e2f2072269b05652a412886
   languageName: node
   linkType: hard
 
-"micromark-extension-cjk-friendly@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "micromark-extension-cjk-friendly@npm:1.1.0"
+"micromark-extension-cjk-friendly@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "micromark-extension-cjk-friendly@npm:1.2.0"
   dependencies:
     devlop: "npm:^1.0.0"
-    micromark-extension-cjk-friendly-util: "npm:^1.1.0"
+    micromark-extension-cjk-friendly-util: "npm:^2.0.0"
     micromark-util-chunked: "npm:^2.0.0"
     micromark-util-resolve-all: "npm:^2.0.0"
     micromark-util-symbol: "npm:^2.0.0"
@@ -12789,7 +12918,7 @@ __metadata:
   peerDependenciesMeta:
     micromark-util-types:
       optional: true
-  checksum: 10c0/95be6d8b4164b9b3b5281d77ed4f9337d95b2041ad4f7a775baa0d7f8ec495818101881eea2c7cc0ee4ee11738716899f20b3fbfbc2e6b80106544065d2ec04d
+  checksum: 10c0/5be1841629310e21c803b64feb00453fb8ac939be80c2ff473d8b4486d8eca973347520912a6e4abeda5bea4ed8ef39d3db48c4bad8285dd380d9ed34417dd0d
   languageName: node
   linkType: hard
 
@@ -14153,6 +14282,36 @@ __metadata:
   version: 12.1.3
   resolution: "openapi-types@npm:12.1.3"
   checksum: 10c0/4ad4eb91ea834c237edfa6ab31394e87e00c888fc2918009763389c00d02342345195d6f302d61c3fd807f17723cd48df29b47b538b68375b3827b3758cd520f
+  languageName: node
+  linkType: hard
+
+"opendal@npm:0.47.11":
+  version: 0.47.11
+  resolution: "opendal@npm:0.47.11"
+  dependencies:
+    "@opendal/lib-darwin-arm64": "npm:0.47.11"
+    "@opendal/lib-darwin-x64": "npm:0.47.11"
+    "@opendal/lib-linux-arm64-gnu": "npm:0.47.11"
+    "@opendal/lib-linux-arm64-musl": "npm:0.47.11"
+    "@opendal/lib-linux-x64-gnu": "npm:0.47.11"
+    "@opendal/lib-win32-arm64-msvc": "npm:0.47.11"
+    "@opendal/lib-win32-x64-msvc": "npm:0.47.11"
+  dependenciesMeta:
+    "@opendal/lib-darwin-arm64":
+      optional: true
+    "@opendal/lib-darwin-x64":
+      optional: true
+    "@opendal/lib-linux-arm64-gnu":
+      optional: true
+    "@opendal/lib-linux-arm64-musl":
+      optional: true
+    "@opendal/lib-linux-x64-gnu":
+      optional: true
+    "@opendal/lib-win32-arm64-msvc":
+      optional: true
+    "@opendal/lib-win32-x64-msvc":
+      optional: true
+  checksum: 10c0/0783da2651bb27ac693ce38938d12b00124530fb965364517eef3de17b3ff898cdecf06260a79a7d70745d57c2ba952a753a4bab52e0831aa7232c3a69120225
   languageName: node
   linkType: hard
 
@@ -15650,9 +15809,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-markdown@npm:^9.0.1":
-  version: 9.1.0
-  resolution: "react-markdown@npm:9.1.0"
+"react-markdown@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "react-markdown@npm:10.1.0"
   dependencies:
     "@types/hast": "npm:^3.0.0"
     "@types/mdast": "npm:^4.0.0"
@@ -15668,7 +15827,7 @@ __metadata:
   peerDependencies:
     "@types/react": ">=18"
     react: ">=18"
-  checksum: 10c0/5bd645d39379f776d64588105f4060c390c3c8e4ff048552c9fa0ad31b756bb3ff7c11081542dc58d840ccf183a6dd4fd4d4edab44d8c24dee8b66551a5fd30d
+  checksum: 10c0/4a5dc7d15ca6d05e9ee95318c1904f83b111a76f7588c44f50f1d54d4c97193b84e4f64c4b592057c989228238a2590306cedd0c4d398e75da49262b2b5ae1bf
   languageName: node
   linkType: hard
 
@@ -15958,7 +16117,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rehype-mathjax@npm:^7.0.0":
+"rehype-mathjax@npm:^7.1.0":
   version: 7.1.0
   resolution: "rehype-mathjax@npm:7.1.0"
   dependencies:
@@ -15985,18 +16144,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-cjk-friendly@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "remark-cjk-friendly@npm:1.1.0"
+"remark-cjk-friendly@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "remark-cjk-friendly@npm:1.2.0"
   dependencies:
-    micromark-extension-cjk-friendly: "npm:^1.1.0"
+    micromark-extension-cjk-friendly: "npm:^1.2.0"
   peerDependencies:
     "@types/mdast": ^4.0.0
     unified: ^11.0.0
   peerDependenciesMeta:
     "@types/mdast":
       optional: true
-  checksum: 10c0/ef43a4c404baaaa3e3d888ea68db8ffa101746faadb96d19d6b7ee8d00f0a025613c2e508527236961b226e41d8fb34f6cc6ac217ae8770fcbf47b9f496ab32a
+  checksum: 10c0/ca7dc4fd50491693c4a84164650b30c3ae027cc7aa11b7a2e3811ab07ad0bf0c73484e37f9aed710bb68f95ca03cc540effe64cbe94bbc055b40e1aa951e2013
   languageName: node
   linkType: hard
 
@@ -16010,7 +16169,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-gfm@npm:^4.0.0":
+"remark-gfm@npm:^4.0.1":
   version: 4.0.1
   resolution: "remark-gfm@npm:4.0.1"
   dependencies:
@@ -16468,6 +16627,15 @@ __metadata:
   version: 1.4.1
   resolution: "sax@npm:1.4.1"
   checksum: 10c0/6bf86318a254c5d898ede6bd3ded15daf68ae08a5495a2739564eb265cd13bcc64a07ab466fb204f67ce472bb534eb8612dac587435515169593f4fffa11de7c
+  languageName: node
+  linkType: hard
+
+"saxes@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "saxes@npm:5.0.1"
+  dependencies:
+    xmlchars: "npm:^2.2.0"
+  checksum: 10c0/b7476c41dbe1c3a89907d2546fecfba234de5e66743ef914cde2603f47b19bed09732ab51b528ad0f98b958369d8be72b6f5af5c9cfad69972a73d061f0b3952
   languageName: node
   linkType: hard
 
@@ -17618,10 +17786,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tokenx@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "tokenx@npm:0.4.1"
-  checksum: 10c0/377f4e3c31ff9dc57b5b6af0fb1ae821227dee5e1d87b92a3ab1a0ed25454f01185c709d73592002b0d3024de1c904c8f029c46ae1806677816e4659fb8c481e
+"tokenx@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "tokenx@npm:1.1.0"
+  checksum: 10c0/8214bce58b48e130bcf4a27ac1bb5abf486c395310fb0c8f54e31656acacf97da533372afb9e8ac8f7736e6c3f29af86ea9623d4875f1399e66a5203b80609db
   languageName: node
   linkType: hard
 
@@ -18679,6 +18847,16 @@ __metadata:
   dependencies:
     registry-js: "npm:^1.15.1"
   checksum: 10c0/f3712938ce0786c359f171c40cc40df37448e06feeaaddd056312dcc93caff02c1eac9df6f0fac162ec99ac1f23dffb70bf19fe08fac097fed3c32b7ae95f6aa
+  languageName: node
+  linkType: hard
+
+"word-extractor@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "word-extractor@npm:1.0.4"
+  dependencies:
+    saxes: "npm:^5.0.1"
+    yauzl: "npm:^2.10.0"
+  checksum: 10c0/f8c6b4f9278802d0c803479c1441713e351e67f7b0d2f85bd8cbe94b76298d4adb058b5f23ee0a01faa02f3b1f01c507a4a2f44fa39cfcbd498a51769dd9e8e7
   languageName: node
   linkType: hard
 

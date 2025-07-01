@@ -10,8 +10,7 @@ import {
   Text as UnWrapIcon,
   WrapText as WrapIcon
 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { memo } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useLanguageExtensions } from './hook'
@@ -227,10 +226,10 @@ const CodeEditor = ({
         ...customBasicSetup // override basicSetup
       }}
       style={{
-        ...style,
         fontSize: `${fontSize - 1}px`,
         marginTop: 0,
-        borderRadius: 'inherit'
+        borderRadius: 'inherit',
+        ...style
       }}
     />
   )

@@ -1,5 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { createSelector } from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { DEFAULT_CONTEXTCOUNT, DEFAULT_TEMPERATURE } from '@renderer/config/constant'
 import { getDefaultAssistant } from '@renderer/services/AssistantService'
 import { Assistant, AssistantSettings, Model } from '@renderer/types'
@@ -8,12 +7,14 @@ export interface AssistantsState {
   defaultAssistant: Assistant
   assistants: Assistant[]
   tagsOrder: string[]
+  collapsedTags: Record<string, boolean>
 }
 
 const initialState: AssistantsState = {
   defaultAssistant: getDefaultAssistant(), // 这个是模型设置的默认助手
   assistants: [getDefaultAssistant()], // 这个是主页列表的默认助手
-  tagsOrder: []
+  tagsOrder: [],
+  collapsedTags: {}
 }
 
 // ----------- selectors -----------
@@ -90,6 +91,36 @@ const assistantsSlice = createSlice({
         }
       }
     },
+    setTagsOrder: (state, action: PayloadAction<string[]>) => {
+      const newOrder = action.payload
+      state.tagsOrder = newOrder
+      const prevCollapsed = state.collapsedTags || {}
+      const updatedCollapsed: Record<string, boolean> = { ...prevCollapsed }
+      newOrder.forEach((tag) => {
+        if (!(tag in updatedCollapsed)) {
+          updatedCollapsed[tag] = false
+        }
+      })
+      state.collapsedTags = updatedCollapsed
+    },
+    updateTagCollapse: (state, action: PayloadAction<string>) => {
+      const tag = action.payload
+      const prev = state.collapsedTags || {}
+      state.collapsedTags = {
+        ...prev,
+        [tag]: !prev[tag]
+      }
+    },
+    updateTopicUpdatedAt: (state, action: PayloadAction<{ topicId: string }>) => {
+      outer: for (const assistant of state.assistants) {
+        for (const topic of assistant.topics) {
+          if (topic.id === action.payload.topicId) {
+            topic.updatedAt = new Date().toISOString()
+            break outer
+          }
+        }
+      }
+    },
     setModel: (state, action: PayloadAction<{ assistantId: string; model: Model }>) => {
       const { assistantId, model } = action.payload
       for (let i = 0; i < state.assistants.length; i++) {
@@ -114,9 +145,6 @@ const assistantsSlice = createSlice({
         }
         state.assistants.push(newAssistant)
       }
-    },
-    setTagsOrder: (state, action: PayloadAction<string[]>) => {
-      state.tagsOrder = action.payload
     }
   }
 })
@@ -128,9 +156,11 @@ export const {
   removeAssistant,
   updateAssistant,
   createAssistantFromTemplate,
+  updateTopicUpdatedAt,
   setModel,
   setTagsOrder,
-  updateAssistantSettings
+  updateAssistantSettings,
+  updateTagCollapse
 } = assistantsSlice.actions
 
 export default assistantsSlice.reducer

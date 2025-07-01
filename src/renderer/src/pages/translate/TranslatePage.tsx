@@ -5,6 +5,7 @@ import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel } from '@renderer/config/models'
 import { TranslateLanguageOptions } from '@renderer/config/translate'
+import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import db from '@renderer/databases'
 import { useDefaultModel } from '@renderer/hooks/useAssistant'
 import { useProviders } from '@renderer/hooks/useProvider'
@@ -27,7 +28,6 @@ import { find, isEmpty, sortBy } from 'lodash'
 import { ChevronDown, HelpCircle, Settings2, TriangleAlert } from 'lucide-react'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components'
 
 let _text = ''
@@ -220,9 +220,11 @@ const TranslateSettings: FC<{
 
 const TranslatePage: FC = () => {
   const { t } = useTranslation()
+  const { shikiMarkdownIt } = useCodeStyle()
   const [targetLanguage, setTargetLanguage] = useState(_targetLanguage)
   const [text, setText] = useState(_text)
   const [result, setResult] = useState(_result)
+  const [renderedMarkdown, setRenderedMarkdown] = useState<string>('')
   const { translateModel, setTranslateModel } = useDefaultModel()
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -233,7 +235,7 @@ const TranslatePage: FC = () => {
   const [bidirectionalPair, setBidirectionalPair] = useState<[string, string]>(['english', 'chinese'])
   const [settingsVisible, setSettingsVisible] = useState(false)
   const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
-  const [sourceLanguage, setSourceLanguage] = useState<string>('auto') // 添加用户选择的源语言状态
+  const [sourceLanguage, setSourceLanguage] = useState<string>('auto')
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const textAreaRef = useRef<TextAreaRef>(null)
   const outputTextRef = useRef<HTMLDivElement>(null)
@@ -311,8 +313,7 @@ const TranslatePage: FC = () => {
       let actualSourceLanguage: string
       if (sourceLanguage === 'auto') {
         actualSourceLanguage = await detectLanguage(text)
-        console.log('检测到的语言:', actualSourceLanguage)
-        setDetectedLanguage(actualSourceLanguage) // 更新检测到的语言
+        setDetectedLanguage(actualSourceLanguage)
       } else {
         actualSourceLanguage = sourceLanguage
       }
@@ -384,10 +385,31 @@ const TranslatePage: FC = () => {
     isEmpty(text) && setResult('')
   }, [text])
 
+  // Render markdown content when result or enableMarkdown changes
+  useEffect(() => {
+    if (enableMarkdown && result) {
+      let isMounted = true
+      shikiMarkdownIt(result).then((rendered) => {
+        if (isMounted) {
+          setRenderedMarkdown(rendered)
+        }
+      })
+      return () => {
+        isMounted = false
+      }
+    } else {
+      setRenderedMarkdown('')
+      return undefined
+    }
+  }, [result, enableMarkdown, shikiMarkdownIt])
+
   useEffect(() => {
     runAsyncFunction(async () => {
       const targetLang = await db.settings.get({ id: 'translate:target:language' })
       targetLang && setTargetLanguage(targetLang.value)
+
+      const sourceLang = await db.settings.get({ id: 'translate:source:language' })
+      sourceLang && setSourceLanguage(sourceLang.value)
 
       const bidirectionalPairSetting = await db.settings.get({ id: 'translate:bidirectional:pair' })
       if (bidirectionalPairSetting) {
@@ -531,12 +553,15 @@ const TranslatePage: FC = () => {
                 value={sourceLanguage}
                 style={{ width: 180 }}
                 optionFilterProp="label"
-                onChange={(value) => setSourceLanguage(value)}
+                onChange={(value) => {
+                  setSourceLanguage(value)
+                  db.settings.put({ id: 'translate:source:language', value })
+                }}
                 options={[
                   {
                     value: 'auto',
                     label: detectedLanguage
-                      ? `${t('translate.detected.language')}(${t(`languages.${detectedLanguage.toLowerCase()}`)})`
+                      ? `${t('translate.detected.language')} (${t(`languages.${detectedLanguage.toLowerCase()}`)})`
                       : t('translate.detected.language')
                   },
                   ...TranslateLanguageOptions.map((lang) => ({
@@ -615,13 +640,13 @@ const TranslatePage: FC = () => {
             />
           </OperationBar>
 
-          <OutputText ref={outputTextRef} onScroll={handleOutputScroll} className="selectable">
+          <OutputText ref={outputTextRef} onScroll={handleOutputScroll} className={'selectable'}>
             {!result ? (
               t('translate.output.placeholder')
             ) : enableMarkdown ? (
-              <ReactMarkdown>{result}</ReactMarkdown>
+              <div className="markdown" dangerouslySetInnerHTML={{ __html: renderedMarkdown }} />
             ) : (
-              result
+              <div className="plain">{result}</div>
             )}
           </OutputText>
         </OutputContainer>
@@ -711,7 +736,19 @@ const OutputText = styled.div`
   flex: 1;
   padding: 5px 16px;
   overflow-y: auto;
-  white-space: pre-wrap;
+
+  .plain {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .markdown {
+    /* for shiki code block overflow */
+    .line * {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+  }
 `
 
 const TranslateButton = styled(Button)``

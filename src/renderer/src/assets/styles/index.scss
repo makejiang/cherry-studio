@@ -8,6 +8,7 @@
 @use './animation.scss';
 @import '../fonts/icon-fonts/iconfont.css';
 @import '../fonts/ubuntu/ubuntu.css';
+@import '../fonts/country-flag-fonts/flag.css';
 
 *,
 *::before,
@@ -112,15 +113,7 @@ ul {
   word-wrap: break-word;
 }
 
-.bubble {
-  .system-prompt {
-    background-color: var(--chat-background-assistant);
-  }
-  .message-content-container {
-    margin: 5px 0;
-    border-radius: 8px;
-  }
-
+.bubble:not(.multi-select-mode) {
   .block-wrapper {
     display: flow-root;
   }
@@ -138,27 +131,35 @@ ul {
   }
 
   .message-user {
+    .message-header {
+      flex-direction: row-reverse;
+      text-align: right;
+      .message-header-info-wrap {
+        flex-direction: row-reverse;
+        text-align: right;
+      }
+    }
     .message-content-container {
-      margin: 5px 0;
-      border-radius: 8px 0 8px 8px;
-      padding: 10px 15px 0 15px;
+      border-radius: 10px 0 10px 10px;
+      padding: 10px 16px 10px 16px;
+      background-color: var(--chat-background-user);
+      align-self: self-end;
+    }
+    .MessageFooter {
+      margin-top: 2px;
+      align-self: self-end;
     }
   }
-  .group-grid-container.horizontal,
-  .group-grid-container.grid {
-    .message-content-container-assistant {
-      padding: 0;
-    }
-  }
-  .group-message-wrapper {
-    background-color: var(--color-background);
+
+  .message-assistant {
     .message-content-container {
-      width: 100%;
+      padding-left: 0;
+    }
+    .MessageFooter {
+      margin-left: 0;
     }
   }
-  .group-menu-bar {
-    background-color: var(--color-background);
-  }
+
   code {
     color: var(--color-text);
   }
@@ -170,16 +171,16 @@ ul {
   }
 }
 
-.lucide {
+.lucide:not(.lucide-custom) {
   color: var(--color-icon);
 }
 
-span.highlight {
+::highlight(search-matches) {
   background-color: var(--color-background-highlight);
   color: var(--color-highlight);
 }
 
-span.highlight.selected {
+::highlight(current-match) {
   background-color: var(--color-background-highlight-accent);
 }
 

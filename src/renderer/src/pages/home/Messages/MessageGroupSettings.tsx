@@ -21,9 +21,8 @@ const MessageGroupSettings: FC = () => {
     <Popover
       arrow={false}
       trigger={undefined}
-      showArrow
       content={
-        <div style={{ padding: 10 }}>
+        <div style={{ padding: 8 }}>
           <SettingRow>
             <div style={{ marginRight: 10 }}>{t('settings.messages.grid_popover_trigger')}</div>
             <Selector

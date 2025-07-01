@@ -112,11 +112,12 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           return
         }
 
-        if (autoDims || typeof values.dimensions === 'undefined') {
+        if (autoDims || values.dimensions === undefined) {
           try {
             const aiProvider = new AiProvider(provider)
             values.dimensions = await aiProvider.getEmbeddingDimensions(selectedEmbeddingModel)
           } catch (error) {
+            console.error('Error getting embedding dimensions:', error)
             window.message.error(t('message.error.get_embedding_dimensions') + '\n' + getErrorMessage(error))
             setLoading(false)
             return
@@ -131,7 +132,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           name: values.name,
           model: selectedEmbeddingModel,
           rerankModel: selectedRerankModel,
-          dimensions: values.dimensions,
+          dimensions: autoDims ? undefined : values.dimensions,
           documentCount: values.documentCount || DEFAULT_KNOWLEDGE_DOCUMENT_COUNT,
           items: [],
           created_at: Date.now(),

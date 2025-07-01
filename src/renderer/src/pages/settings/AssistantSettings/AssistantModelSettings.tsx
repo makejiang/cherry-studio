@@ -118,7 +118,6 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
               { label: 'true', value: true },
               { label: 'false', value: false }
             ]}
-            suffixIcon={<ChevronDown size={16} color="var(--color-border)" />}
           />
         )
       case 'json':

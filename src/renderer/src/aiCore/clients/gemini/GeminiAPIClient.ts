@@ -22,8 +22,8 @@ import { GenericChunk } from '@renderer/aiCore/middleware/schemas'
 import {
   findTokenLimit,
   GEMINI_FLASH_MODEL_REGEX,
-  isGeminiReasoningModel,
   isGemmaModel,
+  isSupportedThinkingTokenGeminiModel,
   isVisionModel
 } from '@renderer/config/models'
 import { CacheService } from '@renderer/services/CacheService'
@@ -60,7 +60,7 @@ import {
 } from '@renderer/utils/mcp-tools'
 import { findFileBlocks, findImageBlocks, getMainTextContent } from '@renderer/utils/messageUtils/find'
 import { buildSystemPrompt } from '@renderer/utils/prompt'
-import { MB } from '@shared/config/constant'
+import { defaultTimeout, MB } from '@shared/config/constant'
 
 import { BaseApiClient } from '../BaseApiClient'
 import { RequestTransformer, ResponseChunkTransformer } from '../types'
@@ -85,7 +85,7 @@ export class GeminiAPIClient extends BaseApiClient<
       ...rest,
       config: {
         ...rest.config,
-        abortSignal: options?.abortSignal,
+        abortSignal: options?.signal,
         httpOptions: {
           ...rest.config?.httpOptions,
           timeout: options?.timeout
@@ -118,7 +118,7 @@ export class GeminiAPIClient extends BaseApiClient<
         aspectRatio: imageSize,
         abortSignal: signal,
         httpOptions: {
-          timeout: 5 * 60 * 1000
+          timeout: defaultTimeout
         }
       }
       const response = await sdk.models.generateImages({
@@ -176,7 +176,10 @@ export class GeminiAPIClient extends BaseApiClient<
       apiVersion: this.getApiVersion(),
       httpOptions: {
         baseUrl: this.getBaseURL(),
-        apiVersion: this.getApiVersion()
+        apiVersion: this.getApiVersion(),
+        headers: {
+          ...this.provider.extra_headers
+        }
       }
     })
 
@@ -240,6 +243,7 @@ export class GeminiAPIClient extends BaseApiClient<
   private async convertMessageToSdkParam(message: Message): Promise<Content> {
     const role = message.role === 'user' ? 'user' : 'model'
     const parts: Part[] = [{ text: await this.getMessageContent(message) }]
+
     // Add any generated images from previous responses
     const imageBlocks = findImageBlocks(message)
     for (const imageBlock of imageBlocks) {
@@ -390,29 +394,29 @@ export class GeminiAPIClient extends BaseApiClient<
    * @returns The reasoning effort
    */
   private getBudgetToken(assistant: Assistant, model: Model) {
-    if (isGeminiReasoningModel(model)) {
+    if (isSupportedThinkingTokenGeminiModel(model)) {
       const reasoningEffort = assistant?.settings?.reasoning_effort
 
       // 如果thinking_budget是undefined，不思考
       if (reasoningEffort === undefined) {
-        return {
-          thinkingConfig: {
-            includeThoughts: false,
-            ...(GEMINI_FLASH_MODEL_REGEX.test(model.id) ? { thinkingBudget: 0 } : {})
-          } as ThinkingConfig
-        }
+        return GEMINI_FLASH_MODEL_REGEX.test(model.id)
+          ? {
+              thinkingConfig: {
+                thinkingBudget: 0
+              }
+            }
+          : {}
       }
 
-      const effortRatio = EFFORT_RATIO[reasoningEffort]
-
-      if (effortRatio > 1) {
+      if (reasoningEffort === 'auto') {
         return {
           thinkingConfig: {
-            includeThoughts: true
+            includeThoughts: true,
+            thinkingBudget: -1
           }
         }
       }
-
+      const effortRatio = EFFORT_RATIO[reasoningEffort]
       const { min, max } = findTokenLimit(model.id) || { min: 0, max: 0 }
       // 计算 budgetTokens，确保不低于 min
       const budget = Math.floor((max - min) * effortRatio + min)
@@ -479,6 +483,7 @@ export class GeminiAPIClient extends BaseApiClient<
             for (const message of messages) {
               history.push(await this.convertMessageToSdkParam(message))
             }
+            messages.push(userLastMessage)
           }
         }
 
@@ -531,7 +536,8 @@ export class GeminiAPIClient extends BaseApiClient<
           tools: tools,
           ...(enableGenerateImage ? this.getGenerateImageParameter() : {}),
           ...this.getBudgetToken(assistant, model),
-          ...this.getCustomParameters(assistant)
+          // 只在对话场景下应用自定义参数，避免影响翻译、总结等其他业务逻辑
+          ...(coreRequest.callType === 'chat' ? this.getCustomParameters(assistant) : {})
         }
 
         const param: GeminiSdkParams = {
@@ -682,16 +688,19 @@ export class GeminiAPIClient extends BaseApiClient<
     toolCalls: FunctionCall[]
   ): Content[] {
     const parts: Part[] = []
+    const modelParts: Part[] = []
     if (output) {
-      parts.push({
+      modelParts.push({
         text: output
       })
     }
+
     toolCalls.forEach((toolCall) => {
-      parts.push({
+      modelParts.push({
         functionCall: toolCall
       })
     })
+
     parts.push(
       ...toolResults
         .map((ts) => ts.parts)
@@ -699,10 +708,22 @@ export class GeminiAPIClient extends BaseApiClient<
         .filter((p) => p !== undefined)
     )
 
-    const lastMessage = currentReqMessages[currentReqMessages.length - 1]
-    if (lastMessage) {
-      lastMessage.parts?.push(...parts)
+    const userMessage: Content = {
+      role: 'user',
+      parts: []
     }
+
+    if (modelParts.length > 0) {
+      currentReqMessages.push({
+        role: 'model',
+        parts: modelParts
+      })
+    }
+    if (parts.length > 0) {
+      userMessage.parts?.push(...parts)
+      currentReqMessages.push(userMessage)
+    }
+
     return currentReqMessages
   }
 
@@ -743,7 +764,7 @@ export class GeminiAPIClient extends BaseApiClient<
         }
       })
     }
-    return [messageParam, ...(sdkPayload.history || [])]
+    return [...(sdkPayload.history || []), messageParam]
   }
 
   private async uploadFile(file: FileType): Promise<File> {

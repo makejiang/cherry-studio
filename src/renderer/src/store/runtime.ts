@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppLogo, UserAvatar } from '@renderer/config/env'
-import type { MinAppType } from '@renderer/types'
+import type { MinAppType, WebSearchStatus } from '@renderer/types'
 import type { UpdateInfo } from 'builder-util-runtime'
 
 export interface ChatState {
@@ -10,6 +10,10 @@ export interface ChatState {
   renamingTopics: string[]
   /** topic ids that are newly renamed */
   newlyRenamedTopics: string[]
+}
+
+export interface WebSearchState {
+  activeSearches: Record<string, WebSearchStatus>
 }
 
 export interface UpdateState {
@@ -38,6 +42,7 @@ export interface RuntimeState {
   update: UpdateState
   export: ExportState
   chat: ChatState
+  websearch: WebSearchState
 }
 
 export interface ExportState {
@@ -70,6 +75,9 @@ const initialState: RuntimeState = {
     selectedMessageIds: [],
     renamingTopics: [],
     newlyRenamedTopics: []
+  },
+  websearch: {
+    activeSearches: {}
   }
 }
 
@@ -125,6 +133,17 @@ const runtimeSlice = createSlice({
     },
     setNewlyRenamedTopics: (state, action: PayloadAction<string[]>) => {
       state.chat.newlyRenamedTopics = action.payload
+    },
+    // WebSearch related actions
+    setActiveSearches: (state, action: PayloadAction<Record<string, WebSearchStatus>>) => {
+      state.websearch.activeSearches = action.payload
+    },
+    setWebSearchStatus: (state, action: PayloadAction<{ requestId: string; status: WebSearchStatus }>) => {
+      const { requestId, status } = action.payload
+      if (status.phase === 'default') {
+        delete state.websearch.activeSearches[requestId]
+      }
+      state.websearch.activeSearches[requestId] = status
     }
   }
 })
@@ -145,7 +164,10 @@ export const {
   toggleMultiSelectMode,
   setSelectedMessageIds,
   setRenamingTopics,
-  setNewlyRenamedTopics
+  setNewlyRenamedTopics,
+  // WebSearch related actions
+  setActiveSearches,
+  setWebSearchStatus
 } = runtimeSlice.actions
 
 export default runtimeSlice.reducer

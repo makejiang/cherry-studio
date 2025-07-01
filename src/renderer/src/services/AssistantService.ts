@@ -15,7 +15,17 @@ export function getDefaultAssistant(): Assistant {
     topics: [],
     messages: [],
     regularPhrases: [],
-    isTemplate: false
+    isTemplate: false,
+    settings: {
+      temperature: DEFAULT_TEMPERATURE,
+      contextCount: DEFAULT_CONTEXTCOUNT,
+      enableMaxTokens: false,
+      maxTokens: 0,
+      streamOutput: true,
+      topP: 1,
+      toolUseMode: 'prompt',
+      customParameters: []
+    }
   }
 }
 
@@ -127,7 +137,17 @@ export async function createAssistantFromAgent(agent: Agent) {
     emoji: agent.emoji,
     model: agent.defaultModel,
     isTemplate: false,
-    regularPhrases: agent.regularPhrases || []
+    regularPhrases: agent.regularPhrases || [],
+    settings: agent.settings || {
+      temperature: DEFAULT_TEMPERATURE,
+      contextCount: DEFAULT_CONTEXTCOUNT,
+      enableMaxTokens: false,
+      maxTokens: 0,
+      streamOutput: true,
+      topP: 1,
+      toolUseMode: 'prompt',
+      customParameters: []
+    }
   }
 
   store.dispatch(addAssistant(assistant))

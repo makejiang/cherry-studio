@@ -4,13 +4,15 @@ import useScrollPosition from '@renderer/hooks/useScrollPosition'
 import { getTopicById } from '@renderer/hooks/useTopic'
 import { useAppSelector } from '@renderer/store'
 import { selectActiveAssistants } from '@renderer/store/assistants'
-import { selectAllTopics } from '@renderer/store/topics'
 import { Topic } from '@renderer/types'
-import { Button, Divider, Empty } from 'antd'
+import { Button, Divider, Empty, Segmented } from 'antd'
 import dayjs from 'dayjs'
 import { groupBy, isEmpty, orderBy } from 'lodash'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+
+type SortType = 'createdAt' | 'updatedAt'
 
 type Props = {
   keywords: string
@@ -19,19 +21,19 @@ type Props = {
 } & React.HTMLAttributes<HTMLDivElement>
 
 const TopicsHistory: React.FC<Props> = ({ keywords, onClick, onSearch, ...props }) => {
-  const topics = useAppSelector(selectAllTopics)
   const assistants = useAppSelector(selectActiveAssistants)
   const { t } = useTranslation()
   const { handleScroll, containerRef } = useScrollPosition('TopicsHistory')
+  const [sortType, setSortType] = useState<SortType>('createdAt')
 
-  const orderedTopics = orderBy(topics, 'createdAt', 'desc')
+  const topics = orderBy(assistants.map((assistant) => assistant.topics).flat(), sortType, 'desc')
 
-  const filteredTopics = orderedTopics.filter((topic) => {
+  const filteredTopics = topics.filter((topic) => {
     return topic.name.toLowerCase().includes(keywords.toLowerCase())
   })
 
   const groupedTopics = groupBy(filteredTopics, (topic) => {
-    return dayjs(topic.createdAt).format('MM/DD')
+    return dayjs(topic[sortType]).format('MM/DD')
   })
 
   // 创建助手映射表
@@ -58,6 +60,16 @@ const TopicsHistory: React.FC<Props> = ({ keywords, onClick, onSearch, ...props 
 
   return (
     <ListContainer {...props} ref={containerRef} onScroll={handleScroll}>
+      <Segmented
+        shape="round"
+        size="small"
+        value={sortType}
+        onChange={setSortType}
+        options={[
+          { label: t('export.created'), value: 'createdAt' },
+          { label: t('export.last_updated'), value: 'updatedAt' }
+        ]}
+      />
       <ContainerWrapper>
         {Object.entries(groupedTopics).map(([date, items]) => (
           <ListItem key={date}>
@@ -80,7 +92,7 @@ const TopicsHistory: React.FC<Props> = ({ keywords, onClick, onSearch, ...props 
                       </AssistantTag>
                     )}
                   </TopicContent>
-                  <TopicDate>{dayjs(topic.updatedAt).format('HH:mm')}</TopicDate>
+                  <TopicDate>{dayjs(topic[sortType]).format('HH:mm')}</TopicDate>
                 </TopicItem>
               )
             })}
@@ -113,7 +125,7 @@ const ListContainer = styled.div`
   overflow-y: scroll;
   width: 100%;
   align-items: center;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
 `
 

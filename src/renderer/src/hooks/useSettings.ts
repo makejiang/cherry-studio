@@ -4,13 +4,14 @@ import {
   SendMessageShortcut,
   setAssistantIconType,
   setAutoCheckUpdate as _setAutoCheckUpdate,
-  setEarlyAccess as _setEarlyAccess,
   setLaunchOnBoot,
   setLaunchToTray,
   setPinTopicsToTop,
   setSendMessageShortcut as _setSendMessageShortcut,
   setSidebarIcons,
   setTargetLanguage,
+  setTestChannel as _setTestChannel,
+  setTestPlan as _setTestPlan,
   setTheme,
   SettingsState,
   setTopicPosition,
@@ -19,7 +20,7 @@ import {
   setTrayOnClose
 } from '@renderer/store/settings'
 import { SidebarIcon, ThemeMode, TranslateLanguageVarious } from '@renderer/types'
-import { FeedUrl } from '@shared/config/constant'
+import { UpgradeChannel } from '@shared/config/constant'
 
 export function useSettings() {
   const settings = useAppSelector((state) => state.settings)
@@ -59,9 +60,14 @@ export function useSettings() {
       window.api.setAutoUpdate(isAutoUpdate)
     },
 
-    setEarlyAccess(isEarlyAccess: boolean) {
-      dispatch(_setEarlyAccess(isEarlyAccess))
-      window.api.setFeedUrl(isEarlyAccess ? FeedUrl.EARLY_ACCESS : FeedUrl.PRODUCTION)
+    setTestPlan(isTestPlan: boolean) {
+      dispatch(_setTestPlan(isTestPlan))
+      window.api.setTestPlan(isTestPlan)
+    },
+
+    setTestChannel(channel: UpgradeChannel) {
+      dispatch(_setTestChannel(channel))
+      window.api.setTestChannel(channel)
     },
 
     setTheme(theme: ThemeMode) {

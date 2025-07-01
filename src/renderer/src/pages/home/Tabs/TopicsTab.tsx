@@ -21,8 +21,7 @@ import { useSettings } from '@renderer/hooks/useSettings'
 import { finishTopicRenaming, startTopicRenaming, TopicManager } from '@renderer/hooks/useTopic'
 import { fetchMessagesSummary } from '@renderer/services/ApiService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
-import store from '@renderer/store'
-import { RootState } from '@renderer/store'
+import store, { RootState } from '@renderer/store'
 import { setGenerating } from '@renderer/store/runtime'
 import { Assistant, Topic } from '@renderer/types'
 import { classNames, removeSpecialCharactersForFileName } from '@renderer/utils'
@@ -131,11 +130,13 @@ const Topics: FC<TopicsTabProps> = ({ searchValue, style }) => {
       }
       await modelGenerating()
       const index = findIndex(topics, (t) => t.id === topic.id)
-      setActiveTopic(topics[index + 1 === topics.length ? index - 1 : index + 1])
+      if (topic.id === activeTopic.id) {
+        setActiveTopic(topics[index + 1 === topics.length ? index - 1 : index + 1])
+      }
       removeTopic(topic)
       setDeletingTopicId(null)
     },
-    [topics, onClearMessages, removeTopic, setActiveTopic]
+    [activeTopic.id, topics, onClearMessages, removeTopic, setActiveTopic]
   )
 
   const onPinTopic = useCallback(
@@ -466,7 +467,7 @@ const Topics: FC<TopicsTabProps> = ({ searchValue, style }) => {
                   <TopicName className={getTopicNameClassName()} title={topicName}>
                     {topicName}
                   </TopicName>
-                  {isActive && !topic.pinned && (
+                  {!topic.pinned && (
                     <Tooltip
                       placement="bottom"
                       mouseEnterDelay={0.7}
@@ -552,6 +553,10 @@ const TopicListItem = styled.div`
   }
   &:hover {
     background-color: var(--color-list-item-hover);
+    transition: background-color 0.1s;
+    .menu {
+      opacity: 1;
+    }
   }
   &.active {
     background-color: var(--color-list-item);

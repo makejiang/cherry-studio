@@ -1,5 +1,5 @@
 import { Dropdown } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -11,7 +11,7 @@ interface ContextMenuProps {
 const ContextMenu: React.FC<ContextMenuProps> = ({ children, onContextMenu }) => {
   const { t } = useTranslation()
   const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null)
-  const [selectedText, setSelectedText] = useState<string>('')
+  const [selectedText, setSelectedText] = useState<string | undefined>(undefined)
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
@@ -36,47 +36,52 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ children, onContextMenu }) =>
     }
   }, [])
 
-  // 获取右键菜单项
-  const getContextMenuItems = (t: (key: string) => string, selectedText: string) => [
-    {
-      key: 'copy',
-      label: t('common.copy'),
-      onClick: () => {
-        if (selectedText) {
-          navigator.clipboard
-            .writeText(selectedText)
-            .then(() => {
-              window.message.success({ content: t('message.copied'), key: 'copy-message' })
-            })
-            .catch(() => {
-              window.message.error({ content: t('message.copy.failed'), key: 'copy-message-failed' })
-            })
+  const contextMenuItems = useMemo(() => {
+    if (!selectedText) return []
+
+    return [
+      {
+        key: 'copy',
+        label: t('common.copy'),
+        onClick: () => {
+          if (selectedText) {
+            navigator.clipboard
+              .writeText(selectedText)
+              .then(() => {
+                window.message.success({ content: t('message.copied'), key: 'copy-message' })
+              })
+              .catch(() => {
+                window.message.error({ content: t('message.copy.failed'), key: 'copy-message-failed' })
+              })
+          }
+        }
+      },
+      {
+        key: 'quote',
+        label: t('chat.message.quote'),
+        onClick: () => {
+          if (selectedText) {
+            window.api?.quoteToMainWindow(selectedText)
+          }
         }
       }
-    },
-    {
-      key: 'quote',
-      label: t('chat.message.quote'),
-      onClick: () => {
-        if (selectedText) {
-          window.api?.quoteToMainWindow(selectedText)
-        }
-      }
+    ]
+  }, [selectedText, t])
+
+  const onOpenChange = (open: boolean) => {
+    if (open) {
+      const selectedText = window.getSelection()?.toString()
+      setSelectedText(selectedText)
     }
-  ]
+  }
 
   return (
     <ContextContainer onContextMenu={handleContextMenu} className="context-menu-container">
       {contextMenuPosition && (
-        <Dropdown
-          overlayStyle={{ position: 'fixed', left: contextMenuPosition.x, top: contextMenuPosition.y, zIndex: 1000 }}
-          menu={{ items: getContextMenuItems(t, selectedText) }}
-          open={true}
-          trigger={['contextMenu']}>
-          <div />
+        <Dropdown onOpenChange={onOpenChange} menu={{ items: contextMenuItems }} trigger={['contextMenu']}>
+          {children}
         </Dropdown>
       )}
-      {children}
     </ContextContainer>
   )
 }

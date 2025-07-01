@@ -57,11 +57,12 @@ const SelectModelButton: FC<Props> = ({ assistant }) => {
 const DropdownButton = styled(Button)`
   font-size: 11px;
   border-radius: 15px;
-  padding: 12px 5px;
+  padding: 13px 5px;
   -webkit-app-region: none;
   box-shadow: none;
   background-color: transparent;
   border: 1px solid transparent;
+  margin-top: 1px;
 `
 
 const ButtonContent = styled.div`

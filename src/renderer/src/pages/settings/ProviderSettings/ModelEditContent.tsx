@@ -134,7 +134,7 @@ const ModelEditContent: FC<ModelEditContentProps> = ({ model, onUpdateModel, ope
           <Input placeholder={t('settings.models.add.group_name.placeholder')} spellCheck={false} />
         </Form.Item>
         <Form.Item style={{ marginBottom: 8, textAlign: 'center' }}>
-          <Flex justify="center" align="center" style={{ position: 'relative' }}>
+          <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
             <Button
               color="default"
               variant="filled"
@@ -152,7 +152,7 @@ const ModelEditContent: FC<ModelEditContentProps> = ({ model, onUpdateModel, ope
         {showMoreSettings && (
           <div style={{ marginBottom: 8 }}>
             <Divider style={{ margin: '16px 0 16px 0' }} />
-            <TypeTitle>{t('models.type.select')}</TypeTitle>
+            <TypeTitle>{t('models.type.select')}:</TypeTitle>
             {(() => {
               const defaultTypes = [
                 ...(isVisionModel(model) ? ['vision'] : []),
@@ -284,8 +284,7 @@ const ModelEditContent: FC<ModelEditContentProps> = ({ model, onUpdateModel, ope
 }
 
 const TypeTitle = styled.div`
-  margin-top: 16px;
-  margin-bottom: 12px;
+  margin: 12px 0;
   font-size: 14px;
   font-weight: 600;
 `

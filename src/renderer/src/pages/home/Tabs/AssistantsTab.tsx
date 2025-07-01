@@ -25,9 +25,8 @@ const Assistants: FC<AssistantsTabProps> = ({ searchValue }) => {
   const { activeAssistant, setActiveAssistant } = useChat()
   const { assistants, removeAssistant, addAssistant, updateAssistants } = useAssistants()
   const [dragging, setDragging] = useState(false)
-  const [collapsedTags, setCollapsedTags] = useState<Record<string, boolean>>({})
   const { t } = useTranslation()
-  const { getGroupedAssistants, allTags, updateTagsOrder } = useTags()
+  const { getGroupedAssistants, allTags, updateTagsOrder, collapsedTags, toggleTagCollapse } = useTags()
   const { assistantsTabSortType = 'list', setAssistantsTabSortType } = useAssistantsTabSortType()
   const containerRef = useRef<HTMLDivElement>(null)
   const { defaultAssistant } = useDefaultAssistant()
@@ -75,13 +74,6 @@ const Assistants: FC<AssistantsTabProps> = ({ searchValue }) => {
     },
     [activeAssistant, assistants, removeAssistant, setActiveAssistant, onCreateDefaultAssistant]
   )
-
-  const toggleTagCollapse = useCallback((tag: string) => {
-    setCollapsedTags((prev) => ({
-      ...prev,
-      [tag]: !prev[tag]
-    }))
-  }, [])
 
   const handleSortByChange = useCallback(
     (sortType: AssistantsSortType) => {
@@ -262,7 +254,6 @@ const Assistants: FC<AssistantsTabProps> = ({ searchValue }) => {
       <DragableList
         list={filteredAssistants}
         onUpdate={updateAssistants}
-        style={{ paddingBottom: dragging ? '34px' : 0 }}
         onDragStart={() => setDragging(true)}
         onDragEnd={() => setDragging(false)}>
         {(assistant) => (

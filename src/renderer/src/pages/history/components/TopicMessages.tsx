@@ -1,10 +1,9 @@
-import { ArrowRightOutlined, MessageOutlined } from '@ant-design/icons'
+import { MessageOutlined } from '@ant-design/icons'
 import { HStack } from '@renderer/components/Layout'
 import SearchPopup from '@renderer/components/Popups/SearchPopup'
 import { MessageEditingProvider } from '@renderer/context/MessageEditingContext'
 import { useChat } from '@renderer/hooks/useChat'
 import useScrollPosition from '@renderer/hooks/useScrollPosition'
-import { useSettings } from '@renderer/hooks/useSettings'
 import { getAssistantById } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { locateToMessage } from '@renderer/services/MessagesService'
@@ -13,6 +12,7 @@ import { loadTopicMessagesThunk } from '@renderer/store/thunk/messageThunk'
 import { Topic } from '@renderer/types'
 import { Button, Divider, Empty } from 'antd'
 import { t } from 'i18next'
+import { Forward } from 'lucide-react'
 import { FC, useEffect } from 'react'
 import styled from 'styled-components'
 
@@ -24,7 +24,6 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 const TopicMessages: FC<Props> = ({ topic, ...props }) => {
   const { handleScroll, containerRef } = useScrollPosition('TopicMessages')
-  const { messageStyle } = useSettings()
   const dispatch = useAppDispatch()
   const { setActiveAssistant, setActiveTopic } = useChat()
 
@@ -50,8 +49,8 @@ const TopicMessages: FC<Props> = ({ topic, ...props }) => {
 
   return (
     <MessageEditingProvider>
-      <MessagesContainer {...props} ref={containerRef} onScroll={handleScroll} className={messageStyle}>
-        <ContainerWrapper style={{ paddingTop: 30, paddingBottom: 30 }}>
+      <MessagesContainer {...props} ref={containerRef} onScroll={handleScroll}>
+        <ContainerWrapper>
           {topic?.messages.map((message) => (
             <div key={message.id} style={{ position: 'relative' }}>
               <MessageItem message={message} topic={topic} hideMenuBar={true} />
@@ -60,7 +59,7 @@ const TopicMessages: FC<Props> = ({ topic, ...props }) => {
                 size="middle"
                 style={{ color: 'var(--color-text-3)', position: 'absolute', right: 0, top: 5 }}
                 onClick={() => locateToMessage(message)}
-                icon={<ArrowRightOutlined />}
+                icon={<Forward size={16} />}
               />
               <Divider style={{ margin: '8px auto 15px' }} variant="dashed" />
             </div>
@@ -89,12 +88,9 @@ const MessagesContainer = styled.div`
 
 const ContainerWrapper = styled.div`
   width: 100%;
-  padding: 0 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  .message {
-    padding: 0;
-  }
 `
 
 export default TopicMessages

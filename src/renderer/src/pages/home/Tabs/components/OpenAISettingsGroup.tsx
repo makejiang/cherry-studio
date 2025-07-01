@@ -1,3 +1,4 @@
+import Selector from '@renderer/components/Selector'
 import { SettingDivider, SettingRow } from '@renderer/pages/settings'
 import { RootState, useAppDispatch } from '@renderer/store'
 import { setOpenAIServiceTier, setOpenAISummaryText } from '@renderer/store/settings'
@@ -122,7 +123,7 @@ const OpenAISettingsGroup: FC<Props> = ({
                 <CircleHelp size={14} style={{ marginLeft: 4 }} color="var(--color-text-2)" />
               </Tooltip>
             </SettingRowTitleSmall>
-            <StyledSelect
+            <Selector
               value={summaryText}
               style={{ width: 135 }}
               onChange={(value) => {

@@ -1,8 +1,11 @@
+import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { handleDelete } from '@renderer/services/FileAction'
 import FileManager from '@renderer/services/FileManager'
 import { FileType } from '@renderer/types'
 import { formatFileSize } from '@renderer/utils'
 import { Col, Image, Spin } from 'antd'
 import { memo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 interface ImageItemProps {
@@ -11,6 +14,7 @@ interface ImageItemProps {
 
 const ImageItem: React.FC<ImageItemProps> = ({ file }) => {
   const [loading, setLoading] = useState(true)
+  const { t } = useTranslation()
   return (
     <Col xs={24} sm={12} md={8} lg={4} xl={3}>
       <ImageWrapper>
@@ -32,6 +36,24 @@ const ImageItem: React.FC<ImageItemProps> = ({ file }) => {
         <ImageInfo>
           <div>{formatFileSize(file.size)}</div>
         </ImageInfo>
+        <DeleteButton
+          title={t('files.delete.title')}
+          onClick={(e) => {
+            e.stopPropagation()
+            window.modal.confirm({
+              title: t('files.delete.title'),
+              content: t('files.delete.content'),
+              okText: t('common.confirm'),
+              cancelText: t('common.cancel'),
+              centered: true,
+              onOk: () => {
+                handleDelete(file.id, t)
+              },
+              icon: <ExclamationCircleOutlined style={{ color: 'red' }} />
+            })
+          }}>
+          <DeleteOutlined />
+        </DeleteButton>
       </ImageWrapper>
     </Col>
   )
@@ -99,6 +121,28 @@ const ImageInfo = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+`
+
+const DeleteButton = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+
+  &:hover {
+    background-color: rgba(255, 0, 0, 0.8);
   }
 `
 

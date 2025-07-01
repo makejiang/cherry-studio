@@ -60,7 +60,7 @@ const AssistantItem: FC<AssistantItemProps> = ({
   const { t } = useTranslation()
   const { allTags } = useTags()
   const { removeAllTopics } = useAssistant(assistant.id)
-  const { assistantIconType, setAssistantIconType, clickAssistantToShowTopic } = useSettings()
+  const { assistantIconType, setAssistantIconType } = useSettings()
   const defaultModel = getDefaultModel()
   const { assistants, updateAssistants } = useAssistants()
 

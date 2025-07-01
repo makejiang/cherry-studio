@@ -156,6 +156,9 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
           padding: 0,
           overflow: 'hidden',
           paddingBottom: 20
+        },
+        body: {
+          padding: 0
         }
       }}
       closeIcon={null}

@@ -1,9 +1,7 @@
-import { isLinux, isWindows } from '@renderer/config/constant'
+import { isLinux, isWin } from '@renderer/config/constant'
 import { useFullscreen } from '@renderer/hooks/useFullscreen'
-import { Button } from 'antd'
-import type { FC, PropsWithChildren } from 'react'
-import type { HTMLAttributes } from 'react'
-import styled, { keyframes } from 'styled-components'
+import type { FC, HTMLAttributes, PropsWithChildren } from 'react'
+import styled from 'styled-components'
 
 type Props = PropsWithChildren & HTMLAttributes<HTMLDivElement>
 
@@ -49,7 +47,7 @@ const NavbarRightContainer = styled.div<{ $isFullscreen: boolean }>`
   display: flex;
   align-items: center;
   padding: 0 12px;
-  padding-right: ${({ $isFullscreen }) => ($isFullscreen ? '12px' : isWindows ? '135px' : isLinux ? '120px' : '12px')};
+  padding-right: ${({ $isFullscreen }) => ($isFullscreen ? '12px' : isWin ? '140px' : isLinux ? '120px' : '12px')};
   justify-content: flex-end;
 `
 
@@ -82,15 +80,15 @@ const NavbarCenterContainer = styled.div`
   color: var(--color-text-1);
 `
 
-const rotateAnimation = keyframes`
-  from {
-    transform: rotate(-180deg);
-  }
-  to {
-    transform: rotate(0);
-  }
-`
+// const rotateAnimation = keyframes`
+//   from {
+//     transform: rotate(-180deg);
+//   }
+//   to {
+//     transform: rotate(0);
+//   }
+// `
 
-const AnimatedButton = styled(Button)`
-  animation: ${rotateAnimation} 0.4s ease-out;
-`
+// const AnimatedButton = styled(Button)`
+//   animation: ${rotateAnimation} 0.4s ease-out;
+// `
