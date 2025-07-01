@@ -66,7 +66,7 @@
     "notion-helper": "^1.3.22",
     "opendal": "0.47.11",
     "os-proxy-config": "^1.1.2",
-    "selection-hook": "^0.9.23",
+    "selection-hook": "^1.0.2",
     "turndown": "7.2.0"
   },
   "devDependencies": {
