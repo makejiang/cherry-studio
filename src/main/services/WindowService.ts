@@ -71,8 +71,7 @@ export class WindowService {
         webSecurity: false,
         webviewTag: true,
         allowRunningInsecureContent: true,
-        zoomFactor: configManager.getZoomFactor(),
-        backgroundThrottling: false
+        zoomFactor: configManager.getZoomFactor()
       }
     })
 
@@ -143,9 +142,10 @@ export class WindowService {
   }
 
   private setupContextMenu(mainWindow: BrowserWindow) {
-    contextMenu.contextMenu(mainWindow)
-    app.on('browser-window-created', (_, win) => {
-      contextMenu.contextMenu(win)
+    contextMenu.contextMenu(mainWindow.webContents)
+    // setup context menu for all webviews like miniapp
+    app.on('web-contents-created', (_, webContents) => {
+      contextMenu.contextMenu(webContents)
     })
 
     // Dangerous API
@@ -450,8 +450,7 @@ export class WindowService {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
         webSecurity: false,
-        webviewTag: true,
-        backgroundThrottling: false
+        webviewTag: true
       }
     })
 

@@ -5,6 +5,7 @@ import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel } from '@renderer/config/models'
 import { TRANSLATE_PROMPT } from '@renderer/config/prompts'
 import { translateLanguageOptions } from '@renderer/config/translate'
+import { useCodeStyle } from '@renderer/context/CodeStyleProvider'
 import db from '@renderer/databases'
 import { useDefaultModel } from '@renderer/hooks/useAssistant'
 import { useProviders } from '@renderer/hooks/useProvider'
@@ -27,10 +28,9 @@ import TextArea, { TextAreaRef } from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { find, isEmpty, sortBy } from 'lodash'
-import { ChevronDown, HelpCircle, Settings2, TriangleAlert } from 'lucide-react'
+import { HelpCircle, Settings2, TriangleAlert } from 'lucide-react'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components'
 
 let _text = ''
@@ -144,7 +144,6 @@ const TranslateSettings: FC<{
               }}
               options={selectOptions}
               showSearch
-              suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
             />
           </HStack>
           {!translateModel && (
@@ -203,7 +202,6 @@ const TranslateSettings: FC<{
                       </Space.Compact>
                     )
                   }))}
-                  suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
                 />
                 <span>⇆</span>
                 <Select
@@ -221,7 +219,6 @@ const TranslateSettings: FC<{
                       </Space.Compact>
                     )
                   }))}
-                  suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
                 />
               </Flex>
             </Space>
@@ -277,9 +274,11 @@ const TranslateSettings: FC<{
 
 const TranslatePage: FC = () => {
   const { t } = useTranslation()
+  const { shikiMarkdownIt } = useCodeStyle()
   const [targetLanguage, setTargetLanguage] = useState(_targetLanguage)
   const [text, setText] = useState(_text)
   const [result, setResult] = useState(_result)
+  const [renderedMarkdown, setRenderedMarkdown] = useState<string>('')
   const { translateModel, setTranslateModel } = useDefaultModel()
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -440,6 +439,24 @@ const TranslatePage: FC = () => {
     isEmpty(text) && setResult('')
   }, [text])
 
+  // Render markdown content when result or enableMarkdown changes
+  useEffect(() => {
+    if (enableMarkdown && result) {
+      let isMounted = true
+      shikiMarkdownIt(result).then((rendered) => {
+        if (isMounted) {
+          setRenderedMarkdown(rendered)
+        }
+      })
+      return () => {
+        isMounted = false
+      }
+    } else {
+      setRenderedMarkdown('')
+      return undefined
+    }
+  }, [result, enableMarkdown, shikiMarkdownIt])
+
   useEffect(() => {
     runAsyncFunction(async () => {
       const targetLang = await db.settings.get({ id: 'translate:target:language' })
@@ -513,7 +530,6 @@ const TranslatePage: FC = () => {
             </Space.Compact>
           )
         }))}
-        suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
       />
     )
   }
@@ -613,7 +629,6 @@ const TranslatePage: FC = () => {
                     )
                   }))
                 ]}
-                suffixIcon={<ChevronDown strokeWidth={1.5} size={16} color="var(--color-text-3)" />}
               />
               <Button
                 type="text"
@@ -670,13 +685,13 @@ const TranslatePage: FC = () => {
             />
           </OperationBar>
 
-          <OutputText ref={outputTextRef} onScroll={handleOutputScroll} className="selectable">
+          <OutputText ref={outputTextRef} onScroll={handleOutputScroll} className={'selectable'}>
             {!result ? (
               t('translate.output.placeholder')
             ) : enableMarkdown ? (
-              <ReactMarkdown>{result}</ReactMarkdown>
+              <div className="markdown" dangerouslySetInnerHTML={{ __html: renderedMarkdown }} />
             ) : (
-              result
+              <div className="plain">{result}</div>
             )}
           </OutputText>
         </OutputContainer>
@@ -766,7 +781,19 @@ const OutputText = styled.div`
   flex: 1;
   padding: 5px 16px;
   overflow-y: auto;
-  white-space: pre-wrap;
+
+  .plain {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .markdown {
+    /* for shiki code block overflow */
+    .line * {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+  }
 `
 
 const TranslateButton = styled(Button)``
