@@ -1634,7 +1634,14 @@
         "tags": "タグ",
         "tagsPlaceholder": "タグを入力",
         "providerPlaceholder": "プロバイダー名",
-        "advancedSettings": "詳細設定"
+        "advancedSettings": "詳細設定",
+        "addServer.importFrom.method": "インポート方法",
+        "addServer.importFrom.dxtFile": "DXTパッケージファイル",
+        "addServer.importFrom.dxtHelp": "MCPサーバーパッケージを含む.dxtファイルを選択してください",
+        "addServer.importFrom.selectDxtFile": "DXTファイルを選択",
+        "addServer.importFrom.noDxtFile": "DXTファイルを選択してください",
+        "addServer.importFrom.dxtProcessFailed": "DXTファイルの処理に失敗しました",
+        "addServer.importFrom.dxt": "DXTパッケージをインポート"
       },
       "messages.prompt": "プロンプト表示",
       "messages.tokens": "トークン使用量を表示",
@@ -2096,11 +2103,11 @@
           "siliconflow": "SiliconFlow",
           "tencentcloud": "Tencent Cloud TTS"
         },
-        "streaming": "[to be translated]:Streaming Synthesis",
-        "streaming.description": "[to be translated]:Enable real-time streaming speech synthesis for faster playback with reduced waiting time",
+        "streaming": "ストリーミング合成",
+        "streaming.description": "リアルタイムストリーミング音声合成を有効にして、待ち時間を短縮し、より高速な再生を実現します",
         "pause_support": {
-          "title": "[to be translated]:Enable Pause Function",
-          "description": "[to be translated]:Enable pause/resume for streaming audio (increases memory usage)"
+          "title": "一時停止機能を有効にする",
+          "description": "ストリーミングオーディオの一時停止/再開を有効にします（メモリ使用量が増加します）"
         }
       }
     },
@@ -2449,7 +2456,12 @@
       "global_memory_disabled_desc": "メモリ機能を使用するには、まずアシスタント設定でグローバルメモリを有効にしてください。",
       "not_configured_title": "メモリが設定されていません",
       "not_configured_desc": "メモリ機能を有効にするには、メモリ設定で埋め込みとLLMモデルを設定してください。",
-      "go_to_memory_page": "メモリページに移動"
+      "go_to_memory_page": "メモリページに移動",
+      "settings": "設定",
+      "statistics": "統計",
+      "search": "検索",
+      "actions": "アクション",
+      "user_management": "ユーザー管理"
     }
   }
 }

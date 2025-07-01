@@ -1637,7 +1637,14 @@
         "tags": "標籤",
         "tagsPlaceholder": "輸入標籤",
         "providerPlaceholder": "提供者名稱",
-        "advancedSettings": "高級設定"
+        "advancedSettings": "高級設定",
+        "addServer.importFrom.method": "導入方式",
+        "addServer.importFrom.dxtFile": "DXT 封裝檔案",
+        "addServer.importFrom.dxtHelp": "選擇包含 MCP 伺服器封裝的 .dxt 檔案",
+        "addServer.importFrom.selectDxtFile": "選擇 DXT 檔案",
+        "addServer.importFrom.noDxtFile": "請選擇一個 DXT 檔案",
+        "addServer.importFrom.dxtProcessFailed": "處理 DXT 檔案失敗",
+        "addServer.importFrom.dxt": "導入 DXT 封裝"
       },
       "messages.prompt": "提示詞顯示",
       "messages.tokens": "Token 用量顯示",
@@ -2096,11 +2103,11 @@
           "siliconflow": "硅基流動",
           "tencentcloud": "騰訊雲語音合成"
         },
-        "streaming": "[to be translated]:Streaming Synthesis",
-        "streaming.description": "[to be translated]:Enable real-time streaming speech synthesis for faster playback with reduced waiting time",
+        "streaming": "串流合成",
+        "streaming.description": "啟用即時串流語音合成，以更快的速度播放並減少等待時間",
         "pause_support": {
-          "title": "[to be translated]:Enable Pause Function",
-          "description": "[to be translated]:Enable pause/resume for streaming audio (increases memory usage)"
+          "title": "啟用暫停功能",
+          "description": "為串流音訊啟用暫停/恢復功能（會增加記憶體用量）"
         }
       }
     },
@@ -2449,7 +2456,12 @@
       "global_memory_disabled_desc": "要使用記憶功能，請先在助手設定中啟用全域記憶。",
       "not_configured_title": "記憶未配置",
       "not_configured_desc": "請在記憶設定中配置嵌入和LLM模型以啟用記憶功能。",
-      "go_to_memory_page": "前往記憶頁面"
+      "go_to_memory_page": "前往記憶頁面",
+      "settings": "設定",
+      "statistics": "統計",
+      "search": "搜尋",
+      "actions": "操作",
+      "user_management": "使用者管理"
     }
   }
 }

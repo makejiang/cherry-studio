@@ -2373,6 +2373,10 @@
     },
     "memory": {
       "title": "Memories",
+      "settings": "Settings",
+      "statistics": "Statistics",
+      "search": "Search",
+      "actions": "Actions",
       "description": "Memory allows you to store and manage information about your interactions with the assistant. You can add, edit, and delete memories, as well as filter and search through them.",
       "add_memory": "Add Memory",
       "edit_memory": "Edit Memory",
@@ -2414,6 +2418,7 @@
       "add_new_user": "Add New User",
       "new_user_id": "New User ID",
       "new_user_id_placeholder": "Enter a unique user ID",
+      "user_management": "User Management",
       "user_id_required": "User ID is required",
       "user_id_reserved": "'default-user' is reserved, please use a different ID",
       "user_id_exists": "This user ID already exists",

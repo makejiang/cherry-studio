@@ -1634,7 +1634,14 @@
         "tags": "Теги",
         "tagsPlaceholder": "Введите теги",
         "providerPlaceholder": "Имя провайдера",
-        "advancedSettings": "Расширенные настройки"
+        "advancedSettings": "Расширенные настройки",
+        "addServer.importFrom.method": "Способ импорта",
+        "addServer.importFrom.dxtFile": "Файл пакета DXT",
+        "addServer.importFrom.dxtHelp": "Выберите .dxt файл, содержащий пакет сервера MCP",
+        "addServer.importFrom.selectDxtFile": "Выберите DXT файл",
+        "addServer.importFrom.noDxtFile": "Пожалуйста, выберите DXT файл",
+        "addServer.importFrom.dxtProcessFailed": "Не удалось обработать DXT файл",
+        "addServer.importFrom.dxt": "Импорт пакета DXT"
       },
       "messages.prompt": "Показывать подсказки",
       "messages.tokens": "Показать использование токенов",
@@ -2096,11 +2103,11 @@
           "siliconflow": "SiliconFlow",
           "tencentcloud": "Tencent Cloud TTS"
         },
-        "streaming": "[to be translated]:Streaming Synthesis",
-        "streaming.description": "[to be translated]:Enable real-time streaming speech synthesis for faster playback with reduced waiting time",
+        "streaming": "Потоковая передача синтеза речи",
+        "streaming.description": "Включите потоковую передачу синтеза речи в реальном времени для более быстрого воспроизведения с уменьшенным временем ожидания",
         "pause_support": {
-          "title": "[to be translated]:Enable Pause Function",
-          "description": "[to be translated]:Enable pause/resume for streaming audio (increases memory usage)"
+          "title": "Включить функцию паузы",
+          "description": "Включить паузу/возобновление для потокового аудио (увеличивает использование памяти)"
         }
       }
     },
@@ -2449,7 +2456,12 @@
       "global_memory_disabled_desc": "Чтобы использовать функции памяти, сначала включите глобальную память в настройках ассистента.",
       "not_configured_title": "Память не настроена",
       "not_configured_desc": "Пожалуйста, настройте модели встраивания и LLM в настройках памяти, чтобы включить функциональность памяти.",
-      "go_to_memory_page": "Перейти на страницу памяти"
+      "go_to_memory_page": "Перейти на страницу памяти",
+      "settings": "Настройки",
+      "statistics": "Статистика",
+      "search": "Поиск",
+      "actions": "Действия",
+      "user_management": "Управление пользователями"
     }
   }
 }
