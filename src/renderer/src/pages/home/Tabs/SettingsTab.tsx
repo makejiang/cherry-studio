@@ -1,7 +1,7 @@
 import EditableNumber from '@renderer/components/EditableNumber'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Selector from '@renderer/components/Selector'
-import { isMac, isWindows } from '@renderer/config/constant'
+import { isMac, isWin } from '@renderer/config/constant'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { SettingDivider, SettingRow, SettingRowTitle } from '@renderer/pages/settings'
 import { useAppDispatch } from '@renderer/store'
@@ -153,7 +153,7 @@ const SettingsTab: FC = () => {
               { value: 'Enter', label: 'Enter' },
               { value: 'Shift+Enter', label: 'Shift + Enter' },
               { value: 'Ctrl+Enter', label: 'Ctrl + Enter' },
-              { value: 'Command+Enter', label: `${isMac ? '⌘' : isWindows ? 'Win' : 'Super'} + Enter` }
+              { value: 'Command+Enter', label: `${isMac ? '⌘' : isWin ? 'Win' : 'Super'} + Enter` }
             ]}
             onChange={(value) => setSendMessageShortcut(value as SendMessageShortcut)}
           />
