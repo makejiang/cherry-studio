@@ -604,21 +604,33 @@ const MemoriesPage = () => {
                       <div style={{ padding: '8px 0' }}>
                         <Button
                           type="text"
-                          icon={<UserAddOutlined />}
                           onClick={() => setAddUserModalVisible(true)}
                           style={{
                             width: '100%',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'flex-start'
+                            justifyContent: 'flex-start',
+                            padding: '4px 12px'
                           }}>
-                          {t('memory.add_new_user')}
+                          <Space align="center">
+                            <div
+                              style={{
+                                width: 20,
+                                height: 20,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                              <UserAddOutlined style={{ fontSize: 14 }} />
+                            </div>
+                            <span>{t('memory.add_new_user')}</span>
+                          </Space>
                         </Button>
                       </div>
                     </>
                   )}>
                   <Option value={DEFAULT_USER_ID}>
-                    <Space>
+                    <Space align="center">
                       <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                         {getUserAvatar(DEFAULT_USER_ID)}
                       </Avatar>
@@ -629,7 +641,7 @@ const MemoriesPage = () => {
                     .filter((user) => user !== DEFAULT_USER_ID)
                     .map((user) => (
                       <Option key={user} value={user}>
-                        <Space>
+                        <Space align="center">
                           <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                             {getUserAvatar(user)}
                           </Avatar>
