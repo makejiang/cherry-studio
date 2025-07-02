@@ -275,5 +275,3 @@ export class MemoryProcessor {
     }
   }
 }
-
-export const memoryProcessor = new MemoryProcessor()

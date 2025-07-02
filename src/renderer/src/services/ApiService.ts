@@ -51,7 +51,7 @@ import {
   getTranslateModel
 } from './AssistantService'
 import { processKnowledgeSearch } from './KnowledgeService'
-import { MemoryProcessor, memoryProcessor } from './MemoryProcessor'
+import { MemoryProcessor } from './MemoryProcessor'
 import {
   filterContextMessages,
   filterEmptyMessages,
@@ -194,6 +194,7 @@ async function fetchExternalTool(
         // Search for relevant memories
         const processorConfig = MemoryProcessor.getProcessorConfig(memoryConfig, assistant.id, currentUserId)
         console.log('Searching for relevant memories with content:', content)
+        const memoryProcessor = new MemoryProcessor()
         const relevantMemories = await memoryProcessor.searchRelevantMemories(
           content,
           processorConfig,
@@ -511,6 +512,7 @@ async function processConversationMemory(messages: Message[], assistant: Assista
     )
 
     // Process the conversation in the background (don't await to avoid blocking UI)
+    const memoryProcessor = new MemoryProcessor()
     memoryProcessor
       .processConversation(conversationMessages, processorConfig)
       .then((result) => {
