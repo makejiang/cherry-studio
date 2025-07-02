@@ -108,6 +108,24 @@ const MainTextBlock: React.FC<Props> = ({ block, citationBlockId, role, mentions
         })
         break
       }
+      case WebSearchSource.PERPLEXITY: {
+        formattedCitations.forEach((citation) => {
+          const citationNum = citation.number
+          const supData = {
+            id: citationNum,
+            url: citation.url,
+            title: citation.title || citation.hostname || '',
+            content: citation.content?.substring(0, 200)
+          }
+          const citationJson = encodeHTML(JSON.stringify(supData))
+
+          // Replace basic citation with full citation including data
+          const basicCitationRegex = new RegExp(`\\[<sup>${citationNum}</sup>\\]\\(.*?\\)`, 'g')
+          const fullCitationTag = `[<sup data-citation='${citationJson}'>${citationNum}</sup>](${citation.url})`
+          content = content.replace(basicCitationRegex, fullCitationTag)
+        })
+        break
+      }
       default: {
         // FIXME：性能问题，需要优化
         // Replace all citation numbers and pre-formatted links with formatted citations

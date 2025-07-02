@@ -8,7 +8,15 @@ import { createStreamProcessor, type StreamProcessorCallbacks } from '@renderer/
 import { estimateMessagesUsage } from '@renderer/services/TokenService'
 import store from '@renderer/store'
 import { updateTopicUpdatedAt } from '@renderer/store/assistants'
-import type { Assistant, ExternalToolResult, FileType, MCPToolResponse, Model, Topic } from '@renderer/types'
+import {
+  type Assistant,
+  type ExternalToolResult,
+  type FileType,
+  type MCPToolResponse,
+  type Model,
+  type Topic,
+  WebSearchSource
+} from '@renderer/types'
 import type {
   CitationMessageBlock,
   FileMessageBlock,
@@ -420,6 +428,9 @@ const fetchAndProcessAssistantResponseImpl = async (
         await handleBlockTransition(baseBlock as PlaceholderMessageBlock, MessageBlockType.UNKNOWN)
       },
       onTextChunk: async (text) => {
+        const citationBlockSource = citationBlockId
+          ? (getState().messageBlocks.entities[citationBlockId] as CitationMessageBlock).response?.source
+          : WebSearchSource.WEBSEARCH
         accumulatedContent += text
         if (mainTextBlockId) {
           const blockChanges: Partial<MessageBlock> = {
@@ -433,7 +444,7 @@ const fetchAndProcessAssistantResponseImpl = async (
             type: MessageBlockType.MAIN_TEXT,
             content: accumulatedContent,
             status: MessageBlockStatus.STREAMING,
-            citationReferences: citationBlockId ? [{ citationBlockId }] : []
+            citationReferences: citationBlockId ? [{ citationBlockId, citationBlockSource }] : []
           }
           mainTextBlockId = initialPlaceholderBlockId
           // 清理占位块
@@ -444,7 +455,7 @@ const fetchAndProcessAssistantResponseImpl = async (
         } else {
           const newBlock = createMainTextBlock(assistantMsgId, accumulatedContent, {
             status: MessageBlockStatus.STREAMING,
-            citationReferences: citationBlockId ? [{ citationBlockId }] : []
+            citationReferences: citationBlockId ? [{ citationBlockId, citationBlockSource }] : []
           })
           mainTextBlockId = newBlock.id // 立即设置ID，防止竞态条件
           await handleBlockTransition(newBlock, MessageBlockType.MAIN_TEXT)
@@ -615,14 +626,16 @@ const fetchAndProcessAssistantResponseImpl = async (
         }
       },
       onLLMWebSearchComplete: async (llmWebSearchResult) => {
-        if (citationBlockId) {
+        const blockId = citationBlockId || initialPlaceholderBlockId
+        if (blockId) {
           hasWebSearch = true
           const changes: Partial<CitationMessageBlock> = {
+            type: MessageBlockType.CITATION,
             response: llmWebSearchResult,
             status: MessageBlockStatus.SUCCESS
           }
-          dispatch(updateOneBlock({ id: citationBlockId, changes }))
-          saveUpdatedBlockToDB(citationBlockId, assistantMsgId, topicId, getState)
+          dispatch(updateOneBlock({ id: blockId, changes }))
+          saveUpdatedBlockToDB(blockId, assistantMsgId, topicId, getState)
 
           if (mainTextBlockId) {
             const state = getState()
@@ -630,16 +643,29 @@ const fetchAndProcessAssistantResponseImpl = async (
             if (existingMainTextBlock && existingMainTextBlock.type === MessageBlockType.MAIN_TEXT) {
               const currentRefs = existingMainTextBlock.citationReferences || []
               const mainTextChanges = {
-                citationReferences: [
-                  ...currentRefs,
-                  { citationBlockId, citationBlockSource: llmWebSearchResult.source }
-                ]
+                citationReferences: [...currentRefs, { blockId, citationBlockSource: llmWebSearchResult.source }]
               }
               dispatch(updateOneBlock({ id: mainTextBlockId, changes: mainTextChanges }))
               saveUpdatedBlockToDB(mainTextBlockId, assistantMsgId, topicId, getState)
             }
             mainTextBlockId = null
           }
+          if (initialPlaceholderBlockId) {
+            citationBlockId = initialPlaceholderBlockId
+            initialPlaceholderBlockId = null
+          }
+        } else {
+          const citationBlock = createCitationBlock(
+            assistantMsgId,
+            {
+              response: llmWebSearchResult
+            },
+            {
+              status: MessageBlockStatus.SUCCESS
+            }
+          )
+          citationBlockId = citationBlock.id
+          await handleBlockTransition(citationBlock, MessageBlockType.CITATION)
         }
       },
       onImageCreated: async () => {

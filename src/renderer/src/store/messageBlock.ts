@@ -160,9 +160,19 @@ export const formatCitationsFromBlock = (block: CitationMessageBlock | undefined
             }
           }) || []
         break
+      case WebSearchSource.PERPLEXITY: {
+        formattedCitations =
+          (block.response.results as any[])?.map((result, index) => ({
+            number: index + 1,
+            url: result.url,
+            title: result.title,
+            showFavicon: true,
+            type: 'websearch'
+          })) || []
+        break
+      }
       case WebSearchSource.GROK:
       case WebSearchSource.OPENROUTER:
-      case WebSearchSource.PERPLEXITY:
         formattedCitations =
           (block.response.results as any[])?.map((url, index) => {
             try {

@@ -564,11 +564,11 @@ export class OpenAIAPIClient extends OpenAIBaseClient<
 
       // Perplexity citations
       // @ts-ignore - citations may not be in standard type definitions
-      if (context.provider?.id === 'perplexity' && chunk.citations && chunk.citations.length > 0) {
+      if (context.provider?.id === 'perplexity' && chunk.search_results && chunk.search_results.length > 0) {
         hasBeenCollectedWebSearch = true
         return {
           // @ts-ignore - citations may not be in standard type definitions
-          results: chunk.citations,
+          results: chunk.search_results,
           source: WebSearchSource.PERPLEXITY
         }
       }
