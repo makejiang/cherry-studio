@@ -293,7 +293,8 @@ async function fetchExternalTool(
     }
 
     // 发送工具执行完成通知
-    if (willUseTools) {
+    const wasAnyToolEnabled = shouldWebSearch || shouldKnowledgeSearch || shouldSearchMemory
+    if (wasAnyToolEnabled) {
       onChunkReceived({
         type: ChunkType.EXTERNEL_TOOL_COMPLETE,
         external_tool: {
@@ -339,7 +340,8 @@ async function fetchExternalTool(
     console.error('Tool execution failed:', error)
 
     // 发送错误状态
-    if (willUseTools) {
+    const wasAnyToolEnabled = shouldWebSearch || shouldKnowledgeSearch || shouldSearchMemory
+    if (wasAnyToolEnabled) {
       onChunkReceived({
         type: ChunkType.EXTERNEL_TOOL_COMPLETE,
         external_tool: {

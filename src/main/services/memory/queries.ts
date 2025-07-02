@@ -51,6 +51,14 @@ export const MemoryQueries = {
   memory: {
     checkExists: 'SELECT id FROM memories WHERE hash = ? AND is_deleted = 0',
 
+    checkExistsIncludeDeleted: 'SELECT id, is_deleted FROM memories WHERE hash = ?',
+
+    restoreDeleted: `
+      UPDATE memories 
+      SET is_deleted = 0, memory = ?, embedding = ?, metadata = ?, updated_at = ?
+      WHERE id = ?
+    `,
+
     insert: `
       INSERT INTO memories (id, memory, hash, embedding, metadata, user_id, agent_id, run_id, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

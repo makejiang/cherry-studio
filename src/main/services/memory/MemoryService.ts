@@ -146,13 +146,62 @@ export class MemoryService {
 
         // Check if memory already exists
         const existing = await this.db.execute({
-          sql: MemoryQueries.memory.checkExists,
+          sql: MemoryQueries.memory.checkExistsIncludeDeleted,
           args: [hash]
         })
 
         if (existing.rows.length > 0) {
-          Logger.info(`Memory already exists with hash: ${hash}`)
-          continue
+          const existingRecord = existing.rows[0] as any
+          const isDeleted = existingRecord.is_deleted === 1
+
+          if (!isDeleted) {
+            // Active record exists, skip insertion
+            Logger.info(`Memory already exists with hash: ${hash}`)
+            continue
+          } else {
+            // Deleted record exists, restore it instead of inserting new one
+            Logger.info(`Restoring deleted memory with hash: ${hash}`)
+
+            // Generate embedding if model is configured
+            let embedding: number[] | null = null
+            if (this.config?.embedderModel) {
+              try {
+                embedding = await this.generateEmbedding(trimmedMemory)
+                Logger.info(
+                  `Generated embedding for restored memory with dimension: ${embedding.length} (normalized to ${MemoryService.UNIFIED_DIMENSION})`
+                )
+              } catch (error) {
+                Logger.error('Failed to generate embedding for restored memory:', error)
+              }
+            }
+
+            const now = new Date().toISOString()
+
+            // Restore the deleted record
+            await this.db.execute({
+              sql: MemoryQueries.memory.restoreDeleted,
+              args: [
+                trimmedMemory,
+                embedding ? this.embeddingToVector(embedding) : null,
+                metadata ? JSON.stringify(metadata) : null,
+                now,
+                existingRecord.id
+              ]
+            })
+
+            // Add to history
+            await this.addHistory(existingRecord.id, null, trimmedMemory, 'ADD')
+
+            addedMemories.push({
+              id: existingRecord.id,
+              memory: trimmedMemory,
+              hash,
+              createdAt: now,
+              updatedAt: now,
+              metadata
+            })
+            continue
+          }
         }
 
         // Generate embedding if model is configured
