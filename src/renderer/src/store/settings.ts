@@ -37,19 +37,6 @@ export type UserTheme = {
   colorPrimary: string
 }
 
-export interface S3Config {
-  endpoint: string
-  region: string
-  bucket: string
-  accessKeyId: string
-  secretAccessKey: string
-  root: string
-  autoSync: boolean
-  syncInterval: number
-  maxBackups: number
-  skipBackupFile: boolean
-}
-
 export interface SettingsState {
   showAssistants: boolean
   showTopics: boolean
@@ -196,7 +183,6 @@ export interface SettingsState {
     knowledgeEmbed: boolean
   }
   defaultPaintingProvider: PaintingProvider
-  s3: S3Config
   transparentWindow: boolean
 }
 
@@ -341,19 +327,7 @@ export const initialState: SettingsState = {
     knowledgeEmbed: false
   },
   defaultPaintingProvider: 'aihubmix',
-  transparentWindow: true,
-  s3: {
-    endpoint: '',
-    region: '',
-    bucket: '',
-    accessKeyId: '',
-    secretAccessKey: '',
-    root: '',
-    autoSync: false,
-    syncInterval: 0,
-    maxBackups: 0,
-    skipBackupFile: false
-  }
+  transparentWindow: true
 }
 
 const settingsSlice = createSlice({
@@ -712,9 +686,6 @@ const settingsSlice = createSlice({
     setDefaultPaintingProvider: (state, action: PayloadAction<PaintingProvider>) => {
       state.defaultPaintingProvider = action.payload
     },
-    setS3: (state, action: PayloadAction<S3Config>) => {
-      state.s3 = action.payload
-    },
     setTransparentWindow: (state, action: PayloadAction<boolean>) => {
       state.transparentWindow = action.payload
     }
@@ -824,7 +795,6 @@ export const {
   setOpenAIServiceTier,
   setNotificationSettings,
   setDefaultPaintingProvider,
-  setS3,
   setTransparentWindow
 } = settingsSlice.actions
 

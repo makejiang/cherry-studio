@@ -3,7 +3,7 @@ import ModelAvatar from '@renderer/components/Avatar/ModelAvatar'
 import CustomSelect from '@renderer/components/CustomSelect'
 import { HStack } from '@renderer/components/Layout'
 import PromptPopup from '@renderer/components/Popups/PromptPopup'
-import { isEmbeddingModel } from '@renderer/config/models'
+import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { TRANSLATE_PROMPT } from '@renderer/config/prompts'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAssistants, useDefaultAssistant, useDefaultModel } from '@renderer/hooks/useAssistant'
@@ -46,7 +46,7 @@ const ModelSettings: FC = () => {
       label: p.isSystem ? t(`provider.${p.id}`) : p.name,
       title: p.name,
       options: sortBy(p.models, 'name')
-        .filter((m) => !isEmbeddingModel(m))
+        .filter((m) => !isEmbeddingModel(m) && !isRerankModel(m))
         .map((m) => ({
           label: `${m.name} | ${p.isSystem ? t(`provider.${p.id}`) : p.name}`,
           value: getModelUniqId(m)
@@ -238,7 +238,7 @@ const StyledButton = styled(Button)<{ selected: boolean }>`
   &:first-child {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right-width: 0px; // No right border for the first button when not selected
+    border-right-width: 0; // No right border for the first button when not selected
   }
 
   &:last-child {
@@ -248,6 +248,7 @@ const StyledButton = styled(Button)<{ selected: boolean }>`
   }
 
   // Override Ant Design's default hover and focus styles for a cleaner look
+
   &:hover,
   &:focus {
     z-index: 1;
