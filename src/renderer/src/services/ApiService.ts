@@ -284,11 +284,15 @@ async function fetchExternalTool(
         // 添加内置工具
         const { BUILT_IN_TOOLS } = await import('../tools')
         mcpTools.push(...BUILT_IN_TOOLS)
-        assistant.prompt = buildSystemPromptWithThinkTool(assistant.prompt)
 
-        // 将系统提示词的修改提前到这里，避免重复代码
+        // 根据toolUseMode决定如何构建系统提示词
+        const basePrompt = assistant.prompt
         if (assistant.settings?.toolUseMode === 'prompt' || mcpTools.length > SYSTEM_PROMPT_THRESHOLD) {
-          assistant.prompt = buildSystemPromptWithTools(assistant.prompt, mcpTools)
+          // 提示词模式：需要完整的工具定义和思考指令
+          assistant.prompt = buildSystemPromptWithTools(basePrompt, mcpTools)
+        } else {
+          // 原生函数调用模式：仅需要注入思考指令
+          assistant.prompt = buildSystemPromptWithThinkTool(basePrompt)
         }
       } catch (toolError) {
         console.error('Error fetching MCP tools:', toolError)
