@@ -110,22 +110,14 @@ class KnowledgeService {
 
   private getRagApplication = async ({
     id,
-    model,
-    provider,
-    apiKey,
-    apiVersion,
-    baseURL,
+    embedApiClient,
     dimensions
   }: KnowledgeBaseParams): Promise<RAGApplication> => {
     let ragApplication: RAGApplication
     const embeddings = new Embeddings({
-      model,
-      provider,
-      apiKey,
-      apiVersion,
-      baseURL,
+      embedApiClient,
       dimensions
-    } as KnowledgeBaseParams)
+    })
     try {
       ragApplication = await new RAGApplicationBuilder()
         .setModel('NO_MODEL')

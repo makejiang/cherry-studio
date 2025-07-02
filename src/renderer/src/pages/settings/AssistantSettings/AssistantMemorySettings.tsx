@@ -65,7 +65,7 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
     window.location.hash = '#/memory'
   }
 
-  const isMemoryConfigured = memoryConfig.embedderModel && memoryConfig.llmModel
+  const isMemoryConfigured = memoryConfig.embedderApiClient && memoryConfig.llmApiClient
   const isMemoryEnabled = globalMemoryEnabled && isMemoryConfigured
 
   return (
@@ -129,16 +129,16 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
             <Text strong>{t('memory.stored_memories')}: </Text>
             <Text>{memoryStats.loading ? t('common.loading') : memoryStats.count}</Text>
           </div>
-          {memoryConfig.embedderModel && (
+          {memoryConfig.embedderApiClient && (
             <div>
               <Text strong>{t('memory.embedding_model')}: </Text>
-              <Text code>{memoryConfig.embedderModel.name}</Text>
+              <Text code>{memoryConfig.embedderApiClient.model}</Text>
             </div>
           )}
-          {memoryConfig.llmModel && (
+          {memoryConfig.llmApiClient && (
             <div>
               <Text strong>{t('memory.llm_model')}: </Text>
-              <Text code>{memoryConfig.llmModel.name}</Text>
+              <Text code>{memoryConfig.llmApiClient.model}</Text>
             </div>
           )}
         </Space>

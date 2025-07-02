@@ -16,8 +16,6 @@ interface SearchResult {
   error?: string
 }
 
-import { getProviderByModel } from './AssistantService'
-
 /**
  * Service for managing memory operations including storing, searching, and retrieving memories
  * This service delegates all operations to the main process via IPC
@@ -202,13 +200,13 @@ class MemoryService {
       }
 
       const memoryConfig = selectMemoryConfig(store.getState())
-      const embedderProvider = memoryConfig.embedderModel ? getProviderByModel(memoryConfig.embedderModel) : undefined
-      const llmProvider = memoryConfig.llmModel ? getProviderByModel(memoryConfig.llmModel) : undefined
+      const embedderApiClient = memoryConfig.embedderApiClient
+      const llmApiClient = memoryConfig.llmApiClient
 
       const configWithProviders = {
         ...memoryConfig,
-        embedderProvider,
-        llmProvider
+        embedderApiClient,
+        llmApiClient
       }
 
       return window.api.memory.setConfig(configWithProviders)

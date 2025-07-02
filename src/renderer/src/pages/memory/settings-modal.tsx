@@ -1,5 +1,6 @@
 import AiProvider from '@renderer/aiCore'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
+import { useModel } from '@renderer/hooks/useModel'
 import { useProviders } from '@renderer/hooks/useProvider'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { selectMemoryConfig, updateMemoryConfig } from '@renderer/store/memory'
@@ -17,6 +18,13 @@ interface MemoriesSettingsModalProps {
   form: any
 }
 
+type formValue = {
+  llmModel: string
+  embedderModel: string
+  embedderDimensions: number
+  autoDims: boolean
+}
+
 const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubmit, onCancel, form }) => {
   const { providers } = useProviders()
   const dispatch = useDispatch()
@@ -26,33 +34,38 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
   // Get all models for lookup
   const allModels = providers.flatMap((p) => p.models)
+  const llmModel = useModel(memoryConfig.llmApiClient?.model, memoryConfig.llmApiClient?.provider)
+  const embedderModel = useModel(memoryConfig.embedderApiClient?.model, memoryConfig.embedderApiClient?.provider)
 
   // Initialize form with current memory config when modal opens
   useEffect(() => {
     if (visible && memoryConfig) {
-      // Set autoDims based on whether dimensions are stored
-      const hasStoredDimensions = memoryConfig.embedderDimensions !== undefined
-      setAutoDims(!hasStoredDimensions)
+      // Use isAutoDimensions to determine autoDims state, defaulting to true if not set
+      const isAutoDims = memoryConfig.isAutoDimensions !== false
+      setAutoDims(isAutoDims)
 
       form.setFieldsValue({
-        llmModel: memoryConfig.llmModel ? getModelUniqId(memoryConfig.llmModel) : undefined,
-        embedderModel: memoryConfig.embedderModel ? getModelUniqId(memoryConfig.embedderModel) : undefined,
+        llmModel: getModelUniqId(llmModel),
+        embedderModel: getModelUniqId(embedderModel),
         embedderDimensions: memoryConfig.embedderDimensions,
-        autoDims: !hasStoredDimensions
+        autoDims: isAutoDims
         // customFactExtractionPrompt: memoryConfig.customFactExtractionPrompt,
         // customUpdateMemoryPrompt: memoryConfig.customUpdateMemoryPrompt
       })
     }
-  }, [visible, memoryConfig, form])
+  }, [visible, memoryConfig, form, llmModel, embedderModel])
 
-  const handleFormSubmit = async (values: any) => {
+  const handleFormSubmit = async (values: formValue) => {
     try {
       // Convert model IDs back to Model objects
       const llmModel = values.llmModel ? allModels.find((m) => getModelUniqId(m) === values.llmModel) : undefined
+      const llmProvider = providers.find((p) => p.id === llmModel?.provider)
+      const aiLlmProvider = new AiProvider(llmProvider!)
       const embedderModel = values.embedderModel
         ? allModels.find((m) => getModelUniqId(m) === values.embedderModel)
         : undefined
-
+      const embedderProvider = providers.find((p) => p.id === embedderModel?.provider)
+      const aiEmbedderProvider = new AiProvider(embedderProvider!)
       if (embedderModel) {
         setLoading(true)
         const provider = providers.find((p) => p.id === embedderModel.provider)
@@ -83,9 +96,22 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
 
         const updatedConfig = {
           ...memoryConfig,
-          llmModel,
-          embedderModel,
-          embedderDimensions: finalDimensions
+          llmApiClient: {
+            model: llmModel?.id ?? '',
+            provider: llmProvider?.id ?? '',
+            apiKey: aiLlmProvider.getApiKey(),
+            baseURL: aiLlmProvider.getBaseURL(),
+            apiVersion: llmProvider?.apiVersion
+          },
+          embedderApiClient: {
+            model: embedderModel?.id ?? '',
+            provider: embedderProvider?.id ?? '',
+            apiKey: aiEmbedderProvider.getApiKey(),
+            baseURL: aiEmbedderProvider.getBaseURL(),
+            apiVersion: embedderProvider?.apiVersion
+          },
+          embedderDimensions: finalDimensions,
+          isAutoDimensions: values.autoDims
           // customFactExtractionPrompt: values.customFactExtractionPrompt,
           // customUpdateMemoryPrompt: values.customUpdateMemoryPrompt
         }

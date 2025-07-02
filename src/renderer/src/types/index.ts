@@ -438,20 +438,21 @@ export interface KnowledgeBase {
   // topN?: number
 }
 
-export type KnowledgeBaseParams = {
-  id: string
+export type ApiClient = {
   model: string
   provider: string
-  dimensions?: number
   apiKey: string
   apiVersion?: string
   baseURL: string
+}
+
+export type KnowledgeBaseParams = {
+  id: string
+  dimensions?: number
   chunkSize?: number
   chunkOverlap?: number
-  rerankApiKey?: string
-  rerankBaseURL?: string
-  rerankModel?: string
-  rerankModelProvider?: string
+  embedApiClient: ApiClient
+  rerankApiClient?: ApiClient
   documentCount?: number
 }
 
@@ -749,13 +750,21 @@ export type { Message } from './newMessage'
 // Memory Service Types
 // ========================================================================
 export interface MemoryConfig {
+  /**
+   * @deprecated use embedderApiClient instead
+   */
   embedderModel?: Model
   embedderDimensions?: number
-  embedderProvider?: Provider
+  /**
+   * @deprecated use llmApiClient instead
+   */
   llmModel?: Model
-  llmProvider?: Provider
+  embedderApiClient?: ApiClient
+  llmApiClient?: ApiClient
   customFactExtractionPrompt?: string
   customUpdateMemoryPrompt?: string
+  /** Indicates whether embedding dimensions are automatically detected */
+  isAutoDimensions?: boolean
 }
 
 export interface MemoryItem {
