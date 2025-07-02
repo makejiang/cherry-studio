@@ -96,7 +96,7 @@ const KnowledgePage: FC = () => {
         <NavbarCenter style={{ borderRight: 'none' }}>{t('knowledge.title')}</NavbarCenter>
       </Navbar>
       <ContentContainer id="content-container">
-        <SideNav>
+        <KnowledgeSideNav>
           <ScrollContainer>
             <DragableList
               list={bases}
@@ -127,7 +127,7 @@ const KnowledgePage: FC = () => {
             )}
             <div style={{ minHeight: '10px' }}></div>
           </ScrollContainer>
-        </SideNav>
+        </KnowledgeSideNav>
         {bases.length === 0 ? (
           <MainContent>
             <Empty description={t('knowledge.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -162,8 +162,8 @@ const MainContent = styled(Scrollbar)`
   padding-bottom: 50px;
 `
 
-const SideNav = styled.div`
-  min-width: var(--settings-width);
+export const KnowledgeSideNav = styled.div`
+  min-width: 240px;
   border-right: 0.5px solid var(--color-border);
   padding: 12px 10px;
   display: flex;
