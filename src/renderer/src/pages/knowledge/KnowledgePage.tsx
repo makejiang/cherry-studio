@@ -163,7 +163,7 @@ const MainContent = styled(Scrollbar)`
 `
 
 export const KnowledgeSideNav = styled.div`
-  min-width: 240px;
+  min-width: var(--settings-width);
   border-right: 0.5px solid var(--color-border);
   padding: 12px 10px;
   display: flex;

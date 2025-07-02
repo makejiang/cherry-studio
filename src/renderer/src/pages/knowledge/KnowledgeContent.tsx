@@ -1,13 +1,12 @@
 import { RedoOutlined } from '@ant-design/icons'
 import CustomTag from '@renderer/components/CustomTag'
 import { HStack } from '@renderer/components/Layout'
-import ListItem from '@renderer/components/ListItem'
 import { useKnowledge } from '@renderer/hooks/useKnowledge'
 import { NavbarIcon } from '@renderer/pages/home/Navbar'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { KnowledgeBase } from '@renderer/types'
-import { Button, Empty, Tag, Tooltip } from 'antd'
-import { Book, Folder, Globe, Link, Notebook, Search, Settings2 } from 'lucide-react'
+import { Button, Empty, Tabs, Tag, Tooltip } from 'antd'
+import { Book, Folder, Globe, Link, Notebook, Search, Settings } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -19,7 +18,6 @@ import KnowledgeFiles from './items/KnowledgeFiles'
 import KnowledgeNotes from './items/KnowledgeNotes'
 import KnowledgeSitemaps from './items/KnowledgeSitemaps'
 import KnowledgeUrls from './items/KnowledgeUrls'
-import { KnowledgeSideNav } from './KnowledgePage'
 
 interface KnowledgeContentProps {
   selectedBase: KnowledgeBase
@@ -36,32 +34,37 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     {
       key: 'files',
       title: t('files.title'),
-      icon: <Book size={16} />,
-      items: fileItems
+      icon: activeKey === 'files' ? <Book size={16} color="var(--color-primary)" /> : <Book size={16} />,
+      items: fileItems,
+      content: <KnowledgeFiles selectedBase={selectedBase} />
     },
     {
       key: 'notes',
       title: t('knowledge.notes'),
-      icon: <Notebook size={16} />,
-      items: noteItems
+      icon: activeKey === 'notes' ? <Notebook size={16} color="var(--color-primary)" /> : <Notebook size={16} />,
+      items: noteItems,
+      content: <KnowledgeNotes selectedBase={selectedBase} />
     },
     {
       key: 'directories',
       title: t('knowledge.directories'),
-      icon: <Folder size={16} />,
-      items: directoryItems
+      icon: activeKey === 'directories' ? <Folder size={16} color="var(--color-primary)" /> : <Folder size={16} />,
+      items: directoryItems,
+      content: <KnowledgeDirectories selectedBase={selectedBase} />
     },
     {
       key: 'urls',
       title: t('knowledge.urls'),
-      icon: <Link size={16} />,
-      items: urlItems
+      icon: activeKey === 'urls' ? <Link size={16} color="var(--color-primary)" /> : <Link size={16} />,
+      items: urlItems,
+      content: <KnowledgeUrls selectedBase={selectedBase} />
     },
     {
       key: 'sitemaps',
       title: t('knowledge.sitemaps'),
-      icon: <Globe size={16} />,
-      items: sitemapItems
+      icon: activeKey === 'sitemaps' ? <Globe size={16} color="var(--color-primary)" /> : <Globe size={16} />,
+      items: sitemapItems,
+      content: <KnowledgeSitemaps selectedBase={selectedBase} />
     }
   ]
 
@@ -69,13 +72,27 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
     return null
   }
 
+  const tabItems = knowledgeItems.map((item) => ({
+    key: item.key,
+    label: (
+      <TabLabel>
+        {item.icon}
+        <span>{item.title}</span>
+        <CustomTag size={10} color={item.items.length > 0 ? '#00b96b' : '#cccccc'}>
+          {item.items.length}
+        </CustomTag>
+      </TabLabel>
+    ),
+    children: <TabContent>{item.content}</TabContent>
+  }))
+
   return (
     <MainContainer>
       <HeaderContainer>
         <ModelInfo>
           <Button
             type="text"
-            icon={<Settings2 size={18} color="var(--color-icon)" />}
+            icon={<Settings size={18} color="var(--color-icon)" />}
             onClick={() => KnowledgeSettingsPopup.show({ base })}
             size="small"
           />
@@ -98,47 +115,12 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           </NarrowIcon>
         </HStack>
       </HeaderContainer>
-      <RightContainer>
-        <KnowledgeSideNav style={{ gap: 10 }}>
-          {knowledgeItems.map((item) => (
-            <ListItem
-              key={item.key}
-              title={item.title}
-              icon={item.icon}
-              active={activeKey === item.key}
-              onClick={() => setActiveKey(item.key)}
-              rightContent={
-                <CustomTag size={12} color={item.items.length > 0 ? '#008001' : '#cccccc'}>
-                  {item.items.length}
-                </CustomTag>
-              }
-            />
-          ))}
-        </KnowledgeSideNav>
-        <MainContent>
-          {activeKey === 'files' && <KnowledgeFiles selectedBase={selectedBase} />}
-          {activeKey === 'directories' && <KnowledgeDirectories selectedBase={selectedBase} />}
-          {activeKey === 'urls' && <KnowledgeUrls selectedBase={selectedBase} />}
-          {activeKey === 'sitemaps' && <KnowledgeSitemaps selectedBase={selectedBase} />}
-          {activeKey === 'notes' && <KnowledgeNotes selectedBase={selectedBase} />}
-        </MainContent>
-      </RightContainer>
+      <StyledTabs activeKey={activeKey} onChange={setActiveKey} items={tabItems} type="line" size="small" />
     </MainContainer>
   )
 }
 
-export const CollapseLabel = ({ label, count }: { label: string; count: number }) => {
-  return (
-    <HStack alignItems="center" gap={10}>
-      <label style={{ fontWeight: 600 }}>{label}</label>
-      <CustomTag size={12} color={count ? '#008001' : '#cccccc'}>
-        {count}
-      </CustomTag>
-    </HStack>
-  )
-}
-
-export const KnowledgeEmptyView = () => <Empty style={{ margin: 0 }} styles={{ image: { display: 'none' } }} />
+export const KnowledgeEmptyView = () => <Empty style={{ margin: 20 }} styles={{ image: { display: 'none' } }} />
 
 export const ItemHeaderLabel = ({ label }: { label: string }) => {
   return (
@@ -155,18 +137,55 @@ const MainContainer = styled.div`
   position: relative;
 `
 
-const RightContainer = styled.div`
+const TabLabel = styled.div`
   display: flex;
-  flex-direction: row;
-  flex: 1;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 14px;
 `
 
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
+const TabContent = styled.div``
+
+const StyledTabs = styled(Tabs)`
   flex: 1;
-  gap: 20px;
-  padding-bottom: 50px;
+
+  .ant-tabs-nav {
+    padding: 0 16px;
+    margin: 0;
+    min-height: 48px;
+  }
+
+  .ant-tabs-tab {
+    padding: 12px 12px;
+    margin-right: 0;
+    font-size: 13px;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  .ant-tabs-tab-btn {
+    font-size: 13px;
+  }
+
+  .ant-tabs-content {
+    position: initial !important;
+  }
+
+  .ant-tabs-content-holder {
+    overflow: hidden;
+  }
+
+  .ant-tabs-tabpane {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .ant-tabs-ink-bar {
+    height: 2px;
+  }
 `
 
 const HeaderContainer = styled.div`
@@ -184,7 +203,7 @@ const ModelInfo = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 8px;
-  height: 50px;
+  height: 45px;
 
   .model-header {
     display: flex;
@@ -233,9 +252,10 @@ export const ItemHeader = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 0.5px solid var(--color-border);
-  padding-bottom: 10px;
-  margin: 10px 15px;
+  position: absolute;
+  top: calc(var(--navbar-height) + 14px);
+  right: 16px;
+  z-index: 1000;
 `
 
 export const StatusIconWrapper = styled.div`

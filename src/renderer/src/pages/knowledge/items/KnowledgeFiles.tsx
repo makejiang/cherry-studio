@@ -21,7 +21,6 @@ import {
   FlexAlignCenter,
   ItemContainer,
   ItemHeader,
-  ItemHeaderLabel,
   KnowledgeEmptyView,
   RefreshIcon,
   StatusIconWrapper
@@ -106,9 +105,8 @@ const KnowledgeFiles: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   return (
     <ItemContainer>
       <ItemHeader>
-        <ItemHeaderLabel label={t('files.title')} />
         <Button
-          type="text"
+          type="primary"
           icon={<Plus size={16} />}
           onClick={(e) => {
             e.stopPropagation()
@@ -124,8 +122,7 @@ const KnowledgeFiles: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           showUploadList={false}
           customRequest={({ file }) => handleDrop([file as File])}
           multiple={true}
-          accept={fileTypes.join(',')}
-          style={{ background: 'transparent' }}>
+          accept={fileTypes.join(',')}>
           <p className="ant-upload-text">{t('knowledge.drag_file')}</p>
           <p className="ant-upload-hint">
             {t('knowledge.file_hint', { file_types: 'TXT, MD, HTML, PDF, DOCX, PPTX, XLSX, EPUB...' })}
@@ -190,8 +187,8 @@ const KnowledgeFiles: FC<KnowledgeContentProps> = ({ selectedBase }) => {
 const ItemFlexColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 0 15px;
+  padding: 20px 16px;
+  gap: 10px;
 `
 
 export default KnowledgeFiles

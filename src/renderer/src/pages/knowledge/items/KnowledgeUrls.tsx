@@ -19,7 +19,6 @@ import {
   FlexAlignCenter,
   ItemContainer,
   ItemHeader,
-  ItemHeaderLabel,
   KnowledgeEmptyView,
   RefreshIcon,
   StatusIconWrapper
@@ -111,9 +110,8 @@ const KnowledgeUrls: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   return (
     <ItemContainer>
       <ItemHeader>
-        <ItemHeaderLabel label={t('knowledge.urls')} />
         <Button
-          type="text"
+          type="primary"
           icon={<Plus size={16} />}
           onClick={(e) => {
             e.stopPropagation()
@@ -184,9 +182,9 @@ const KnowledgeUrls: FC<KnowledgeContentProps> = ({ selectedBase }) => {
 const ItemFlexColumn = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 0 15px;
-  height: calc(100vh - 175px);
+  gap: 10px;
+  padding: 20px 16px;
+  height: calc(100vh - 135px);
 `
 
 export default KnowledgeUrls

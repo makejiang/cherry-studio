@@ -13,14 +13,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import StatusIcon from '../components/StatusIcon'
-import {
-  FlexAlignCenter,
-  ItemContainer,
-  ItemHeader,
-  ItemHeaderLabel,
-  KnowledgeEmptyView,
-  StatusIconWrapper
-} from '../KnowledgeContent'
+import { FlexAlignCenter, ItemContainer, ItemHeader, KnowledgeEmptyView, StatusIconWrapper } from '../KnowledgeContent'
 
 interface KnowledgeContentProps {
   selectedBase: KnowledgeBase
@@ -66,9 +59,8 @@ const KnowledgeNotes: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   return (
     <ItemContainer>
       <ItemHeader>
-        <ItemHeaderLabel label={t('knowledge.notes')} />
         <Button
-          type="text"
+          type="primary"
           icon={<Plus size={16} />}
           onClick={(e) => {
             e.stopPropagation()
@@ -107,9 +99,9 @@ const KnowledgeNotes: FC<KnowledgeContentProps> = ({ selectedBase }) => {
 const ItemFlexColumn = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 0 15px;
-  height: calc(100vh - 175px);
+  gap: 10px;
+  padding: 20px 16px;
+  height: calc(100vh - 135px);
 `
 
 export default KnowledgeNotes
