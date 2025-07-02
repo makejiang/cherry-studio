@@ -5,10 +5,8 @@ import AppsPage from './pages/apps/AppsPage'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
-import LaunchpadPage from './pages/launchpad/LaunchpadPage'
 import McpServersPage from './pages/mcp-servers'
 import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
-import SettingsPage from './pages/settings/SettingsPage'
 import TranslatePage from './pages/translate/TranslatePage'
 
 const RouteContainer = () => {
@@ -22,8 +20,8 @@ const RouteContainer = () => {
       <Route path="/knowledge" element={<KnowledgePage />} />
       <Route path="/apps" element={<AppsPage />} />
       <Route path="/mcp-servers/*" element={<McpServersPage />} />
-      <Route path="/settings/*" element={<SettingsPage />} />
-      <Route path="/launchpad" element={<LaunchpadPage />} />
+      {/* <Route path="/settings/*" element={<SettingsPage />} />
+      <Route path="/launchpad" element={<LaunchpadPage />} /> */}
     </Routes>
   )
 }

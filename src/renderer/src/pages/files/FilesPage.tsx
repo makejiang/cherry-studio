@@ -134,17 +134,6 @@ const FilesPage: FC = () => {
         <NavbarCenter style={{ borderRight: 'none' }}>{t('files.title')}</NavbarCenter>
       </NavbarMain>
       <ContentContainer id="content-container">
-        <SideNav>
-          {menuItems.map((item) => (
-            <ListItem
-              key={item.key}
-              icon={item.icon}
-              title={item.label}
-              active={fileType === item.key}
-              onClick={() => setFileType(item.key as FileTypes)}
-            />
-          ))}
-        </SideNav>
         <MainContent>
           <SortContainer>
             <Flex gap={8} align="center">
@@ -207,6 +196,17 @@ const FilesPage: FC = () => {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           )}
         </MainContent>
+        <SideNav>
+          {menuItems.map((item) => (
+            <ListItem
+              key={item.key}
+              icon={item.icon}
+              title={item.label}
+              active={fileType === item.key}
+              onClick={() => setFileType(item.key as FileTypes)}
+            />
+          ))}
+        </SideNav>
       </ContentContainer>
     </Container>
   )

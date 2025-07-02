@@ -96,6 +96,13 @@ const KnowledgePage: FC = () => {
         <NavbarCenter style={{ borderRight: 'none' }}>{t('knowledge.title')}</NavbarCenter>
       </NavbarMain>
       <ContentContainer id="content-container">
+        {bases.length === 0 ? (
+          <MainContent>
+            <Empty description={t('knowledge.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </MainContent>
+        ) : selectedBase ? (
+          <KnowledgeContent selectedBase={selectedBase} />
+        ) : null}
         <SideNav>
           <ScrollContainer>
             <DragableList
@@ -128,13 +135,6 @@ const KnowledgePage: FC = () => {
             <div style={{ minHeight: '10px' }}></div>
           </ScrollContainer>
         </SideNav>
-        {bases.length === 0 ? (
-          <MainContent>
-            <Empty description={t('knowledge.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-          </MainContent>
-        ) : selectedBase ? (
-          <KnowledgeContent selectedBase={selectedBase} />
-        ) : null}
       </ContentContainer>
     </Container>
   )

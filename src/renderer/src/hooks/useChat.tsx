@@ -1,10 +1,9 @@
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { loadTopicMessagesThunk } from '@renderer/store/thunk/messageThunk'
-import { Assistant } from '@renderer/types'
-import { Topic } from '@renderer/types'
-import { use, useEffect, useMemo, useState } from 'react'
-import { createContext } from 'react'
+import { Assistant, Topic } from '@renderer/types'
+import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useTopicsForAssistant } from './useAssistant'
 import { useSettings } from './useSettings'
@@ -20,14 +19,25 @@ const ChatContext = createContext<ChatContextType | null>(null)
 
 export const ChatProvider = ({ children }) => {
   const assistants = useAppSelector((state) => state.assistants.assistants)
-  const [activeAssistant, setActiveAssistant] = useState<Assistant>(assistants[0])
+  const [activeAssistant, setActiveAssistantBase] = useState<Assistant>(assistants[0])
   const topics = useTopicsForAssistant(activeAssistant.id)
   const [activeTopic, setActiveTopic] = useState<Topic>(topics[0])
   const { clickAssistantToShowTopic } = useSettings()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  console.log('activeAssistant', activeAssistant)
-  console.log('activeTopic', activeTopic)
+  // 包装setActiveAssistant以添加导航逻辑
+  const setActiveAssistant = useCallback(
+    (assistant: Assistant) => {
+      setActiveAssistantBase(assistant)
+      // 如果当前不在聊天页面，导航到聊天页面
+      if (location.pathname !== '/') {
+        navigate('/')
+      }
+    },
+    [setActiveAssistantBase, location.pathname, navigate]
+  )
 
   // 当 topics 变化时，如果当前 activeTopic 不在 topics 中，设置第一个 topic
   useEffect(() => {
@@ -58,7 +68,7 @@ export const ChatProvider = ({ children }) => {
       EventEmitter.on(EVENT_NAMES.SET_TOPIC, setActiveTopic)
     ]
     return () => subscriptions.forEach((subscription) => subscription())
-  }, [])
+  }, [setActiveAssistant])
 
   const value = useMemo(
     () => ({
@@ -67,7 +77,7 @@ export const ChatProvider = ({ children }) => {
       setActiveAssistant,
       setActiveTopic
     }),
-    [activeAssistant, activeTopic]
+    [activeAssistant, activeTopic, setActiveAssistant]
   )
 
   return <ChatContext value={value}>{children}</ChatContext>

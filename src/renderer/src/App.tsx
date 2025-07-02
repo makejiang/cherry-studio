@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
 
-import TabsContainer from './components/Tabs/TabsContainer'
+import AppLayout from './components/Layout/AppLayout'
 import TopViewContainer from './components/TopView'
 import AntdProvider from './context/AntdProvider'
 import { CodeStyleProvider } from './context/CodeStyleProvider'
@@ -13,6 +13,7 @@ import { NotificationProvider } from './context/NotificationProvider'
 import StyleSheetManager from './context/StyleSheetManager'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
+import { ChatProvider } from './hooks/useChat'
 import Routes from './Routes'
 
 function App(): React.ReactElement {
@@ -24,14 +25,16 @@ function App(): React.ReactElement {
             <NotificationProvider>
               <CodeStyleProvider>
                 <PersistGate loading={null} persistor={persistor}>
-                  <TopViewContainer>
-                    <HashRouter>
+                  <HashRouter>
+                    <TopViewContainer>
                       <NavigationHandler />
-                      <TabsContainer>
-                        <Routes />
-                      </TabsContainer>
-                    </HashRouter>
-                  </TopViewContainer>
+                      <ChatProvider>
+                        <AppLayout>
+                          <Routes />
+                        </AppLayout>
+                      </ChatProvider>
+                    </TopViewContainer>
+                  </HashRouter>
                 </PersistGate>
               </CodeStyleProvider>
             </NotificationProvider>

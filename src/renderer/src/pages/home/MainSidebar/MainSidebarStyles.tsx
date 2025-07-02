@@ -56,6 +56,7 @@ export const Container = styled.div<{ transparent?: boolean }>`
   min-height: var(--main-height);
   background: var(--color-background);
   padding-top: 10px;
+  margin-top: 50px;
 `
 
 export const MainMenu = styled.div`
