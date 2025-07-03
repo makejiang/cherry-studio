@@ -325,10 +325,7 @@ text after`,
       })
 
       // Verify determineCitationSource was called with correct parameters
-      expect(mockDetermineCitationSource).toHaveBeenCalledWith(
-        block.citationReferences,
-        undefined // citationBlock from selector (mocked as undefined)
-      )
+      expect(mockDetermineCitationSource).toHaveBeenCalledWith(block.citationReferences)
 
       // Verify citation processing was called with correct parameters
       expect(mockWithCitationTags).toHaveBeenCalledWith('Content to process', mockCitations, 'DEFAULT')
@@ -381,10 +378,7 @@ text after`,
       expect(getRenderedMarkdown()).toBeInTheDocument()
 
       // Verify determineCitationSource was called
-      expect(mockDetermineCitationSource).toHaveBeenCalledWith(
-        block.citationReferences,
-        undefined // citationBlock from selector
-      )
+      expect(mockDetermineCitationSource).toHaveBeenCalledWith(block.citationReferences)
 
       // Verify withCitationTags was called with correct parameters
       expect(mockWithCitationTags).toHaveBeenCalledWith(
