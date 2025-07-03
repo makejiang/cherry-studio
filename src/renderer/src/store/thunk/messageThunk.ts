@@ -428,9 +428,6 @@ const fetchAndProcessAssistantResponseImpl = async (
         await handleBlockTransition(baseBlock as PlaceholderMessageBlock, MessageBlockType.UNKNOWN)
       },
       onTextChunk: async (text) => {
-        const citationBlockSource = citationBlockId
-          ? (getState().messageBlocks.entities[citationBlockId] as CitationMessageBlock).response?.source
-          : WebSearchSource.WEBSEARCH
         accumulatedContent += text
         if (mainTextBlockId) {
           const blockChanges: Partial<MessageBlock> = {
@@ -443,8 +440,7 @@ const fetchAndProcessAssistantResponseImpl = async (
           const initialChanges: Partial<MessageBlock> = {
             type: MessageBlockType.MAIN_TEXT,
             content: accumulatedContent,
-            status: MessageBlockStatus.STREAMING,
-            citationReferences: citationBlockId ? [{ citationBlockId, citationBlockSource }] : []
+            status: MessageBlockStatus.STREAMING
           }
           mainTextBlockId = initialPlaceholderBlockId
           // 清理占位块
@@ -454,8 +450,7 @@ const fetchAndProcessAssistantResponseImpl = async (
           saveUpdatedBlockToDB(mainTextBlockId, assistantMsgId, topicId, getState)
         } else {
           const newBlock = createMainTextBlock(assistantMsgId, accumulatedContent, {
-            status: MessageBlockStatus.STREAMING,
-            citationReferences: citationBlockId ? [{ citationBlockId, citationBlockSource }] : []
+            status: MessageBlockStatus.STREAMING
           })
           mainTextBlockId = newBlock.id // 立即设置ID，防止竞态条件
           await handleBlockTransition(newBlock, MessageBlockType.MAIN_TEXT)
@@ -463,9 +458,15 @@ const fetchAndProcessAssistantResponseImpl = async (
       },
       onTextComplete: async (finalText) => {
         if (mainTextBlockId) {
+          let citationBlockSource: WebSearchSource | undefined
+          if (citationBlockId) {
+            const citationBlock = getState().messageBlocks.entities[citationBlockId] as CitationMessageBlock
+            citationBlockSource = citationBlock.response?.source
+          }
           const changes = {
             content: finalText,
-            status: MessageBlockStatus.SUCCESS
+            status: MessageBlockStatus.SUCCESS,
+            citationReferences: citationBlockSource ? [{ citationBlockId, citationBlockSource }] : []
           }
           cancelThrottledBlockUpdate(mainTextBlockId)
           dispatch(updateOneBlock({ id: mainTextBlockId, changes }))
