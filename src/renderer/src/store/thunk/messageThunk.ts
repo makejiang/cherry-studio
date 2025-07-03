@@ -360,7 +360,7 @@ const fetchAndProcessAssistantResponseImpl = async (
     let thinkingBlockId: string | null = null
     let imageBlockId: string | null = null
     let toolBlockId: string | null = null
-    let hasWebSearch = false
+
     const toolCallIdToBlockIdMap = new Map<string, string>()
     const notificationService = NotificationService.getInstance()
 
@@ -470,19 +470,13 @@ const fetchAndProcessAssistantResponseImpl = async (
           cancelThrottledBlockUpdate(mainTextBlockId)
           dispatch(updateOneBlock({ id: mainTextBlockId, changes }))
           saveUpdatedBlockToDB(mainTextBlockId, assistantMsgId, topicId, getState)
-          mainTextBlockId = null
+          if (!assistant.enableWebSearch) {
+            mainTextBlockId = null
+          }
         } else {
           console.warn(
             `[onTextComplete] Received text.complete but last block was not MAIN_TEXT (was ${lastBlockType}) or lastBlockId  is null.`
           )
-        }
-        if (citationBlockId && !hasWebSearch) {
-          const changes: Partial<CitationMessageBlock> = {
-            status: MessageBlockStatus.SUCCESS
-          }
-          dispatch(updateOneBlock({ id: citationBlockId, changes }))
-          saveUpdatedBlockToDB(citationBlockId, assistantMsgId, topicId, getState)
-          citationBlockId = null
         }
       },
       onThinkingChunk: async (text, thinking_millsec) => {
@@ -628,7 +622,6 @@ const fetchAndProcessAssistantResponseImpl = async (
       onLLMWebSearchComplete: async (llmWebSearchResult) => {
         const blockId = citationBlockId || initialPlaceholderBlockId
         if (blockId) {
-          hasWebSearch = true
           const changes: Partial<CitationMessageBlock> = {
             type: MessageBlockType.CITATION,
             response: llmWebSearchResult,
@@ -665,6 +658,22 @@ const fetchAndProcessAssistantResponseImpl = async (
             }
           )
           citationBlockId = citationBlock.id
+          if (mainTextBlockId) {
+            const state = getState()
+            const existingMainTextBlock = state.messageBlocks.entities[mainTextBlockId]
+            if (existingMainTextBlock && existingMainTextBlock.type === MessageBlockType.MAIN_TEXT) {
+              const currentRefs = existingMainTextBlock.citationReferences || []
+              const mainTextChanges = {
+                citationReferences: [
+                  ...currentRefs,
+                  { citationBlockId, citationBlockSource: llmWebSearchResult.source }
+                ]
+              }
+              dispatch(updateOneBlock({ id: mainTextBlockId, changes: mainTextChanges }))
+              saveUpdatedBlockToDB(mainTextBlockId, assistantMsgId, topicId, getState)
+            }
+            mainTextBlockId = null
+          }
           await handleBlockTransition(citationBlock, MessageBlockType.CITATION)
         }
       },

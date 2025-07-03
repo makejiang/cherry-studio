@@ -164,8 +164,8 @@ export const formatCitationsFromBlock = (block: CitationMessageBlock | undefined
         formattedCitations =
           (block.response.results as any[])?.map((result, index) => ({
             number: index + 1,
-            url: result.url,
-            title: result.title,
+            url: result.url || result, // 兼容旧数据
+            title: result.title || new URL(result).hostname, // 兼容旧数据
             showFavicon: true,
             type: 'websearch'
           })) || []
