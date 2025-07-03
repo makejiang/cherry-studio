@@ -297,106 +297,135 @@ Numbered list:
   })
 
   describe('normalizeCitationMarks simple', () => {
-    it('should normalize OpenAI format citations', () => {
-      const content = 'Text with [<sup>1</sup>](https://example.com) citation'
-      const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
-      const citationMap = createCitationMap(citations)
+    describe('OpenAI format citations', () => {
+      it('should normalize OpenAI format citations', () => {
+        const content = 'Text with [<sup>1</sup>](https://example.com) citation'
+        const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
+        const citationMap = createCitationMap(citations)
 
-      for (const sourceType of [WebSearchSource.OPENAI, WebSearchSource.OPENAI_RESPONSE]) {
-        const result = normalizeCitationMarks(content, citationMap, sourceType)
-        expect(result).toBe('Text with [cite:1] citation')
-      }
-    })
-
-    it('should preserve non-matching OpenAI citations', () => {
-      const content = 'Text with [<sup>3</sup>](https://missing.com) citation'
-      const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
-      const citationMap = createCitationMap(citations)
-
-      for (const sourceType of [WebSearchSource.OPENAI, WebSearchSource.OPENAI_RESPONSE]) {
-        const result = normalizeCitationMarks(content, citationMap, sourceType)
-        expect(result).toBe('Text with [<sup>3</sup>](https://missing.com) citation')
-      }
-    })
-
-    it('should normalize Gemini format citations', () => {
-      const content = 'This is test content from Gemini'
-      const metadata: GroundingSupport[] = [
-        {
-          segment: { text: 'test content' },
-          groundingChunkIndices: [0, 1]
+        for (const sourceType of [WebSearchSource.OPENAI, WebSearchSource.OPENAI_RESPONSE]) {
+          const result = normalizeCitationMarks(content, citationMap, sourceType)
+          expect(result).toBe('Text with [cite:1] citation')
         }
-      ]
-      const citations: Citation[] = [
-        { number: 1, url: 'https://example1.com', title: 'Test 1', metadata },
-        { number: 2, url: 'https://example2.com', title: 'Test 2' }
-      ]
-      const citationMap = createCitationMap(citations)
+      })
 
-      const result = normalizeCitationMarks(content, citationMap, WebSearchSource.GEMINI)
+      it('should preserve non-matching OpenAI citations', () => {
+        const content = 'Text with [<sup>3</sup>](https://missing.com) citation'
+        const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
+        const citationMap = createCitationMap(citations)
 
-      expect(result).toBe('This is test content[cite:1][cite:2] from Gemini')
+        for (const sourceType of [WebSearchSource.OPENAI, WebSearchSource.OPENAI_RESPONSE]) {
+          const result = normalizeCitationMarks(content, citationMap, sourceType)
+          expect(result).toBe('Text with [<sup>3</sup>](https://missing.com) citation')
+        }
+      })
     })
 
-    it('should handle Gemini citations without metadata', () => {
-      const content = 'Content without metadata'
-      const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
-      const citationMap = createCitationMap(citations)
+    describe('Perplexity format citations', () => {
+      it('should normalize Perplexity format citations', () => {
+        const content = 'Perplexity citations [<sup>1</sup>](https://example.com)'
+        const citations: Citation[] = [
+          { number: 1, url: 'https://example.com', title: 'Example Citation', content: 'Citation content' }
+        ]
+        const citationMap = new Map(citations.map((c) => [c.number, c]))
 
-      const result = normalizeCitationMarks(content, citationMap, WebSearchSource.GEMINI)
+        const normalized = normalizeCitationMarks(content, citationMap, WebSearchSource.PERPLEXITY)
+        expect(normalized).toBe('Perplexity citations [cite:1]')
+      })
 
-      expect(result).toBe('Content without metadata')
+      it('should preserve unmatched Perplexity citations', () => {
+        const content = 'Text with [<sup>2</sup>](https://notfound.com) citation'
+        const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Example Citation' }]
+        const citationMap = new Map(citations.map((c) => [c.number, c]))
+
+        // 2号引用不存在，应该保持原样
+        const normalized = normalizeCitationMarks(content, citationMap, WebSearchSource.PERPLEXITY)
+        expect(normalized).toBe('Text with [<sup>2</sup>](https://notfound.com) citation')
+      })
     })
 
-    it('should normalize default format citations', () => {
-      const content = 'Text with [1][2] and [3] citations'
-      const citations: Citation[] = [
-        { number: 1, url: 'https://example1.com', title: 'Test 1' },
-        { number: 2, url: 'https://example2.com', title: 'Test 2' },
-        { number: 3, url: 'https://example3.com', title: 'Test 3' }
-      ]
-      const citationMap = createCitationMap(citations)
+    describe('Gemini format citations', () => {
+      it('should normalize Gemini format citations', () => {
+        const content = 'This is test content from Gemini'
+        const metadata: GroundingSupport[] = [
+          {
+            segment: { text: 'test content' },
+            groundingChunkIndices: [0, 1]
+          }
+        ]
+        const citations: Citation[] = [
+          { number: 1, url: 'https://example1.com', title: 'Test 1', metadata },
+          { number: 2, url: 'https://example2.com', title: 'Test 2' }
+        ]
+        const citationMap = createCitationMap(citations)
 
-      const result = normalizeCitationMarks(content, citationMap)
+        const result = normalizeCitationMarks(content, citationMap, WebSearchSource.GEMINI)
 
-      expect(result).toBe('Text with [cite:1][cite:2] and [cite:3] citations')
+        expect(result).toBe('This is test content[cite:1][cite:2] from Gemini')
+      })
+
+      it('should handle Gemini citations without metadata', () => {
+        const content = 'Content without metadata'
+        const citations: Citation[] = [{ number: 1, url: 'https://example.com', title: 'Test' }]
+        const citationMap = createCitationMap(citations)
+
+        const result = normalizeCitationMarks(content, citationMap, WebSearchSource.GEMINI)
+
+        expect(result).toBe('Content without metadata')
+      })
     })
 
-    it('should preserve non-matching default format citations', () => {
-      const content = 'Text with [1] and [3] citations'
-      const citations: Citation[] = [{ number: 1, url: 'https://example1.com', title: 'Test 1' }]
-      const citationMap = createCitationMap(citations)
+    describe('default format citations', () => {
+      it('should normalize default format citations', () => {
+        const content = 'Text with [1][2] and [3] citations'
+        const citations: Citation[] = [
+          { number: 1, url: 'https://example1.com', title: 'Test 1' },
+          { number: 2, url: 'https://example2.com', title: 'Test 2' },
+          { number: 3, url: 'https://example3.com', title: 'Test 3' }
+        ]
+        const citationMap = createCitationMap(citations)
 
-      const result = normalizeCitationMarks(content, citationMap)
+        const result = normalizeCitationMarks(content, citationMap)
 
-      expect(result).toBe('Text with [cite:1] and [3] citations')
-    })
+        expect(result).toBe('Text with [cite:1][cite:2] and [cite:3] citations')
+      })
 
-    it('should handle nested citation patterns', () => {
-      const content = 'Text with [[1]] and [cite:[2]] patterns'
-      const citations: Citation[] = [
-        { number: 1, url: 'https://example1.com', title: 'Test 1' },
-        { number: 2, url: 'https://example2.com', title: 'Test 2' }
-      ]
-      const citationMap = new Map(citations.map((c) => [c.number, c]))
+      it('should preserve non-matching default format citations', () => {
+        const content = 'Text with [1] and [3] citations'
+        const citations: Citation[] = [{ number: 1, url: 'https://example1.com', title: 'Test 1' }]
+        const citationMap = createCitationMap(citations)
 
-      const result = normalizeCitationMarks(content, citationMap)
+        const result = normalizeCitationMarks(content, citationMap)
 
-      // 最里面的会被处理
-      expect(result).toBe('Text with [[cite:1]] and [cite:[cite:2]] patterns')
-    })
+        expect(result).toBe('Text with [cite:1] and [3] citations')
+      })
 
-    it('should handle mixed citation formats', () => {
-      const content = 'Text with [1] and [<sup>2</sup>](url) and other [3] formats'
-      const citations: Citation[] = [
-        { number: 1, url: 'https://example1.com', title: 'Test 1' },
-        { number: 2, url: 'https://example2.com', title: 'Test 2' }
-      ]
-      const citationMap = createCitationMap(citations)
+      it('should handle nested citation patterns', () => {
+        const content = 'Text with [[1]] and [cite:[2]] patterns'
+        const citations: Citation[] = [
+          { number: 1, url: 'https://example1.com', title: 'Test 1' },
+          { number: 2, url: 'https://example2.com', title: 'Test 2' }
+        ]
+        const citationMap = new Map(citations.map((c) => [c.number, c]))
 
-      const result = normalizeCitationMarks(content, citationMap, WebSearchSource.OPENAI)
+        const result = normalizeCitationMarks(content, citationMap)
 
-      expect(result).toBe('Text with [1] and [cite:2] and other [3] formats')
+        // 最里面的会被处理
+        expect(result).toBe('Text with [[cite:1]] and [cite:[cite:2]] patterns')
+      })
+
+      it('should handle mixed citation formats', () => {
+        const content = 'Text with [1] and [<sup>2</sup>](url) and other [3] formats'
+        const citations: Citation[] = [
+          { number: 1, url: 'https://example1.com', title: 'Test 1' },
+          { number: 2, url: 'https://example2.com', title: 'Test 2' }
+        ]
+        const citationMap = createCitationMap(citations)
+
+        const result = normalizeCitationMarks(content, citationMap, WebSearchSource.OPENAI)
+
+        expect(result).toBe('Text with [1] and [cite:2] and other [3] formats')
+      })
     })
   })
 
@@ -544,6 +573,25 @@ Numbered list:
 
       expect(result).toContain('[<sup data-citation=')
       expect(result).toContain('6</sup>]()')
+    })
+
+    it('should truncate content to 200 characters in data-citation', () => {
+      const longContent = 'a'.repeat(300)
+      const citation: Citation = {
+        number: 1,
+        url: 'https://example.com',
+        title: 'Test',
+        content: longContent
+      }
+
+      const result = generateCitationTag(citation)
+      const match = result.match(/data-citation='([^']+)'/)
+      expect(match).not.toBeNull()
+      if (match) {
+        const citationData = JSON.parse(match[1].replace(/&quot;/g, '"'))
+        expect(citationData.content.length).toBe(200)
+        expect(citationData.content).toBe(longContent.substring(0, 200))
+      }
     })
   })
 

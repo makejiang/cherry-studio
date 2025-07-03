@@ -458,59 +458,6 @@ text after`,
 
       expect(getRenderedMarkdown()).toBeInTheDocument()
     })
-
-    it('should handle Perplexity citations correctly', () => {
-      const block = createMainTextBlock({
-        content: 'Perplexity citations [<sup>1</sup>](https://example.com)',
-        citationReferences: [{ citationBlockId: 'perplexity-test', citationBlockSource: WebSearchSource.PERPLEXITY }]
-      })
-      const mockCitations = [
-        { id: '1', number: 1, url: 'https://example.com', title: 'Example Citation', content: 'Citation content' }
-      ]
-      mockUseSelector.mockReturnValue(mockCitations)
-      renderMainTextBlock({ block, role: 'assistant', citationBlockId: 'perplexity-test' })
-      expect(getRenderedMarkdown()).toBeInTheDocument()
-    })
-
-    it('should correctly format Perplexity citations with data-citation attribute', () => {
-      const originalContent =
-        'Conflict and military action [<sup>1</sup>](https://www.takungpao.com/news/232111/2025/0615/1095534.html).'
-      const block = createMainTextBlock({
-        content: originalContent,
-        citationReferences: [{ citationBlockId: 'perplexity-test', citationBlockSource: WebSearchSource.PERPLEXITY }]
-      })
-
-      const mockCitations = [
-        {
-          id: '1',
-          number: 1,
-          url: 'https://www.takungpao.com/news/232111/2025/0615/1095534.html',
-          title: '大公報',
-          content:
-            '冲突升级与军事行动 以伊军事冲突 2025年6月13日晚至14日，伊朗向以色列发射数百枚弹道导弹，作为对以色列袭击伊朗核设施及军事指挥官的报复。以色列随后对伊朗多地实施空袭，造成超过400名伊朗平民伤亡。伊朗警告可能攻击中东美军基地，并考虑封锁霍尔木兹海峡。中国外交部长王毅在与伊、以外长通话中，谴责以色列攻击伊朗主权，并强调此举可能引发"灾难性后果"。 以色列转向加沙地带 在6月24日以伊停火后，以色列国防军宣布将重点转向加沙地带，旨在解救被扣押人员并终结哈马斯统治。中国国际关系研究院专家秦天指出，此次停火存在脆弱性，因伊核问题未获根本解决，未来以伊冲突可能周期性爆发。'
-        }
-      ]
-
-      mockUseSelector.mockReturnValue(mockCitations)
-      renderMainTextBlock({ block, role: 'assistant', citationBlockId: 'perplexity-test' })
-
-      const markdownElement = screen.getByTestId('mock-markdown')
-      const processedContent = markdownElement.getAttribute('data-content')
-
-      // Construct the expected data-citation JSON string (HTML encoded)
-      const expectedSupData = {
-        id: mockCitations[0].number,
-        url: mockCitations[0].url,
-        title: mockCitations[0].title,
-        content: mockCitations[0].content?.substring(0, 200) // Ensure content is truncated as in the component
-      }
-      const expectedCitationJson = JSON.stringify(expectedSupData).replace(/"/g, '&quot;')
-
-      // Construct the expected full citation tag
-      const expectedFullCitationTag = `[<sup data-citation='${expectedCitationJson}'>${mockCitations[0].number}</sup>](${mockCitations[0].url})`
-
-      expect(processedContent).toContain(expectedFullCitationTag)
-    })
   })
 
   describe('settings integration', () => {
