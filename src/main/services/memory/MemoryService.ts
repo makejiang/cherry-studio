@@ -1,5 +1,5 @@
 import { Client, createClient } from '@libsql/client'
-import Embeddings from '@main/embeddings/Embeddings'
+import Embeddings from '@main/knowledge/embeddings/Embeddings'
 import type {
   AddMemoryOptions,
   AssistantMessage,
@@ -146,22 +146,72 @@ export class MemoryService {
 
         // Check if memory already exists
         const existing = await this.db.execute({
-          sql: MemoryQueries.memory.checkExists,
+          sql: MemoryQueries.memory.checkExistsIncludeDeleted,
           args: [hash]
         })
 
         if (existing.rows.length > 0) {
-          Logger.info(`Memory already exists with hash: ${hash}`)
-          continue
+          const existingRecord = existing.rows[0] as any
+          const isDeleted = existingRecord.is_deleted === 1
+
+          if (!isDeleted) {
+            // Active record exists, skip insertion
+            Logger.info(`Memory already exists with hash: ${hash}`)
+            continue
+          } else {
+            // Deleted record exists, restore it instead of inserting new one
+            Logger.info(`Restoring deleted memory with hash: ${hash}`)
+
+            // Generate embedding if model is configured
+            let embedding: number[] | null = null
+            const embedderApiClient = this.config?.embedderApiClient
+            if (embedderApiClient) {
+              try {
+                embedding = await this.generateEmbedding(trimmedMemory)
+                Logger.info(
+                  `Generated embedding for restored memory with dimension: ${embedding.length} (target: ${this.config?.embedderDimensions || MemoryService.UNIFIED_DIMENSION})`
+                )
+              } catch (error) {
+                Logger.error('Failed to generate embedding for restored memory:', error)
+              }
+            }
+
+            const now = new Date().toISOString()
+
+            // Restore the deleted record
+            await this.db.execute({
+              sql: MemoryQueries.memory.restoreDeleted,
+              args: [
+                trimmedMemory,
+                embedding ? this.embeddingToVector(embedding) : null,
+                metadata ? JSON.stringify(metadata) : null,
+                now,
+                existingRecord.id
+              ]
+            })
+
+            // Add to history
+            await this.addHistory(existingRecord.id, null, trimmedMemory, 'ADD')
+
+            addedMemories.push({
+              id: existingRecord.id,
+              memory: trimmedMemory,
+              hash,
+              createdAt: now,
+              updatedAt: now,
+              metadata
+            })
+            continue
+          }
         }
 
         // Generate embedding if model is configured
         let embedding: number[] | null = null
-        if (this.config?.embedderModel) {
+        if (this.config?.embedderApiClient) {
           try {
             embedding = await this.generateEmbedding(trimmedMemory)
             Logger.info(
-              `Generated embedding with dimension: ${embedding.length} (normalized to ${MemoryService.UNIFIED_DIMENSION})`
+              `Generated embedding with dimension: ${embedding.length} (target: ${this.config?.embedderDimensions || MemoryService.UNIFIED_DIMENSION})`
             )
           } catch (error) {
             Logger.error('Failed to generate embedding:', error)
@@ -227,7 +277,7 @@ export class MemoryService {
 
     try {
       // If we have an embedder model configured, use vector search
-      if (this.config?.embedderModel) {
+      if (this.config?.embedderApiClient) {
         try {
           const queryEmbedding = await this.generateEmbedding(query)
           return await this.hybridSearch(query, queryEmbedding, { limit, userId, agentId, filters })
@@ -424,11 +474,11 @@ export class MemoryService {
 
       // Generate new embedding if model is configured
       let embedding: number[] | null = null
-      if (this.config?.embedderModel) {
+      if (this.config?.embedderApiClient) {
         try {
           embedding = await this.generateEmbedding(memory)
           Logger.info(
-            `Updated embedding with dimension: ${embedding.length} (normalized to ${MemoryService.UNIFIED_DIMENSION})`
+            `Updated embedding with dimension: ${embedding.length} (target: ${this.config?.embedderDimensions || MemoryService.UNIFIED_DIMENSION})`
           )
         } catch (error) {
           Logger.error('Failed to generate embedding for update:', error)
@@ -637,27 +687,19 @@ export class MemoryService {
    * Generate embedding for text
    */
   private async generateEmbedding(text: string): Promise<number[]> {
-    if (!this.config?.embedderModel) {
+    if (!this.config?.embedderApiClient) {
       throw new Error('Embedder model not configured')
     }
 
     try {
       // Initialize embeddings instance if needed
       if (!this.embeddings) {
-        const model = this.config.embedderModel
-        const provider = this.config.embedderProvider
-
-        if (!provider) {
+        if (!this.config.embedderApiClient) {
           throw new Error('Embedder provider not configured')
         }
 
         this.embeddings = new Embeddings({
-          id: model.id,
-          model: model.id,
-          provider: provider.id,
-          apiKey: provider.apiKey || '',
-          baseURL: provider.apiHost || '',
-          apiVersion: provider.apiVersion,
+          embedApiClient: this.config.embedderApiClient,
           dimensions: this.config.embedderDimensions
         })
         await this.embeddings.init()

@@ -51,6 +51,14 @@ export const MemoryQueries = {
   memory: {
     checkExists: 'SELECT id FROM memories WHERE hash = ? AND is_deleted = 0',
 
+    checkExistsIncludeDeleted: 'SELECT id, is_deleted FROM memories WHERE hash = ?',
+
+    restoreDeleted: `
+      UPDATE memories
+      SET is_deleted = 0, memory = ?, embedding = ?, metadata = ?, updated_at = ?
+      WHERE id = ?
+    `,
+
     insert: `
       INSERT INTO memories (id, memory, hash, embedding, metadata, user_id, agent_id, run_id, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -63,7 +71,7 @@ export const MemoryQueries = {
     getForUpdate: 'SELECT memory, metadata FROM memories WHERE id = ? AND is_deleted = 0',
 
     update: `
-      UPDATE memories 
+      UPDATE memories
       SET memory = ?, hash = ?, embedding = ?, metadata = ?, updated_at = ?
       WHERE id = ?
     `,
@@ -71,7 +79,7 @@ export const MemoryQueries = {
     count: 'SELECT COUNT(*) as total FROM memories m WHERE',
 
     list: `
-      SELECT 
+      SELECT
         m.id,
         m.memory,
         m.hash,
@@ -94,7 +102,7 @@ export const MemoryQueries = {
     `,
 
     getByMemoryId: `
-      SELECT * FROM memory_history 
+      SELECT * FROM memory_history
       WHERE memory_id = ? AND is_deleted = 0
       ORDER BY created_at DESC
     `
@@ -104,7 +112,7 @@ export const MemoryQueries = {
   search: {
     hybridSearch: `
       SELECT * FROM (
-        SELECT 
+        SELECT
           m.id,
           m.memory,
           m.hash,
@@ -114,17 +122,17 @@ export const MemoryQueries = {
           m.run_id,
           m.created_at,
           m.updated_at,
-          CASE 
+          CASE
             WHEN m.embedding IS NULL THEN 2.0
             ELSE vector_distance_cos(m.embedding, vector32(?))
           END as distance,
-          CASE 
+          CASE
             WHEN m.embedding IS NULL THEN 0.0
             ELSE (1 - vector_distance_cos(m.embedding, vector32(?)))
           END as vector_similarity,
           0.0 as text_similarity,
           (
-            CASE 
+            CASE
               WHEN m.embedding IS NULL THEN 0.0
               ELSE (1 - vector_distance_cos(m.embedding, vector32(?)))
             END
@@ -137,11 +145,11 @@ export const MemoryQueries = {
   // User operations
   users: {
     getUniqueUsers: `
-      SELECT DISTINCT 
+      SELECT DISTINCT
         user_id,
         COUNT(*) as memory_count,
         MAX(created_at) as last_memory_date
-      FROM memories 
+      FROM memories
       WHERE user_id IS NOT NULL AND is_deleted = 0
       GROUP BY user_id
       ORDER BY last_memory_date DESC

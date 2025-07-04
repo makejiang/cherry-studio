@@ -1,3 +1,4 @@
+import { getModel } from '@renderer/hooks/useModel'
 import { AssistantMessage } from '@renderer/types'
 import {
   FactRetrievalSchema,
@@ -36,7 +37,7 @@ export class MemoryProcessor {
     try {
       const { memoryConfig } = config
 
-      if (!memoryConfig.llmModel) {
+      if (!memoryConfig.llmApiClient) {
         throw new Error('No LLM model configured for memory processing')
       }
 
@@ -52,7 +53,7 @@ export class MemoryProcessor {
       const responseContent = await fetchGenerate({
         prompt: systemPrompt,
         content: userPrompt,
-        model: memoryConfig.llmModel
+        model: getModel(memoryConfig.llmApiClient.model, memoryConfig.llmApiClient.provider)
       })
       if (!responseContent || responseContent.trim() === '') {
         return []
@@ -99,7 +100,7 @@ export class MemoryProcessor {
 
     const { memoryConfig, assistantId, userId, lastMessageId } = config
 
-    if (!memoryConfig.llmModel) {
+    if (!memoryConfig.llmApiClient) {
       throw new Error('No LLM model configured for memory processing')
     }
 
@@ -123,7 +124,7 @@ export class MemoryProcessor {
       const responseContent = await fetchGenerate({
         prompt: updateMemorySystemPrompt,
         content: updateMemoryUserPrompt,
-        model: memoryConfig.llmModel
+        model: getModel(memoryConfig.llmApiClient.model, memoryConfig.llmApiClient.provider)
       })
       if (!responseContent || responseContent.trim() === '') {
         return []
@@ -274,5 +275,3 @@ export class MemoryProcessor {
     }
   }
 }
-
-export const memoryProcessor = new MemoryProcessor()

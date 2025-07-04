@@ -16,6 +16,7 @@ import {
   SEARCH_SUMMARY_PROMPT_KNOWLEDGE_ONLY,
   SEARCH_SUMMARY_PROMPT_WEB_ONLY
 } from '@renderer/config/prompts'
+import { getModel } from '@renderer/hooks/useModel'
 import { getStoreSetting } from '@renderer/hooks/useSettings'
 import i18n from '@renderer/i18n'
 import store from '@renderer/store'
@@ -51,7 +52,7 @@ import {
   getTranslateModel
 } from './AssistantService'
 import { processKnowledgeSearch } from './KnowledgeService'
-import { MemoryProcessor, memoryProcessor } from './MemoryProcessor'
+import { MemoryProcessor } from './MemoryProcessor'
 import {
   filterContextMessages,
   filterEmptyMessages,
@@ -189,11 +190,12 @@ async function fetchExternalTool(
         return []
       }
 
-      if (memoryConfig.embedderModel && memoryConfig.llmModel) {
+      if (memoryConfig.llmApiClient && memoryConfig.embedderApiClient) {
         const currentUserId = selectCurrentUserId(store.getState())
         // Search for relevant memories
         const processorConfig = MemoryProcessor.getProcessorConfig(memoryConfig, assistant.id, currentUserId)
         console.log('Searching for relevant memories with content:', content)
+        const memoryProcessor = new MemoryProcessor()
         const relevantMemories = await memoryProcessor.searchRelevantMemories(
           content,
           processorConfig,
@@ -294,7 +296,8 @@ async function fetchExternalTool(
     }
 
     // 发送工具执行完成通知
-    if (willUseTools) {
+    const wasAnyToolEnabled = shouldWebSearch || shouldKnowledgeSearch || shouldSearchMemory
+    if (wasAnyToolEnabled) {
       onChunkReceived({
         type: ChunkType.EXTERNEL_TOOL_COMPLETE,
         external_tool: {
@@ -340,7 +343,8 @@ async function fetchExternalTool(
     console.error('Tool execution failed:', error)
 
     // 发送错误状态
-    if (willUseTools) {
+    const wasAnyToolEnabled = shouldWebSearch || shouldKnowledgeSearch || shouldSearchMemory
+    if (wasAnyToolEnabled) {
       onChunkReceived({
         type: ChunkType.EXTERNEL_TOOL_COMPLETE,
         external_tool: {
@@ -451,8 +455,13 @@ async function processConversationMemory(messages: Message[], assistant: Assista
     const memoryConfig = selectMemoryConfig(store.getState())
 
     // Use assistant's model as fallback for memory processing if not configured
-    const llmModel = memoryConfig.llmModel || assistant.model || getDefaultModel()
-    const embedderModel = memoryConfig.embedderModel || getFirstEmbeddingModel()
+    const llmModel =
+      getModel(memoryConfig.llmApiClient?.model, memoryConfig.llmApiClient?.provider) ||
+      assistant.model ||
+      getDefaultModel()
+    const embedderModel =
+      getModel(memoryConfig.embedderApiClient?.model, memoryConfig.embedderApiClient?.provider) ||
+      getFirstEmbeddingModel()
 
     if (!embedderModel) {
       console.warn(
@@ -485,8 +494,20 @@ async function processConversationMemory(messages: Message[], assistant: Assista
     // Create updated memory config with resolved models
     const updatedMemoryConfig = {
       ...memoryConfig,
-      llmModel,
-      embedderModel
+      llmApiClient: {
+        model: llmModel.id,
+        provider: llmModel.provider,
+        apiKey: getProviderByModel(llmModel).apiKey,
+        baseURL: new AiProvider(getProviderByModel(llmModel)).getBaseURL(),
+        apiVersion: getProviderByModel(llmModel).apiVersion
+      },
+      embedderApiClient: {
+        model: embedderModel.id,
+        provider: embedderModel.provider,
+        apiKey: getProviderByModel(embedderModel).apiKey,
+        baseURL: new AiProvider(getProviderByModel(embedderModel)).getBaseURL(),
+        apiVersion: getProviderByModel(embedderModel).apiVersion
+      }
     }
 
     const lastUserMessage = findLast(messages, (m) => m.role === 'user')
@@ -497,10 +518,8 @@ async function processConversationMemory(messages: Message[], assistant: Assista
       lastUserMessage?.id
     )
 
-    console.log('Starting memory processing for conversation with', conversationMessages.length, 'messages')
-    console.log('Using LLM model:', llmModel?.name, 'Embedding model:', embedderModel?.name)
-
     // Process the conversation in the background (don't await to avoid blocking UI)
+    const memoryProcessor = new MemoryProcessor()
     memoryProcessor
       .processConversation(conversationMessages, processorConfig)
       .then((result) => {

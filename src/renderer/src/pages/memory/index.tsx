@@ -12,6 +12,7 @@ import {
   UserOutlined
 } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { Center } from '@renderer/components/Layout'
 import Scrollbar from '@renderer/components/Scrollbar'
 import MemoryService from '@renderer/services/MemoryService'
 import {
@@ -29,7 +30,6 @@ import {
   Empty,
   Form,
   Input,
-  message,
   Modal,
   Pagination,
   Select,
@@ -93,32 +93,30 @@ const AddMemoryModal: React.FC<AddMemoryModalProps> = ({ visible, onCancel, onAd
 
   return (
     <Modal
+      open={visible}
+      onCancel={onCancel}
+      width={600}
+      centered
+      transitionName="animation-move-down"
+      onOk={() => form.submit()}
+      okButtonProps={{ loading: loading }}
       title={
         <Space>
           <PlusOutlined style={{ color: 'var(--color-primary)' }} />
           <span>{t('memory.add_memory')}</span>
         </Space>
       }
-      open={visible}
-      onCancel={onCancel}
-      width={600}
       styles={{
         header: {
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 16
+          borderBottom: '0.5px solid var(--color-border)',
+          paddingBottom: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0
         },
         body: {
-          paddingTop: 24
+          paddingTop: 20
         }
-      }}
-      footer={[
-        <Button key="cancel" size="large" onClick={onCancel}>
-          {t('common.cancel')}
-        </Button>,
-        <Button key="submit" type="primary" size="large" loading={loading} onClick={() => form.submit()}>
-          {t('common.add')}
-        </Button>
-      ]}>
+      }}>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label={t('memory.memory_content')}
@@ -174,7 +172,7 @@ const EditMemoryModal: React.FC<EditMemoryModalProps> = ({ visible, memory, onCa
       width={600}
       styles={{
         header: {
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '0.5px solid var(--color-border)',
           paddingBottom: 16
         },
         body: {
@@ -243,32 +241,30 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ visible, onCancel, onAdd, e
 
   return (
     <Modal
-      title={
-        <Space>
-          <UserAddOutlined style={{ color: 'var(--color-primary)' }} />
-          <span>{t('memory.add_user')}</span>
-        </Space>
-      }
       open={visible}
       onCancel={onCancel}
       width={500}
+      centered
+      transitionName="animation-move-down"
+      onOk={() => form.submit()}
+      okButtonProps={{ loading: loading }}
       styles={{
         header: {
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 16
+          borderBottom: '0.5px solid var(--color-border)',
+          paddingBottom: 16,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0
         },
         body: {
           paddingTop: 24
         }
       }}
-      footer={[
-        <Button key="cancel" size="large" onClick={onCancel}>
-          {t('common.cancel')}
-        </Button>,
-        <Button key="submit" type="primary" size="large" loading={loading} onClick={() => form.submit()}>
-          {t('common.add')}
-        </Button>
-      ]}>
+      title={
+        <Space>
+          <UserAddOutlined style={{ color: 'var(--color-primary)' }} />
+          <span>{t('memory.add_user')}</span>
+        </Space>
+      }>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item label={t('memory.new_user_id')} name="userId" rules={[{ validator: validateUserId }]}>
           <Input
@@ -354,7 +350,7 @@ const MemoriesPage = () => {
         setAllMemories(result.results || [])
       } catch (error) {
         console.error('Failed to load memories:', error)
-        message.error(t('memory.load_failed'))
+        window.message.error(t('memory.load_failed'))
       } finally {
         setLoading(false)
       }
@@ -383,10 +379,7 @@ const MemoriesPage = () => {
   const filteredMemories = useMemo(() => {
     return allMemories.filter((memory) => {
       // Search text filter
-      if (debouncedSearchText && !memory.memory.toLowerCase().includes(debouncedSearchText.toLowerCase())) {
-        return false
-      }
-      return true
+      return !(debouncedSearchText && !memory.memory.toLowerCase().includes(debouncedSearchText.toLowerCase()))
     })
   }, [allMemories, debouncedSearchText])
 
@@ -417,25 +410,25 @@ const MemoriesPage = () => {
     try {
       // The memory service will automatically use the current user from its state
       await memoryService.add(memory, {})
-      message.success(t('memory.add_success'))
+      window.message.success(t('memory.add_success'))
       // Go to first page to see the newly added memory
       setCurrentPage(1)
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to add memory:', error)
-      message.error(t('memory.add_failed'))
+      window.message.error(t('memory.add_failed'))
     }
   }
 
   const handleDeleteMemory = async (id: string) => {
     try {
       await memoryService.delete(id)
-      message.success(t('memory.delete_success'))
+      window.message.success(t('memory.delete_success'))
       // Reload all memories
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to delete memory:', error)
-      message.error(t('memory.delete_failed'))
+      window.message.error(t('memory.delete_failed'))
     }
   }
 
@@ -446,13 +439,13 @@ const MemoriesPage = () => {
   const handleUpdateMemory = async (id: string, memory: string, metadata?: Record<string, any>) => {
     try {
       await memoryService.update(id, memory, metadata)
-      message.success(t('memory.update_success'))
+      window.message.success(t('memory.update_success'))
       setEditingMemory(null)
       // Reload all memories
       await loadMemories(currentUser)
     } catch (error) {
       console.error('Failed to update memory:', error)
-      message.error(t('memory.update_failed'))
+      window.message.error(t('memory.update_failed'))
     }
   }
 
@@ -472,12 +465,12 @@ const MemoriesPage = () => {
       // Explicitly load memories for the new user
       await loadMemories(userId)
 
-      message.success(
+      window.message.success(
         t('memory.user_switched', { user: userId === DEFAULT_USER_ID ? t('memory.default_user') : userId })
       )
     } catch (error) {
       console.error('Failed to switch user:', error)
-      message.error(t('memory.user_switch_failed'))
+      window.message.error(t('memory.user_switch_failed'))
     }
   }
 
@@ -493,11 +486,11 @@ const MemoriesPage = () => {
 
       // Switch to the newly created user
       await handleUserSwitch(userId)
-      message.success(t('memory.user_created', { user: userId }))
+      window.message.success(t('memory.user_created', { user: userId }))
       setAddUserModalVisible(false)
     } catch (error) {
       console.error('Failed to add user:', error)
-      message.error(t('memory.add_user_failed'))
+      window.message.error(t('memory.add_user_failed'))
     }
   }
 
@@ -512,7 +505,8 @@ const MemoriesPage = () => {
   }
 
   const handleResetMemories = async (userId: string) => {
-    Modal.confirm({
+    window.modal.confirm({
+      centered: true,
       title: t('memory.reset_memories_confirm_title'),
       content: t('memory.reset_memories_confirm_content', { user: getUserDisplayName(userId) }),
       icon: <ExclamationCircleOutlined />,
@@ -522,13 +516,13 @@ const MemoriesPage = () => {
       onOk: async () => {
         try {
           await memoryService.deleteAllMemoriesForUser(userId)
-          message.success(t('memory.memories_reset_success', { user: getUserDisplayName(userId) }))
+          window.message.success(t('memory.memories_reset_success', { user: getUserDisplayName(userId) }))
 
           // Reload memories to show the empty state
           await loadMemories(currentUser)
         } catch (error) {
           console.error('Failed to reset memories:', error)
-          message.error(t('memory.reset_memories_failed'))
+          window.message.error(t('memory.reset_memories_failed'))
         }
       }
     })
@@ -536,11 +530,12 @@ const MemoriesPage = () => {
 
   const handleDeleteUser = async (userId: string) => {
     if (userId === DEFAULT_USER_ID) {
-      message.error(t('memory.cannot_delete_default_user'))
+      window.message.error(t('memory.cannot_delete_default_user'))
       return
     }
 
-    Modal.confirm({
+    window.modal.confirm({
+      centered: true,
       title: t('memory.delete_user_confirm_title'),
       content: t('memory.delete_user_confirm_content', { user: userId }),
       icon: <ExclamationCircleOutlined />,
@@ -550,7 +545,7 @@ const MemoriesPage = () => {
       onOk: async () => {
         try {
           await memoryService.deleteUser(userId)
-          message.success(t('memory.user_deleted', { user: userId }))
+          window.message.success(t('memory.user_deleted', { user: userId }))
 
           // Refresh the users list from database after deletion
           await loadUniqueUsers()
@@ -563,7 +558,7 @@ const MemoriesPage = () => {
           }
         } catch (error) {
           console.error('Failed to delete user:', error)
-          message.error(t('memory.delete_user_failed'))
+          window.message.error(t('memory.delete_user_failed'))
         }
       }
     })
@@ -571,7 +566,9 @@ const MemoriesPage = () => {
 
   const handleGlobalMemoryToggle = (enabled: boolean) => {
     dispatch(setGlobalMemoryEnabled(enabled))
-    message.success(enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled'))
+    window.window.message.success(
+      enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled_title')
+    )
   }
 
   return (
@@ -604,19 +601,36 @@ const MemoriesPage = () => {
                   dropdownRender={(menu) => (
                     <>
                       {menu}
-                      <div style={{ padding: '8px 0', borderTop: '1px solid #f0f0f0' }}>
+                      <div style={{ padding: '8px 0' }}>
                         <Button
                           type="text"
-                          icon={<UserAddOutlined />}
                           onClick={() => setAddUserModalVisible(true)}
-                          style={{ width: '100%', textAlign: 'left' }}>
-                          {t('memory.add_new_user')}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            padding: '4px 12px'
+                          }}>
+                          <Space align="center">
+                            <div
+                              style={{
+                                width: 20,
+                                height: 20,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                              <UserAddOutlined style={{ fontSize: 14 }} />
+                            </div>
+                            <span>{t('memory.add_new_user')}</span>
+                          </Space>
                         </Button>
                       </div>
                     </>
                   )}>
                   <Option value={DEFAULT_USER_ID}>
-                    <Space>
+                    <Space align="center">
                       <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                         {getUserAvatar(DEFAULT_USER_ID)}
                       </Avatar>
@@ -627,7 +641,7 @@ const MemoriesPage = () => {
                     .filter((user) => user !== DEFAULT_USER_ID)
                     .map((user) => (
                       <Option key={user} value={user}>
-                        <Space>
+                        <Space align="center">
                           <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                             {getUserAvatar(user)}
                           </Avatar>
@@ -744,24 +758,26 @@ const MemoriesPage = () => {
 
         {allMemories.length === 0 && !loading ? (
           <MainContent>
-            <EmptyView>
-              <Brain size={48} className="empty-icon" />
-              <div className="empty-title">
-                {allMemories.length === 0 ? t('memory.no_memories') : t('memory.no_matching_memories')}
-              </div>
-              <div className="empty-description">
-                {allMemories.length === 0 ? t('memory.no_memories_description') : t('memory.try_different_filters')}
-              </div>
-              {allMemories.length === 0 && (
-                <Button
-                  type="primary"
-                  size="large"
-                  icon={<PlusOutlined />}
-                  onClick={() => setAddMemoryModalVisible(true)}>
-                  {t('memory.add_first_memory')}
-                </Button>
-              )}
-            </EmptyView>
+            <Center style={{ flex: 1 }}>
+              <EmptyView>
+                <Brain size={48} className="empty-icon" />
+                <div className="empty-title">
+                  {allMemories.length === 0 ? t('memory.no_memories') : t('memory.no_matching_memories')}
+                </div>
+                <div className="empty-description">
+                  {allMemories.length === 0 ? t('memory.no_memories_description') : t('memory.try_different_filters')}
+                </div>
+                {allMemories.length === 0 && (
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon={<PlusOutlined />}
+                    onClick={() => setAddMemoryModalVisible(true)}>
+                    {t('memory.add_first_memory')}
+                  </Button>
+                )}
+              </EmptyView>
+            </Center>
           </MainContent>
         ) : (
           <MainContent>
@@ -808,7 +824,8 @@ const MemoriesPage = () => {
                           icon: <DeleteOutlined />,
                           danger: true,
                           onClick: () => {
-                            Modal.confirm({
+                            window.modal.confirm({
+                              centered: true,
                               title: t('memory.delete_confirm'),
                               content: t('memory.delete_confirm_single'),
                               onOk: () => handleDeleteMemory(memory.id),
