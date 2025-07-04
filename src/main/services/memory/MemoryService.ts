@@ -1,5 +1,5 @@
 import { Client, createClient } from '@libsql/client'
-import Embeddings from '@main/embeddings/Embeddings'
+import Embeddings from '@main/knowledge/embeddings/Embeddings'
 import type {
   AddMemoryOptions,
   AssistantMessage,
