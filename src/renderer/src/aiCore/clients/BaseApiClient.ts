@@ -215,6 +215,7 @@ export abstract class BaseApiClient<
 
   public async getMessageContent(message: Message): Promise<string> {
     const content = getContentWithTools(message)
+
     if (isEmpty(content)) {
       return ''
     }
@@ -293,6 +294,7 @@ export abstract class BaseApiClient<
     const webSearch: WebSearchResponse = window.keyv.get(`web-search-${message.id}`)
 
     if (webSearch) {
+      window.keyv.remove(`web-search-${message.id}`)
       return (webSearch.results as WebSearchProviderResponse).results.map(
         (result, index) =>
           ({
@@ -318,6 +320,7 @@ export abstract class BaseApiClient<
     const knowledgeReferences: KnowledgeReference[] = window.keyv.get(`knowledge-search-${message.id}`)
 
     if (!isEmpty(knowledgeReferences)) {
+      window.keyv.remove(`knowledge-search-${message.id}`)
       // Logger.log(`Found ${knowledgeReferences.length} knowledge base references in cache for ID: ${message.id}`)
       return knowledgeReferences
     }

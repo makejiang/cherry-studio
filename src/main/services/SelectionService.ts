@@ -1,7 +1,7 @@
 import { SELECTION_FINETUNED_LIST, SELECTION_PREDEFINED_BLACKLIST } from '@main/configs/SelectionConfig'
 import { isDev, isMac, isWin } from '@main/constant'
 import { IpcChannel } from '@shared/IpcChannel'
-import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
+import { BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
 import Logger from 'electron-log'
 import { join } from 'path'
 import type {
@@ -431,7 +431,9 @@ export class SelectionService {
 
     // Hide when losing focus
     this.toolbarWindow.on('blur', () => {
-      this.hideToolbar()
+      if (this.toolbarWindow!.isVisible()) {
+        this.hideToolbar()
+      }
     })
 
     // Clean up when closed
@@ -534,10 +536,52 @@ export class SelectionService {
   public hideToolbar(): void {
     if (!this.isToolbarAlive()) return
 
-    // this.toolbarWindow!.setOpacity(0)
+    this.stopHideByMouseKeyListener()
+
+    // [Windows] just hide the toolbar window is enough
+    if (!isMac) {
+      this.toolbarWindow!.hide()
+      return
+    }
+
+    /************************************************
+     * [macOS] the following code is only for macOS
+     *************************************************/
+
+    // [macOS] a HACKY way
+    // make sure other windows do not bring to front when toolbar is hidden
+    // get all focusable windows and set them to not focusable
+    const focusableWindows: BrowserWindow[] = []
+    for (const window of BrowserWindow.getAllWindows()) {
+      if (!window.isDestroyed() && window.isVisible()) {
+        if (window.isFocusable()) {
+          focusableWindows.push(window)
+          window.setFocusable(false)
+        }
+      }
+    }
+
     this.toolbarWindow!.hide()
 
-    this.stopHideByMouseKeyListener()
+    // set them back to focusable after 50ms
+    setTimeout(() => {
+      for (const window of focusableWindows) {
+        if (!window.isDestroyed()) {
+          window.setFocusable(true)
+        }
+      }
+    }, 50)
+
+    // [macOS] hacky way
+    // Because toolbar is not a FOCUSED window, so the hover status will remain when next time show
+    // so we just send mouseMove event to the toolbar window to make the hover status disappear
+    this.toolbarWindow!.webContents.sendInputEvent({
+      type: 'mouseMove',
+      x: -1,
+      y: -1
+    })
+
+    return
   }
 
   /**
@@ -1098,23 +1142,32 @@ export class SelectionService {
     // Get a window from the preloaded queue or create a new one if empty
     const actionWindow = this.preloadedActionWindows.pop() || this.createPreloadedActionWindow()
 
-    // [macOS] a HACKY way
-    // make sure other windows do not bring to front when action window is closed
-    // may blink or the mainWindow will be hidden, but it's a workaround
-    if (isMac) {
-      actionWindow.on('close', () => {
-        app.hide()
-        setTimeout(() => {
-          app.show()
-        }, 50)
-      })
-    }
-
     // Set up event listeners for this instance
     actionWindow.on('closed', () => {
       this.actionWindows.delete(actionWindow)
       if (!actionWindow.isDestroyed()) {
         actionWindow.destroy()
+      }
+
+      // [macOS] a HACKY way
+      // make sure other windows do not bring to front when action window is closed
+      if (isMac) {
+        const focusableWindows: BrowserWindow[] = []
+        for (const window of BrowserWindow.getAllWindows()) {
+          if (!window.isDestroyed() && window.isVisible()) {
+            if (window.isFocusable()) {
+              focusableWindows.push(window)
+              window.setFocusable(false)
+            }
+          }
+        }
+        setTimeout(() => {
+          for (const window of focusableWindows) {
+            if (!window.isDestroyed()) {
+              window.setFocusable(true)
+            }
+          }
+        }, 50)
       }
     })
 
@@ -1161,8 +1214,7 @@ export class SelectionService {
 
     //center way
     if (!this.isFollowToolbar || !this.toolbarWindow) {
-      const cursorPoint = screen.getCursorScreenPoint()
-      const display = screen.getDisplayNearestPoint(cursorPoint)
+      const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
       const workArea = display.workArea
 
       const centerX = workArea.x + (workArea.width - actionWindowWidth) / 2
@@ -1181,7 +1233,7 @@ export class SelectionService {
 
     //follow toolbar
     const toolbarBounds = this.toolbarWindow!.getBounds()
-    const display = screen.getDisplayNearestPoint({ x: toolbarBounds.x, y: toolbarBounds.y })
+    const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const workArea = display.workArea
     const GAP = 6 // 6px gap from screen edges
 

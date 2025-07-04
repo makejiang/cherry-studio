@@ -1191,7 +1191,6 @@ const migrateConfig = {
       console.error(error)
       return state
     }
-
     return state
   },
   '87': (state: RootState) => {
@@ -1664,9 +1663,35 @@ const migrateConfig = {
   },
   '117': (state: RootState) => {
     try {
-      updateProvider(state, 'ppio', {
-        models: SYSTEM_MODELS.ppio,
-        apiHost: 'https://api.ppinfra.com/v3/openai/'
+      const ppioProvider = state.llm.providers.find((provider) => provider.id === 'ppio')
+      const modelsToRemove = [
+        'qwen/qwen-2.5-72b-instruct',
+        'qwen/qwen2.5-32b-instruct',
+        'meta-llama/llama-3.1-70b-instruct',
+        'meta-llama/llama-3.1-8b-instruct',
+        '01-ai/yi-1.5-34b-chat',
+        '01-ai/yi-1.5-9b-chat',
+        'thudm/glm-z1-32b-0414',
+        'thudm/glm-z1-9b-0414'
+      ]
+      if (ppioProvider) {
+        updateProvider(state, 'ppio', {
+          models: [
+            ...ppioProvider.models.filter((model) => !modelsToRemove.includes(model.id)),
+            ...SYSTEM_MODELS.ppio.filter(
+              (systemModel) => !ppioProvider.models.some((existingModel) => existingModel.id === systemModel.id)
+            )
+          ],
+          apiHost: 'https://api.ppinfra.com/v3/openai/'
+        })
+      }
+      state.assistants.assistants.forEach((assistant) => {
+        if (assistant.settings && assistant.settings.streamOutput === undefined) {
+          assistant.settings = {
+            ...assistant.settings,
+            streamOutput: true
+          }
+        }
       })
       return state
     } catch (error) {
@@ -1675,13 +1700,19 @@ const migrateConfig = {
   },
   '118': (state: RootState) => {
     try {
-      // migrate to enable memory feature on sidebar
-      if (state.settings && state.settings.sidebarIcons) {
-        // Check if 'memory' is not already in visible icons
-        if (!state.settings.sidebarIcons.visible.includes('memory')) {
-          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory']
-        }
+      addProvider(state, 'ph8')
+      state.llm.providers = moveProvider(state.llm.providers, 'ph8', 14)
+
+      if (!state.settings.userId) {
+        state.settings.userId = uuid()
       }
+
+      state.llm.providers.forEach((provider) => {
+        if (provider.id === 'mistral') {
+          provider.type = 'mistral'
+        }
+      })
+
       return state
     } catch (error) {
       return state
@@ -1689,6 +1720,22 @@ const migrateConfig = {
   },
   '119': (state: RootState) => {
     try {
+      addProvider(state, 'new-api')
+      state.llm.providers = moveProvider(state.llm.providers, 'new-api', 16)
+      return state
+    } catch (error) {
+      return state
+    }
+  },
+  '120': (state: RootState) => {
+    try {
+      // migrate to enable memory feature on sidebar
+      if (state.settings && state.settings.sidebarIcons) {
+        // Check if 'memory' is not already in visible icons
+        if (!state.settings.sidebarIcons.visible.includes('memory')) {
+          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory']
+        }
+      }
       // 完整的 TTS 功能初始化和所有提供商添加
       console.log('[Migration 119] Initializing complete TTS functionality')
 
@@ -1737,10 +1784,8 @@ const migrateConfig = {
         }
       })
 
-      console.log(`[Migration 119] TTS providers initialized, count: ${state.tts.providers.length}`)
       return state
     } catch (error) {
-      console.error('[Migration 119] Complete TTS initialization failed:', error)
       return state
     }
   }
