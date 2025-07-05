@@ -1,6 +1,8 @@
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons'
 import { isOpenAIProvider } from '@renderer/aiCore/clients/ApiClientFactory'
 import OpenAIAlert from '@renderer/components/Alert/OpenAIAlert'
+import CodeEditor from '@renderer/components/CodeEditor'
+import { CodeTool, CodeToolbar, TOOL_SPECS, useCodeTool } from '@renderer/components/CodeToolbar'
 import { StreamlineGoodHealthAndWellBeing } from '@renderer/components/Icons/SVGIcon'
 import { HStack } from '@renderer/components/Layout'
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
@@ -17,7 +19,7 @@ import { lightbulbVariants } from '@renderer/utils/motionVariants'
 import { Button, Divider, Flex, Input, Space, Switch, Tooltip } from 'antd'
 import Link from 'antd/es/typography/Link'
 import { debounce, isEmpty } from 'lodash'
-import { Settings2, SquareArrowOutUpRight } from 'lucide-react'
+import { SaveIcon, Settings2, SquareArrowOutUpRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { FC, useCallback, useDeferredValue, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -75,6 +77,10 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
 
   const [modelStatuses, setModelStatuses] = useState<ModelStatus[]>([])
   const [isHealthChecking, setIsHealthChecking] = useState(false)
+
+  const [headerText, setHeaderText] = useState<string>(JSON.stringify(provider.extra_headers || {}, null, 2))
+  const [tools, setTools] = useState<CodeTool[]>([])
+  const { registerTool, removeTool } = useCodeTool(setTools)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetApiKey = useCallback(
@@ -293,6 +299,29 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
     }
   }, [apiKey, provider, updateProvider])
 
+  const onUpdateHeaders = useCallback(() => {
+    try {
+      const headers = headerText.trim() ? JSON.parse(headerText) : {}
+      setHeaderText(headerText)
+      updateProvider({ ...provider, extra_headers: headers })
+      window.message.success({ content: t('message.save.success.title') })
+    } catch (error) {
+      window.message.error({ content: t('settings.provider.copilot.invalid_json') })
+    }
+  }, [headerText, provider, updateProvider, t])
+
+  useEffect(() => {
+    registerTool({
+      ...TOOL_SPECS.save,
+      icon: <SaveIcon className="icon" />,
+      tooltip: t('common.save'),
+      onClick: onUpdateHeaders
+    })
+    return () => {
+      removeTool(TOOL_SPECS.save.id)
+    }
+  }, [onUpdateHeaders, registerTool, removeTool, t])
+
   return (
     <SettingContainer theme={theme} style={{ background: 'var(--color-background)' }}>
       <SettingTitle>
@@ -404,6 +433,33 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
                   </SettingHelpText>
                 </SettingHelpTextRow>
               )}
+            </>
+          )}
+          {provider.id !== 'copilot' && (
+            <>
+              <SettingSubtitle style={{ marginTop: 5 }}>
+                {t('settings.provider.copilot.custom_headers')}
+              </SettingSubtitle>
+              <Space.Compact direction="vertical" style={{ width: '100%', marginTop: 5 }}>
+                <SettingHelpText>{t('settings.provider.copilot.headers_description')}</SettingHelpText>
+                <CodeToolbar tools={tools} />
+                <CodeEditor
+                  value={headerText}
+                  language="json"
+                  onChange={(value) => setHeaderText(value)}
+                  setTools={setTools}
+                  placeholder={`{\n  "Header-Name": "Header-Value"\n}`}
+                  options={{
+                    lint: true,
+                    collapsible: false,
+                    wrappable: true,
+                    lineNumbers: true,
+                    foldGutter: true,
+                    highlightActiveLine: true,
+                    keymap: true
+                  }}
+                />
+              </Space.Compact>
             </>
           )}
         </>
