@@ -1721,6 +1721,7 @@ const migrateConfig = {
     try {
       addProvider(state, 'new-api')
       state.llm.providers = moveProvider(state.llm.providers, 'new-api', 16)
+      state.settings.disableHardwareAcceleration = false
       // migrate to enable memory feature on sidebar
       if (state.settings && state.settings.sidebarIcons) {
         // Check if 'memory' is not already in visible icons
