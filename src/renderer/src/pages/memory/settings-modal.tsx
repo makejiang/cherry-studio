@@ -132,7 +132,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
       label: p.isSystem ? t(`provider.${p.id}`) : p.name,
       title: p.name,
       options: sortBy(p.models, 'name')
-        .filter((model) => !isEmbeddingModel(model) && !isRerankModel(model) && p.type === 'openai')
+        .filter((model) => !isEmbeddingModel(model) && !isRerankModel(model))
         .map((m) => ({
           label: m.name,
           value: getModelUniqId(m)
@@ -180,7 +180,7 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
           label={t('memory.llm_model')}
           name="llmModel"
           rules={[{ required: true, message: t('memory.please_select_llm_model') }]}>
-          <Select placeholder={t('memory.select_llm_model_placeholder')} options={llmSelectOptions} />
+          <Select placeholder={t('memory.select_llm_model_placeholder')} options={llmSelectOptions} showSearch />
         </Form.Item>
         <Form.Item
           label={t('memory.embedding_model')}
