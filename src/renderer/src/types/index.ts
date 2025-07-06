@@ -634,7 +634,7 @@ export interface MCPTool {
   name: string
   description?: string
   inputSchema: MCPToolInputSchema
-  outputSchema: z.infer<typeof MCPToolOutputSchema>
+  outputSchema?: z.infer<typeof MCPToolOutputSchema>
 }
 
 export interface MCPPromptArguments {
