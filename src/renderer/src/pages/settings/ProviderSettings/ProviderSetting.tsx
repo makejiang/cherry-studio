@@ -302,7 +302,6 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
   const onUpdateHeaders = useCallback(() => {
     try {
       const headers = headerText.trim() ? JSON.parse(headerText) : {}
-      setHeaderText(headerText)
       updateProvider({ ...provider, extra_headers: headers })
       window.message.success({ content: t('message.save.success.title') })
     } catch (error) {
