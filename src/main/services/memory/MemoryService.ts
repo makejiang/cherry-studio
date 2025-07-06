@@ -47,6 +47,7 @@ export class MemoryService {
   private embeddings: Embeddings | null = null
   private config: MemoryConfig | null = null
   private static readonly UNIFIED_DIMENSION = 1536
+  private static readonly SIMILARITY_THRESHOLD = 0.85
 
   private constructor() {
     // Private constructor to enforce singleton pattern
@@ -213,9 +214,28 @@ export class MemoryService {
             Logger.info(
               `Generated embedding with dimension: ${embedding.length} (target: ${this.config?.embedderDimensions || MemoryService.UNIFIED_DIMENSION})`
             )
+
+            // Check for similar memories using vector similarity
+            const similarMemories = await this.hybridSearch(trimmedMemory, embedding, {
+              limit: 5,
+              threshold: 0.1, // Lower threshold to get more candidates
+              userId,
+              agentId
+            })
+
+            // Check if any similar memory exceeds the similarity threshold
+            if (similarMemories.memories.length > 0) {
+              const highestSimilarity = Math.max(...similarMemories.memories.map((m) => m.score || 0))
+              if (highestSimilarity >= MemoryService.SIMILARITY_THRESHOLD) {
+                Logger.info(
+                  `Skipping memory addition due to high similarity: ${highestSimilarity.toFixed(3)} >= ${MemoryService.SIMILARITY_THRESHOLD}`
+                )
+                Logger.info(`Similar memory found: "${similarMemories.memories[0].memory}"`)
+                continue
+              }
+            }
           } catch (error) {
             Logger.error('Failed to generate embedding:', error)
-            // Continue without embedding
           }
         }
 
