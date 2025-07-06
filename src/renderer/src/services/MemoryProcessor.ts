@@ -45,10 +45,7 @@ export class MemoryProcessor {
       const parsedMessages = messages.map((msg) => `${msg.role}: ${msg.content}`).join('\n')
 
       // Get fact extraction prompt
-      const [systemPrompt, userPrompt] = getFactRetrievalMessages(
-        parsedMessages,
-        memoryConfig.customFactExtractionPrompt
-      )
+      const [systemPrompt, userPrompt] = getFactRetrievalMessages(parsedMessages)
 
       const responseContent = await fetchGenerate({
         prompt: systemPrompt,
