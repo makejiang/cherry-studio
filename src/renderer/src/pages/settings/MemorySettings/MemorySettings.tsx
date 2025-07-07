@@ -11,6 +11,7 @@ import {
   UserDeleteOutlined,
   UserOutlined
 } from '@ant-design/icons'
+import { useTheme } from '@renderer/context/ThemeProvider'
 import MemoryService from '@renderer/services/MemoryService'
 import {
   selectCurrentUserId,
@@ -18,11 +19,11 @@ import {
   setCurrentUserId,
   setGlobalMemoryEnabled
 } from '@renderer/store/memory'
-import { MemoryItem } from '@types'
+import type { MemoryItem } from '@types'
 import {
   Avatar,
+  Badge,
   Button,
-  Card,
   Dropdown,
   Empty,
   Form,
@@ -36,7 +37,7 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Brain, Users } from 'lucide-react'
+import { Brain } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -44,12 +45,11 @@ import styled from 'styled-components'
 
 import {
   SettingContainer,
-  SettingDescription,
   SettingDivider,
   SettingGroup,
+  SettingHelpText,
   SettingRow,
   SettingRowTitle,
-  SettingSubtitle,
   SettingTitle
 } from '../index'
 import MemoriesSettingsModal from './MemoriesSettingsModal'
@@ -574,40 +574,46 @@ const MemorySettings = () => {
     window.message.success(enabled ? t('memory.global_memory_enabled') : t('memory.global_memory_disabled_title'))
   }
 
-  return (
-    <SettingContainer>
-      <SettingTitle>{t('memory.title')}</SettingTitle>
-      <SettingDescription>{t('memory.description')}</SettingDescription>
+  const { theme } = useTheme()
 
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.settings', 'Settings')}</SettingSubtitle>
+  return (
+    <SettingContainer theme={theme}>
+      {/* Memory Settings */}
+      <SettingGroup theme={theme}>
+        <SettingTitle>{t('memory.settings')}</SettingTitle>
         <SettingDivider />
         <SettingRow>
-          <SettingRowTitle>{t('memory.global_memory', 'Global Memory')}</SettingRowTitle>
-          <Switch checked={globalMemoryEnabled} onChange={handleGlobalMemoryToggle} size="small" />
+          <SettingRowTitle>{t('memory.global_memory')}</SettingRowTitle>
+          <Switch checked={globalMemoryEnabled} onChange={handleGlobalMemoryToggle} />
         </SettingRow>
+        <SettingDivider />
         <SettingRow>
-          <SettingRowTitle>{t('memory.memory_settings', 'Memory Settings')}</SettingRowTitle>
-          <Button icon={<SettingOutlined />} onClick={() => setSettingsModalVisible(true)} size="small">
-            {t('memory.configure', 'Configure')}
+          <SettingRowTitle>{t('memory.configure')}</SettingRowTitle>
+          <Button icon={<SettingOutlined />} onClick={() => setSettingsModalVisible(true)}>
+            {t('common.settings')}
           </Button>
         </SettingRow>
       </SettingGroup>
 
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.user_management', 'User Management')}</SettingSubtitle>
+      {/* User Management */}
+      <SettingGroup theme={theme}>
+        <SettingTitle>{t('memory.user_management')}</SettingTitle>
         <SettingDivider />
         <SettingRow>
-          <SettingRowTitle>{t('memory.current_user', 'Current User')}</SettingRowTitle>
+          <SettingRowTitle>
+            {t('memory.user_id')}
+            <SettingHelpText>
+              {allMemories.length} {t('memory.total_memories')}
+            </SettingHelpText>
+          </SettingRowTitle>
           <Select
             value={currentUser}
             onChange={handleUserSwitch}
             style={{ width: 200 }}
-            size="small"
             dropdownRender={(menu) => (
               <>
                 {menu}
-                <div style={{ padding: '8px 0' }}>
+                <div style={{ padding: '8px' }}>
                   <Button
                     type="text"
                     onClick={() => setAddUserModalVisible(true)}
@@ -615,11 +621,10 @@ const MemorySettings = () => {
                       width: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      padding: '4px 12px'
+                      justifyContent: 'flex-start'
                     }}>
                     <Space align="center">
-                      <UserAddOutlined style={{ fontSize: 14 }} />
+                      <UserAddOutlined />
                       <span>{t('memory.add_new_user')}</span>
                     </Space>
                   </Button>
@@ -628,7 +633,7 @@ const MemorySettings = () => {
             )}>
             <Option value={DEFAULT_USER_ID}>
               <Space align="center">
-                <Avatar size={16} style={{ background: 'var(--color-primary)' }}>
+                <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                   {getUserAvatar(DEFAULT_USER_ID)}
                 </Avatar>
                 <span>{t('memory.default_user')}</span>
@@ -639,7 +644,7 @@ const MemorySettings = () => {
               .map((user) => (
                 <Option key={user} value={user}>
                   <Space align="center">
-                    <Avatar size={16} style={{ background: 'var(--color-primary)' }}>
+                    <Avatar size={20} style={{ background: 'var(--color-primary)' }}>
                       {getUserAvatar(user)}
                     </Avatar>
                     <span>{user}</span>
@@ -648,207 +653,177 @@ const MemorySettings = () => {
               ))}
           </Select>
         </SettingRow>
-      </SettingGroup>
-
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.statistics', 'Statistics')}</SettingSubtitle>
         <SettingDivider />
         <SettingRow>
           <SettingRowTitle>
-            <UserOutlined style={{ marginRight: 8 }} />
-            {getUserDisplayName(currentUser)}
+            {t('memory.users')}
+            <SettingHelpText>{t('memory.statistics')}</SettingHelpText>
           </SettingRowTitle>
-        </SettingRow>
-        <SettingRow>
-          <SettingRowTitle>
-            <Brain size={14} style={{ marginRight: 8 }} />
-            {allMemories.length} {allMemories.length === 1 ? t('memory.memory') : t('memory.title')}
-          </SettingRowTitle>
-        </SettingRow>
-        <SettingRow>
-          <SettingRowTitle>
-            <Users size={14} style={{ marginRight: 8 }} />
-            {uniqueUsers.length} {t('memory.users', 'Users')}
-          </SettingRowTitle>
+          <Badge count={uniqueUsers.length} showZero style={{ backgroundColor: 'var(--color-primary)' }} />
         </SettingRow>
       </SettingGroup>
 
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.search', 'Search')}</SettingSubtitle>
-        <SettingDivider />
-        <Input.Search
-          placeholder={t('memory.search_placeholder')}
-          size="middle"
-          value={searchText}
-          onChange={(e) => handleSearch(e.target.value)}
-          allowClear
-          style={{ width: '100%' }}
-        />
-      </SettingGroup>
-
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.actions', 'Actions')}</SettingSubtitle>
-        <SettingDivider />
-        <Space direction="vertical" style={{ width: '100%' }} size="small">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setAddMemoryModalVisible(true)}
-            style={{ width: '100%' }}>
-            {t('memory.add_memory')}
-          </Button>
-
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: 'refresh',
-                  label: t('common.refresh'),
-                  icon: <ReloadOutlined />,
-                  onClick: () => loadMemories(currentUser)
-                },
-                {
-                  key: 'divider-reset',
-                  type: 'divider' as const
-                },
-                {
-                  key: 'reset',
-                  label: t('memory.reset_memories'),
-                  icon: <DeleteOutlined />,
-                  danger: true,
-                  onClick: () => handleResetMemories(currentUser)
-                },
-                ...(currentUser !== DEFAULT_USER_ID
-                  ? [
-                      {
-                        key: 'divider-1',
-                        type: 'divider' as const
-                      },
-                      {
-                        key: 'deleteUser',
-                        label: t('memory.delete_user'),
-                        icon: <UserDeleteOutlined />,
-                        danger: true,
-                        onClick: () => handleDeleteUser(currentUser)
-                      }
-                    ]
-                  : [])
-              ]
-            }}
-            trigger={['click']}
-            placement="bottomRight">
-            <Button icon={<MoreOutlined />} style={{ width: '100%' }}>
-              {t('common.more', 'More')}
-            </Button>
-          </Dropdown>
-        </Space>
-      </SettingGroup>
-
-      <SettingGroup>
-        <SettingSubtitle>{t('memory.memories', 'Memories')}</SettingSubtitle>
-        <SettingDivider />
-
-        {allMemories.length === 0 && !loading ? (
-          <EmptyView>
-            <Brain size={32} className="empty-icon" />
-            <div className="empty-title">{t('memory.no_memories')}</div>
-            <div className="empty-description">{t('memory.no_memories_description')}</div>
+      {/* Memory List */}
+      <SettingGroup theme={theme}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <SettingTitle>{t('memory.title')}</SettingTitle>
+          <Space>
+            <Input.Search
+              placeholder={t('memory.search_placeholder')}
+              value={searchText}
+              onChange={(e) => handleSearch(e.target.value)}
+              allowClear
+              style={{ width: 240 }}
+            />
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setAddMemoryModalVisible(true)}>
-              {t('memory.add_first_memory')}
+              {t('memory.add_memory')}
             </Button>
-          </EmptyView>
-        ) : (
-          <>
-            {loading && (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <Spin size="large" />
-                <div style={{ marginTop: 8, color: 'var(--color-text-secondary)', fontSize: 12 }}>
-                  {t('memory.loading')}
-                </div>
-              </div>
-            )}
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'refresh',
+                    label: t('common.refresh'),
+                    icon: <ReloadOutlined />,
+                    onClick: () => loadMemories(currentUser)
+                  },
+                  {
+                    key: 'divider-reset',
+                    type: 'divider' as const
+                  },
+                  {
+                    key: 'reset',
+                    label: t('memory.reset_memories'),
+                    icon: <DeleteOutlined />,
+                    danger: true,
+                    onClick: () => handleResetMemories(currentUser)
+                  },
+                  ...(currentUser !== DEFAULT_USER_ID
+                    ? [
+                        {
+                          key: 'divider-1',
+                          type: 'divider' as const
+                        },
+                        {
+                          key: 'deleteUser',
+                          label: t('memory.delete_user'),
+                          icon: <UserDeleteOutlined />,
+                          danger: true,
+                          onClick: () => handleDeleteUser(currentUser)
+                        }
+                      ]
+                    : [])
+                ]
+              }}
+              trigger={['click']}
+              placement="bottomRight">
+              <Button icon={<MoreOutlined />}>{t('common.more')}</Button>
+            </Dropdown>
+          </Space>
+        </div>
+        <SettingDivider />
 
-            {!loading && filteredMemories.length === 0 && allMemories.length > 0 && (
-              <Empty
-                description={t('memory.no_matching_memories')}
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                style={{ padding: '20px 0' }}
-              />
-            )}
-
-            {paginatedMemories.map((memory) => (
-              <MemoryCard key={memory.id}>
-                <div className="memory-header">
-                  <div className="memory-meta">
-                    <CalendarOutlined />
-                    <span>{memory.createdAt ? dayjs(memory.createdAt).fromNow() : '-'}</span>
+        {/* Memory Content Area */}
+        <div style={{ minHeight: 400 }}>
+          {allMemories.length === 0 && !loading ? (
+            <Empty
+              image={<Brain size={48} style={{ opacity: 0.3 }} />}
+              description={
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{t('memory.no_memories')}</div>
+                  <div style={{ color: 'var(--color-text-secondary)', marginBottom: 16 }}>
+                    {t('memory.no_memories_description')}
                   </div>
-                  <div className="memory-actions">
-                    <Button
-                      className="quick-edit-btn"
-                      type="text"
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={() => handleEditMemory(memory)}
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setAddMemoryModalVisible(true)}
+                    size="large">
+                    {t('memory.add_first_memory')}
+                  </Button>
+                </div>
+              }
+            />
+          ) : (
+            <>
+              {loading && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
+                  <Spin size="large" />
+                </div>
+              )}
+
+              {!loading && filteredMemories.length === 0 && allMemories.length > 0 && (
+                <Empty description={t('memory.no_matching_memories')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
+
+              {!loading && filteredMemories.length > 0 && (
+                <>
+                  <MemoryListContainer>
+                    {paginatedMemories.map((memory) => (
+                      <MemoryItem key={memory.id}>
+                        <div className="memory-header">
+                          <div className="memory-meta">
+                            <CalendarOutlined style={{ marginRight: 4 }} />
+                            <span>{memory.createdAt ? dayjs(memory.createdAt).fromNow() : '-'}</span>
+                          </div>
+                          <Space size="small">
+                            <Button
+                              type="text"
+                              size="small"
+                              icon={<EditOutlined />}
+                              onClick={() => handleEditMemory(memory)}
+                            />
+                            <Button
+                              type="text"
+                              size="small"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => {
+                                window.modal.confirm({
+                                  centered: true,
+                                  title: t('memory.delete_confirm'),
+                                  content: t('memory.delete_confirm_single'),
+                                  onOk: () => handleDeleteMemory(memory.id),
+                                  okText: t('common.confirm'),
+                                  cancelText: t('common.cancel')
+                                })
+                              }}
+                            />
+                          </Space>
+                        </div>
+                        <div className="memory-content">{memory.memory}</div>
+                      </MemoryItem>
+                    ))}
+                  </MemoryListContainer>
+
+                  <div style={{ marginTop: 16, textAlign: 'center' }}>
+                    <Pagination
+                      current={currentPage}
+                      pageSize={pageSize}
+                      total={filteredMemories.length}
+                      onChange={handlePageChange}
+                      showSizeChanger
+                      showTotal={(total, range) =>
+                        t('memory.pagination_total', { start: range[0], end: range[1], total })
+                      }
+                      pageSizeOptions={['20', '50', '100', '200']}
+                      defaultPageSize={50}
                     />
-                    <Dropdown
-                      menu={{
-                        items: [
-                          {
-                            key: 'delete',
-                            label: t('common.delete'),
-                            icon: <DeleteOutlined />,
-                            danger: true,
-                            onClick: () => {
-                              window.modal.confirm({
-                                centered: true,
-                                title: t('memory.delete_confirm'),
-                                content: t('memory.delete_confirm_single'),
-                                onOk: () => handleDeleteMemory(memory.id),
-                                okText: t('common.confirm'),
-                                cancelText: t('common.cancel')
-                              })
-                            }
-                          }
-                        ]
-                      }}
-                      trigger={['click']}
-                      placement="topRight">
-                      <Button className="quick-edit-btn" type="text" size="small" icon={<MoreOutlined />} />
-                    </Dropdown>
                   </div>
-                </div>
-                <p className="memory-content">{memory.memory}</p>
-              </MemoryCard>
-            ))}
-
-            {!loading && filteredMemories.length > 0 && (
-              <PaginationContainer>
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={filteredMemories.length}
-                  onChange={handlePageChange}
-                  showSizeChanger
-                  showTotal={(total, range) => t('memory.pagination_total', { start: range[0], end: range[1], total })}
-                  pageSizeOptions={['20', '50', '100', '200']}
-                  defaultPageSize={50}
-                  size="small"
-                />
-              </PaginationContainer>
-            )}
-          </>
-        )}
+                </>
+              )}
+            </>
+          )}
+        </div>
       </SettingGroup>
 
-      {/* Add Memory Modal */}
+      {/* Modals */}
       <AddMemoryModal
         visible={addMemoryModalVisible}
         onCancel={() => setAddMemoryModalVisible(false)}
         onAdd={handleAddMemory}
       />
 
-      {/* Edit Memory Modal */}
       <EditMemoryModal
         visible={!!editingMemory}
         memory={editingMemory}
@@ -856,7 +831,6 @@ const MemorySettings = () => {
         onUpdate={handleUpdateMemory}
       />
 
-      {/* Add User Modal */}
       <AddUserModal
         visible={addUserModalVisible}
         onCancel={() => setAddUserModalVisible(false)}
@@ -864,7 +838,6 @@ const MemorySettings = () => {
         existingUsers={[...uniqueUsers, DEFAULT_USER_ID]}
       />
 
-      {/* Settings Modal */}
       <MemoriesSettingsModal
         visible={settingsModalVisible}
         onSubmit={async () => await handleSettingsSubmit()}
@@ -875,116 +848,46 @@ const MemorySettings = () => {
   )
 }
 
-const MemoryCard = styled(Card)`
-  background: var(--color-background);
+// Styled Components
+const MemoryListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+`
+
+const MemoryItem = styled.div`
+  padding: 12px;
+  background: var(--color-background-soft);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: var(--list-item-border-radius);
   transition: all 0.2s ease;
 
   &:hover {
     border-color: var(--color-primary);
-  }
-
-  .ant-card-body {
-    padding: 12px;
+    background: var(--color-background);
   }
 
   .memory-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 8px;
   }
 
   .memory-meta {
     display: flex;
     align-items: center;
-    gap: 4px;
     color: var(--color-text-tertiary);
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 12px;
   }
 
   .memory-content {
     color: var(--color-text);
-    font-size: 13px;
-    line-height: 1.4;
-    margin: 0;
-    word-break: break-word;
-  }
-
-  .memory-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .quick-edit-btn {
-    border: none;
-    background: transparent;
-    color: var(--color-text-secondary);
-    transition: color 0.2s ease;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      color: var(--color-primary);
-    }
-  }
-`
-
-const EmptyView = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-
-  .empty-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    opacity: 0.6;
-  }
-
-  .empty-title {
-    color: var(--color-text);
     font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .empty-description {
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    margin-bottom: 16px;
-    max-width: 250px;
-  }
-`
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-  padding: 12px 0;
-
-  .ant-pagination {
-    font-size: 12px;
-  }
-
-  .ant-pagination-item-active {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-
-    a {
-      color: white;
-    }
+    line-height: 1.6;
+    word-break: break-word;
   }
 `
 
