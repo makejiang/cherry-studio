@@ -741,10 +741,6 @@ export async function fetchModels(provider: Provider): Promise<SdkModel[]> {
   }
 }
 
-export const formatApiKeys = (value: string) => {
-  return value.replaceAll('，', ',').replaceAll(' ', ',').replaceAll(' ', '').replaceAll('\n', ',')
-}
-
 export function checkApiProvider(provider: Provider): void {
   const key = 'api-check'
   const style = { marginTop: '3vh' }
