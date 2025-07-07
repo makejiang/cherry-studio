@@ -1723,6 +1723,13 @@ const migrateConfig = {
       addProvider(state, 'new-api')
       state.llm.providers = moveProvider(state.llm.providers, 'new-api', 16)
       state.settings.disableHardwareAcceleration = false
+      // migrate to enable memory feature on sidebar
+      if (state.settings && state.settings.sidebarIcons) {
+        // Check if 'memory' is not already in visible icons
+        if (!state.settings.sidebarIcons.visible.includes('memory' as any)) {
+          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory' as any]
+        }
+      }
       return state
     } catch (error) {
       return state
@@ -1730,12 +1737,16 @@ const migrateConfig = {
   },
   '120': (state: RootState) => {
     try {
-      // migrate to enable memory feature on sidebar
+      // migrate to remove memory feature from sidebar (moved to settings)
       if (state.settings && state.settings.sidebarIcons) {
-        // Check if 'memory' is not already in visible icons
-        if (!state.settings.sidebarIcons.visible.includes('memory')) {
-          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory']
-        }
+        // Remove 'memory' from visible icons if present
+        state.settings.sidebarIcons.visible = state.settings.sidebarIcons.visible.filter(
+          (icon) => icon !== ('memory' as any)
+        )
+        // Remove 'memory' from disabled icons if present
+        state.settings.sidebarIcons.disabled = state.settings.sidebarIcons.disabled.filter(
+          (icon) => icon !== ('memory' as any)
+        )
       }
       // 完整的 TTS 功能初始化和所有提供商添加
       console.log('[Migration 119] Initializing complete TTS functionality')

@@ -1576,7 +1576,14 @@
         "tags": "Теги",
         "tagsPlaceholder": "Введите теги",
         "providerPlaceholder": "Имя провайдера",
-        "advancedSettings": "Расширенные настройки"
+        "advancedSettings": "Расширенные настройки",
+        "addServer.importFrom.method": "[to be translated]:Import Method",
+        "addServer.importFrom.dxtFile": "[to be translated]:DXT Package File",
+        "addServer.importFrom.dxtHelp": "[to be translated]:Select a .dxt file containing an MCP server package",
+        "addServer.importFrom.selectDxtFile": "[to be translated]:Select DXT File",
+        "addServer.importFrom.noDxtFile": "[to be translated]:Please select a DXT file",
+        "addServer.importFrom.dxtProcessFailed": "[to be translated]:Failed to process DXT file",
+        "addServer.importFrom.dxt": "[to be translated]:Import DXT Package"
       },
       "messages.prompt": "Показывать подсказки",
       "messages.tokens": "Показать использование токенов",

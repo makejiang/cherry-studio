@@ -49,8 +49,6 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
         embedderModel: getModelUniqId(embedderModel),
         embedderDimensions: memoryConfig.embedderDimensions,
         autoDims: isAutoDims
-        // customFactExtractionPrompt: memoryConfig.customFactExtractionPrompt,
-        // customUpdateMemoryPrompt: memoryConfig.customUpdateMemoryPrompt
       })
     }
   }, [visible, memoryConfig, form, llmModel, embedderModel])
@@ -112,8 +110,6 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
           },
           embedderDimensions: finalDimensions,
           isAutoDimensions: values.autoDims
-          // customFactExtractionPrompt: values.customFactExtractionPrompt,
-          // customUpdateMemoryPrompt: values.customUpdateMemoryPrompt
         }
 
         dispatch(updateMemoryConfig(updatedConfig))
@@ -222,12 +218,6 @@ const MemoriesSettingsModal: FC<MemoriesSettingsModalProps> = ({ visible, onSubm
             <InputNumber style={{ width: '100%' }} min={1} placeholder={t('knowledge.dimensions_size_placeholder')} />
           </Form.Item>
         )}
-        {/* <Form.Item label="Custom Fact Extraction Prompt" name="customFactExtractionPrompt">
-          <Input.TextArea placeholder="Optional custom prompt for fact extraction..." rows={3} />
-        </Form.Item>
-        <Form.Item label="Custom Update Memory Prompt" name="customUpdateMemoryPrompt">
-          <Input.TextArea placeholder="Optional custom prompt for memory updates..." rows={3} />
-        </Form.Item> */}
       </Form>
     </Modal>
   )

@@ -61,8 +61,8 @@ const AssistantMemorySettings: React.FC<Props> = ({ assistant, updateAssistant, 
     if (onClose) {
       onClose()
     }
-    // Then navigate to memory page
-    window.location.hash = '#/memory'
+    // Then navigate to memory settings page
+    window.location.hash = '#/settings/memory'
   }
 
   const isMemoryConfigured = memoryConfig.embedderApiClient && memoryConfig.llmApiClient

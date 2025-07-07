@@ -1576,7 +1576,14 @@
         "tags": "タグ",
         "tagsPlaceholder": "タグを入力",
         "providerPlaceholder": "プロバイダー名",
-        "advancedSettings": "詳細設定"
+        "advancedSettings": "詳細設定",
+        "addServer.importFrom.method": "[to be translated]:Import Method",
+        "addServer.importFrom.dxtFile": "[to be translated]:DXT Package File",
+        "addServer.importFrom.dxtHelp": "[to be translated]:Select a .dxt file containing an MCP server package",
+        "addServer.importFrom.selectDxtFile": "[to be translated]:Select DXT File",
+        "addServer.importFrom.noDxtFile": "[to be translated]:Please select a DXT file",
+        "addServer.importFrom.dxtProcessFailed": "[to be translated]:Failed to process DXT file",
+        "addServer.importFrom.dxt": "[to be translated]:Import DXT Package"
       },
       "messages.prompt": "プロンプト表示",
       "messages.tokens": "トークン使用量を表示",
