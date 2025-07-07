@@ -588,7 +588,7 @@ const MemorySettings = () => {
         </SettingRow>
         <SettingDivider />
         <SettingRow>
-          <SettingRowTitle>{t('memory.configure')}</SettingRowTitle>
+          <SettingRowTitle>{t('memory.settings')}</SettingRowTitle>
           <Button icon={<SettingOutlined />} onClick={() => setSettingsModalVisible(true)}>
             {t('common.settings')}
           </Button>
