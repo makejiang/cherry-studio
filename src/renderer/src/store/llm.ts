@@ -22,6 +22,9 @@ type LlmSettings = {
     projectId: string
     location: string
   }
+  ovms: {
+    urlBackend: string
+  }
 }
 
 export interface LlmState {
@@ -181,6 +184,16 @@ export const INITIAL_PROVIDERS: Provider[] = [
     apiKey: '',
     apiHost: 'https://openrouter.ai/api/v1/',
     models: SYSTEM_MODELS.openrouter,
+    isSystem: true,
+    enabled: false
+  },
+  {
+    id: 'ovms',
+    name: 'Intel OVMS',
+    type: 'openai',
+    apiKey: '',
+    apiHost: 'http://localhost:8000/v3/',
+    models: SYSTEM_MODELS.ovms,
     isSystem: true,
     enabled: false
   },
@@ -553,7 +566,11 @@ export const initialState: LlmState = {
       },
       projectId: '',
       location: ''
+    },
+    ovms: {
+      urlBackend: 'https://github.com/openvinotoolkit/model_server/releases/download/v2025.2/ovms_windows_python_off.zip'
     }
+
   }
 }
 

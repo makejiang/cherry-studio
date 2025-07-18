@@ -1041,6 +1041,7 @@
       "o3": "O3",
       "ocoolai": "ocoolAI",
       "ollama": "Ollama",
+      "ovms": "Intel OVMS",
       "openai": "OpenAI",
       "openrouter": "OpenRouter",
       "perplexity": "Perplexity",

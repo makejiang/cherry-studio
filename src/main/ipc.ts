@@ -39,12 +39,14 @@ import { calculateDirectorySize, getResourcePath } from './utils'
 import { decrypt, encrypt } from './utils/aes'
 import { getCacheDir, getConfigDir, getFilesDir, hasWritePermission, updateAppDataConfig } from './utils/file'
 import { compress, decompress } from './utils/zip'
+import { OvmsManager } from './services/OvmsManager'
 
 const fileManager = new FileStorage()
 const backupManager = new BackupManager()
 const exportService = new ExportService(fileManager)
 const obsidianVaultService = new ObsidianVaultService()
 const vertexAIService = VertexAIService.getInstance()
+const ovmsManager = new OvmsManager()
 
 export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   const appUpdater = new AppUpdater(mainWindow)
@@ -561,4 +563,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   SelectionService.registerIpcHandler()
 
   ipcMain.handle(IpcChannel.App_QuoteToMain, (_, text: string) => windowService.quoteToMainWindow(text))
+
+  // OVMS
+  ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, timeout: number) => ovmsManager.addModel(modelName, modelId, timeout))
 }

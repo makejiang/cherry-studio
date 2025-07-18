@@ -43,6 +43,7 @@ import ProviderOAuth from './ProviderOAuth'
 import ProviderSettingsPopup from './ProviderSettingsPopup'
 import SelectProviderModelPopup from './SelectProviderModelPopup'
 import VertexAISettings from './VertexAISettings'
+import OVMSSettings from './OVMSSettings'
 
 interface Props {
   provider: Provider
@@ -67,6 +68,7 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
   const isAzureOpenAI = provider.id === 'azure-openai' || provider.type === 'azure-openai'
 
   const isDmxapi = provider.id === 'dmxapi'
+  const isOVMS = provider.id === 'ovms'
 
   const providerConfig = PROVIDER_CONFIG[provider.id]
   const officialWebsite = providerConfig?.websites?.official
@@ -335,6 +337,7 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
         />
       )}
       {provider.id === 'openai' && <OpenAIAlert />}
+      {isOVMS && <OVMSSettings />}
       {isDmxapi && <DMXAPISettings provider={provider} setApiKey={setApiKey} />}
       {provider.id !== 'vertexai' && (
         <>
@@ -424,7 +427,7 @@ const ProviderSetting: FC<Props> = ({ provider: _provider }) => {
       {provider.id === 'lmstudio' && <LMStudioSettings />}
       {provider.id === 'gpustack' && <GPUStackSettings />}
       {provider.id === 'copilot' && <GithubCopilotSettings provider={provider} setApiKey={setApiKey} />}
-      {provider.id === 'vertexai' && <VertexAISettings />}
+      {provider.id === 'vertexai' && <VertexAISettings />}      
       <SettingSubtitle style={{ marginBottom: 5 }}>
         <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
           <HStack alignItems="center" gap={8} mb={5}>

@@ -49,6 +49,7 @@ import VoyageAIProviderLogo from '@renderer/assets/images/providers/voyageai.png
 import XirangProviderLogo from '@renderer/assets/images/providers/xirang.png'
 import ZeroOneProviderLogo from '@renderer/assets/images/providers/zero-one.png'
 import ZhipuProviderLogo from '@renderer/assets/images/providers/zhipu.png'
+import IntelOvmsLogo from '@renderer/assets/images/providers/intel.png'
 
 import { TOKENFLUX_HOST } from './constant'
 
@@ -104,7 +105,8 @@ const PROVIDER_LOGO_MAP = {
   tokenflux: TokenFluxProviderLogo,
   cephalon: CephalonProviderLogo,
   lanyun: LanyunProviderLogo,
-  vertexai: VertexAIProviderLogo
+  vertexai: VertexAIProviderLogo,
+  ovms: IntelOvmsLogo
 } as const
 
 export function getProviderLogo(providerId: string) {
@@ -439,6 +441,16 @@ export const PROVIDER_CONFIG = {
       apiKey: 'https://console.groq.com/keys',
       docs: 'https://console.groq.com/docs/quickstart',
       models: 'https://console.groq.com/docs/models'
+    }
+  },
+  ovms: {
+    api: {
+      url: 'http://localhost:8000/v3/'
+    },
+    websites: {
+      official: 'https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html',
+      docs: 'https://docs.openvino.ai/2025/model-server/ovms_what_is_openvino_model_server.html',
+      models: 'https://huggingface.co/OpenVINO'
     }
   },
   ollama: {

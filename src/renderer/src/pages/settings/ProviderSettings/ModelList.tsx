@@ -29,6 +29,7 @@ import { SettingHelpLink, SettingHelpText, SettingHelpTextRow } from '..'
 import AddModelPopup from './AddModelPopup'
 import EditModelsPopup from './EditModelsPopup'
 import ModelEditContent from './ModelEditContent'
+import DownloadOVMSModelPopup from './DownloadOVMSModelPopup'
 
 const STATUS_COLORS = {
   success: '#52c41a',
@@ -207,6 +208,11 @@ const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], s
     [provider, t]
   )
 
+  const onDownloadModel = useCallback(
+    () => DownloadOVMSModelPopup.show({ title: t('settings.models.download.ov.title') }),
+    [provider, t]
+  )
+
   const onEditModel = useCallback((model: Model) => {
     setEditingModel(model)
   }, [])
@@ -330,9 +336,15 @@ const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], s
         <Button type="primary" onClick={onManageModel} icon={<ListCheck size={18} />}>
           {t('button.manage')}
         </Button>
-        <Button type="default" onClick={onAddModel} icon={<PlusOutlined />}>
-          {t('button.add')}
-        </Button>
+        {provider.id !== 'ovms' ? (
+          <Button type="default" onClick={onAddModel} icon={<PlusOutlined />}>
+            {t('button.add')}
+          </Button>
+        ) : (
+          <Button type="default" onClick={onDownloadModel} icon={<PlusOutlined />}>
+            {t('button.download')}
+          </Button>
+        )}
       </Flex>
       {models.map((model) => (
         <ModelEditContent

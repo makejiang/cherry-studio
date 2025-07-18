@@ -183,6 +183,10 @@ const api = {
     clearAuthCache: (projectId: string, clientEmail?: string) =>
       ipcRenderer.invoke(IpcChannel.VertexAI_ClearAuthCache, projectId, clientEmail)
   },
+  ovms: {
+    addModel: (modelName: string, modelId: string, timeout: number) =>
+      ipcRenderer.invoke(IpcChannel.Ovms_AddModel, modelName, modelId, timeout)
+  },
   config: {
     set: (key: string, value: any, isNotify: boolean = false) =>
       ipcRenderer.invoke(IpcChannel.Config_Set, key, value, isNotify),

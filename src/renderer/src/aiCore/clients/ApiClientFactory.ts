@@ -8,6 +8,7 @@ import { VertexAPIClient } from './gemini/VertexAPIClient'
 import { OpenAIAPIClient } from './openai/OpenAIApiClient'
 import { OpenAIResponseAPIClient } from './openai/OpenAIResponseAPIClient'
 import { PPIOAPIClient } from './ppio/PPIOAPIClient'
+import { OVMSClient } from './ovms/OVMSClient'
 
 /**
  * Factory for creating ApiClient instances based on provider configuration
@@ -35,6 +36,11 @@ export class ApiClientFactory {
     if (provider.id === 'ppio') {
       console.log(`[ApiClientFactory] Creating PPIOAPIClient for provider: ${provider.id}`)
       instance = new PPIOAPIClient(provider) as BaseApiClient
+      return instance
+    }
+    if (provider.id === 'ovms') {
+      console.log(`[ApiClientFactory] Creating OVMSClient for provider: ${provider.id}`)
+      instance = new OVMSClient(provider) as BaseApiClient
       return instance
     }
 
