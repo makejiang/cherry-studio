@@ -151,7 +151,7 @@ export class OvmsManager {
       
     } catch (error) {
       Logger.error('Failed to add model:', error);
-      return { success: false, message : `Download model ${modelId} failed, please check the model id, timeout or network connection and try again.` };
+      return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- timeout value</p><p>- network connection and proxy</p>` };
     }
 
     // Update config file

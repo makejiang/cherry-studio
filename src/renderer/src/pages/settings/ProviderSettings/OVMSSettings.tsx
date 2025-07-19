@@ -8,18 +8,21 @@ import { SettingHelpText, SettingHelpTextRow, SettingSubtitle } from '..'
 
 const OVMSSettings: FC = () => {
   const urlBackend = getOVMSUrlBackend()
-  const [url] = useState(urlBackend)
+  const urlGuide = 'https://github.com/openvinotoolkit/model_server/blob/c55551763d02825829337b62c2dcef9339706f79/docs/deploying_server_baremetal.md'
   const { t } = useTranslation()
-
+  
   return (
     <>
-      <SettingSubtitle style={{ marginBottom: 5 }}>
-        OVMS Backend URL:
-      </SettingSubtitle>
       <Alert
         type="info"
         style={{ marginTop: 5 }}
-        message={urlBackend}
+        message={'Intel OVMS Guide:'}
+        description={<div> 
+                      <p>1. Download OVMS runtime package: <a href={urlBackend}>{urlBackend}</a></p>
+                      <p>2. Unzip the package.</p>
+                      <p>3. Run OVMS with reference documents.</p>
+                        <p><a href={urlGuide}>{urlGuide}</a></p>
+                    </div>}
         showIcon
       />
     </>

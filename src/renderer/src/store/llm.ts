@@ -568,7 +568,7 @@ export const initialState: LlmState = {
       location: ''
     },
     ovms: {
-      urlBackend: 'https://github.com/openvinotoolkit/model_server/releases/download/v2025.2/ovms_windows_python_off.zip'
+      urlBackend: 'https://github.com/openvinotoolkit/model_server/releases'
     }
 
   }

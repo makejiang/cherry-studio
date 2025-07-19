@@ -94,7 +94,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
         stopFakeProgress(false) // Reset progress on error
         Modal.error({
           title: t('settings.models.download.ov.error'),
-          content: result.message,
+          content: (<div dangerouslySetInnerHTML={{ __html: result.message}}></div>),
           onOk: () => {
             // Keep the form open for retry
           }
