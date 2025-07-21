@@ -231,5 +231,6 @@ export enum IpcChannel {
   Selection_UpdateActionData = 'selection:update-action-data',
 
   // OVMS
-  Ovms_AddModel = 'ovms:add-model'
+  Ovms_AddModel = 'ovms:add-model',
+  Ovms_GetModels = 'ovms:get-models'
 }

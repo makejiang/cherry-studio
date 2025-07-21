@@ -6,10 +6,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { promisify } from 'node:util'
 
-import { app } from 'electron'
 import Logger from 'electron-log';
-import { SubjectReferenceImage } from '@google/genai';
-import { log } from 'node:console';
 
 
 const execAsync = promisify(exec);
@@ -151,7 +148,7 @@ export class OvmsManager {
       
     } catch (error) {
       Logger.error('Failed to add model:', error);
-      return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- timeout value</p><p>- network connection and proxy</p>` };
+      return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- timeout value</p><p>- network connection and proxy</p><p>- environment variable HF_TOKEN</p>` };
     }
 
     // Update config file
@@ -256,5 +253,48 @@ export class OvmsManager {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Get all models from OVMS config, filtered for image generation models
+   * @returns Array of model configurations
+   */
+  public async getModels(): Promise<ModelConfig[]> {
+    if (!this.ovms) {
+      if (!(await this.initializeOvms())) {
+        Logger.error('Failed to initialize OVMS.');
+        return [];
+      }
+    }
+
+    const configPath = path.join(this.ovms!.workingDirectory, 'models', 'config.json');
+    try {
+      if (!await fs.pathExists(configPath)) {
+        Logger.warn('Config file does not exist:', configPath);
+        return [];
+      }
+
+      const config: OvmsConfig = await fs.readJson(configPath);
+      if (!config.mediapipe_config_list) {
+        Logger.warn('No mediapipe_config_list found in config');
+        return [];
+      }
+
+      // Filter models for image generation (SD, Stable-Diffusion, Stable Diffusion, FLUX)
+      const imageGenerationModels = config.mediapipe_config_list.filter(model => {
+        const modelName = model.name.toLowerCase();
+        return modelName.startsWith('sd') || 
+               modelName.startsWith('stable-diffusion') || 
+               modelName.startsWith('stable diffusion') || 
+               modelName.startsWith('flux');
+      });
+
+      Logger.info(`Found ${imageGenerationModels.length} image generation models`);
+      return imageGenerationModels;
+
+    } catch (error) {
+      Logger.error('Failed to get models:', error);
+      return [];
+    }
   }
 }

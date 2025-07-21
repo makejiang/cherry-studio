@@ -11,18 +11,21 @@ export function usePaintings() {
   const upscale = useAppSelector((state) => state.paintings.upscale)
   const DMXAPIPaintings = useAppSelector((state) => state.paintings.DMXAPIPaintings)
   const tokenFluxPaintings = useAppSelector((state) => state.paintings.tokenFluxPaintings)
+  const ovmsPaintings = useAppSelector((state) => state.paintings.ovmsPaintings)
   const dispatch = useAppDispatch()
 
   return {
     paintings,
     DMXAPIPaintings,
     tokenFluxPaintings,
+    ovmsPaintings,
     persistentData: {
       generate,
       remix,
       edit,
       upscale,
-      tokenFluxPaintings
+      tokenFluxPaintings,
+      ovmsPaintings
     },
     addPainting: (namespace: keyof PaintingsState, painting: PaintingAction) => {
       dispatch(addPainting({ namespace, painting }))
