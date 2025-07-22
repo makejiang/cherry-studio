@@ -21,7 +21,7 @@ const OVMSSettings: FC = () => {
                       <p>1. Download OVMS runtime package: <a href={urlBackend}>{urlBackend}</a></p>
                       <p>2. Unzip the package.</p>
                       <p>3. Run OVMS with reference documents.</p>
-                        <p><a href={urlGuide}>{urlGuide}</a></p>
+                        <p><a href={urlGuide}>OVMS Deployment</a></p>
                     </div>}
         showIcon
       />

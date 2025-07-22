@@ -46,8 +46,8 @@ const SIZE_OPTIONS = [
 ]
 
 // Available OVMS models for image generation - will be populated dynamically
-const OVMS_MODELS = [
-  { label: 'no model', value: 'none' }
+export const OVMS_MODELS = [
+  { label: 'no available model', value: 'none' }
 ]
 
 // Function to get available OVMS models from provider

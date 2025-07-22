@@ -27,7 +27,7 @@ import SendMessageButton from '../home/Inputbar/SendMessageButton'
 import { SettingHelpLink, SettingTitle } from '../settings'
 import Artboard from './components/Artboard'
 import PaintingsList from './components/PaintingsList'
-import { type ConfigItem, createOvmsConfig, DEFAULT_OVMS_PAINTING, getOvmsModels, createDefaultOvmsPainting } from './config/ovmsConfig'
+import { type ConfigItem, createOvmsConfig, DEFAULT_OVMS_PAINTING, getOvmsModels, createDefaultOvmsPainting, OVMS_MODELS } from './config/ovmsConfig'
 
 const OvmsPage: FC<{ Options: string[] }> = ({ Options }) => {
   const { addPainting, removePainting, updatePainting, persistentData } = usePaintings()
@@ -544,7 +544,7 @@ const OvmsPage: FC<{ Options: string[] }> = ({ Options }) => {
             />
             <Toolbar>
               <ToolbarMenu>
-                <SendMessageButton sendMessage={onGenerate} disabled={isLoading} />
+                <SendMessageButton sendMessage={onGenerate} disabled={isLoading || painting.model === OVMS_MODELS[0]?.value} />
               </ToolbarMenu>
             </Toolbar>
           </InputContainer>
