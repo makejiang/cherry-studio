@@ -83,13 +83,17 @@ const PopupContainer: React.FC<Props> = ({ base: _base, resolve }) => {
   const ocrOptions = {
     label: t('settings.tool.ocr.provider'),
     title: t('settings.tool.ocr.provider'),
-    options: ocrProviders.filter((p) => p.apiKey !== '').map((p) => ({ value: p.id, label: p.name }))
+    options: ocrProviders.filter((p) => p.apiKey !== '' &&
+      (isMac || !p.name.includes('(Mac Only)')))
+      .map((p) => ({ value: p.id, label: p.name }))
   }
+  console.log('ocrOptions', ocrOptions)
 
   const preprocessOrOcrSelectOptions = [
     ...(preprocessOptions.options.length > 0 ? [preprocessOptions] : []),
-    ...(isMac && ocrOptions.options.length > 0 ? [ocrOptions] : [])
+    ...(ocrOptions.options.length > 0 ? [ocrOptions] : [])
   ]
+  console.log('preprocessOrOcrSelectOptions', preprocessOrOcrSelectOptions)
 
   const onOk = async () => {
     try {

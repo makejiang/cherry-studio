@@ -232,5 +232,6 @@ export enum IpcChannel {
 
   // OVMS
   Ovms_AddModel = 'ovms:add-model',
-  Ovms_GetModels = 'ovms:get-models'
+  Ovms_GetModels = 'ovms:get-models',
+  Ovms_IsRunning = 'ovms:is-running'
 }

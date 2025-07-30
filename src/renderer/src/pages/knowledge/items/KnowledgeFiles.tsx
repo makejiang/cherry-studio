@@ -7,7 +7,7 @@ import FileManager from '@renderer/services/FileManager'
 import { getProviderName } from '@renderer/services/ProviderService'
 import { FileMetadata, FileType, FileTypes, KnowledgeBase, KnowledgeItem } from '@renderer/types'
 import { formatFileSize, uuid } from '@renderer/utils'
-import { bookExts, documentExts, textExts, thirdPartyApplicationExts } from '@shared/config/constant'
+import { bookExts, documentExts, textExts, thirdPartyApplicationExts, imageExts } from '@shared/config/constant'
 import { Button, Tooltip, Upload } from 'antd'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
@@ -34,7 +34,7 @@ interface KnowledgeContentProps {
   preprocessMap: Map<string, boolean>
 }
 
-const fileTypes = [...bookExts, ...thirdPartyApplicationExts, ...documentExts, ...textExts]
+const fileTypes = [...bookExts, ...thirdPartyApplicationExts, ...documentExts, ...textExts, ...imageExts]
 
 const getDisplayTime = (item: KnowledgeItem) => {
   const timestamp = item.updated_at && item.updated_at > item.created_at ? item.updated_at : item.created_at
@@ -150,7 +150,7 @@ const KnowledgeFiles: FC<KnowledgeContentProps> = ({ selectedBase, progressMap, 
           accept={fileTypes.join(',')}>
           <p className="ant-upload-text">{t('knowledge.drag_file')}</p>
           <p className="ant-upload-hint">
-            {t('knowledge.file_hint', { file_types: 'TXT, MD, HTML, PDF, DOCX, PPTX, XLSX, EPUB...' })}
+            {t('knowledge.file_hint', { file_types: 'TXT, MD, HTML, PDF, DOCX, PPTX, XLSX, EPUB, PNG...' })}
           </p>
         </Dragger>
         {fileItems.length === 0 ? (

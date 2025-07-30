@@ -187,7 +187,9 @@ const api = {
     addModel: (modelName: string, modelId: string, timeout: number) =>
       ipcRenderer.invoke(IpcChannel.Ovms_AddModel, modelName, modelId, timeout),
     getModels: () =>
-      ipcRenderer.invoke(IpcChannel.Ovms_GetModels)
+      ipcRenderer.invoke(IpcChannel.Ovms_GetModels),
+    isRunning: () =>
+      ipcRenderer.invoke(IpcChannel.Ovms_IsRunning)
   },
   config: {
     set: (key: string, value: any, isNotify: boolean = false) =>

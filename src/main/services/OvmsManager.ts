@@ -36,7 +36,7 @@ export class OvmsManager {
   /**
    * Initialize OVMS by finding the executable path and working directory
    */
-  private async initializeOvms(): Promise<Boolean> {
+  public async initializeOvms(): Promise<Boolean> {
     
     // Use PowerShell to find ovms.exe processes with their paths
     const psCommand = `Get-Process -Name "ovms" -ErrorAction SilentlyContinue | Select-Object Id, Path | ConvertTo-Json`;
@@ -63,6 +63,7 @@ export class OvmsManager {
     
     return this.ovms !== null;
   }
+
 
   /**
    * Check if the Model Name and ID are valid, they are valid only if they are not used in the config.json
@@ -135,7 +136,12 @@ export class OvmsManager {
       }
 
       // Run the download command
-      const command = `"${this.ovms?.path}" --pull --model_repository_path "${this.ovms?.workingDirectory}/models" --source_model "${modelId}"`;
+      const command = `"${this.ovms?.path}" --pull 
+                                            --model_repository_path "${this.ovms?.workingDirectory}/models" 
+                                            --source_model "${modelId}"
+                                            --model_name "${modelName}" 
+                                            --target_device GPU
+                                            --overwrite_models`;
       Logger.info(`Running command: ${command}`);
       
       const { stdout } = await execAsync(command, {

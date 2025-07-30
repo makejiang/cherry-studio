@@ -896,6 +896,7 @@
       "image_file_retry": "Please re-upload an image first",
       "image_placeholder": "No image available",
       "image_retry": "Retry",
+      "image_size": "Image Size",
       "translating": "Translating...",
       "style_types": {
         "auto": "Auto",
@@ -985,6 +986,9 @@
         "number_images_tip": "Number of upscaled results to generate",
         "seed_tip": "Controls upscaling randomness",
         "magic_prompt_option_tip": "Intelligently enhances upscaling prompts"
+      },
+      "ovms": {
+        "num_inference_steps": "Inference Steps"
       },
       "text_desc_required": "Please enter image description first",
       "image_handle_required": "Please upload an image first.",

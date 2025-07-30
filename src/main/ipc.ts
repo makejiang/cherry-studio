@@ -567,4 +567,5 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   // OVMS
   ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, timeout: number) => ovmsManager.addModel(modelName, modelId, timeout))
   ipcMain.handle(IpcChannel.Ovms_GetModels, () => ovmsManager.getModels())
+  ipcMain.handle(IpcChannel.Ovms_IsRunning, () => ovmsManager.initializeOvms())
 }

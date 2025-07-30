@@ -124,7 +124,11 @@ const PopupContainer: React.FC<Props> = ({ provider: _provider, resolve }) => {
 
   const onCancel = useCallback(() => setOpen(false), [])
 
-  const onClose = useCallback(() => resolve({}), [resolve])
+  const onClose = useCallback(() => {
+    console.log('[EditModelsPopup] onClose:', provider.id, 'provider enabled:', provider.enabled, 'models', provider.models)
+    resolve({})
+  }, [resolve, provider])
+
 
   const onAddModel = useCallback(
     (model: Model) => {

@@ -60,6 +60,7 @@ async function downloadUvBinary(platform, arch, version = DEFAULT_UV_VERSION, is
   try {
     console.log(`Downloading uv ${version} for ${platformKey}...`)
     console.log(`URL: ${downloadUrl}`)
+    console.log(`TempFile Path ${tempFilename}`)
 
     await downloadWithRedirects(downloadUrl, tempFilename)
 

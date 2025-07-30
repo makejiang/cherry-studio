@@ -36,6 +36,7 @@ import { IpcChannel } from '@shared/IpcChannel'
 import { FileMetadata, KnowledgeBaseParams, KnowledgeItem } from '@types'
 import Logger from 'electron-log'
 import { v4 as uuidv4 } from 'uuid'
+import { imageExts} from '@shared/config/constant'
 
 export interface KnowledgeBaseAddItemOptions {
   base: KnowledgeBaseParams
@@ -481,6 +482,7 @@ class KnowledgeService {
     return new Promise((resolve) => {
       const { base, item, forceReload = false, userId = '' } = options
       const optionsNonNullableAttribute = { base, item, forceReload, userId }
+      Logger.log(`[KnowledgeService Add Item UniqueId: ${item.id}]`, optionsNonNullableAttribute)
       this.getRagApplication(base)
         .then((ragApplication) => {
           const task = (() => {
@@ -564,14 +566,18 @@ class KnowledgeService {
     userId: string
   ): Promise<FileMetadata> => {
     let fileToProcess: FileMetadata = file
-    if (base.preprocessOrOcrProvider && file.ext.toLowerCase() === '.pdf') {
+    Logger.info(`[KnowledgeService] Preprocessing file: ${file.path}, ${file.ext.toLowerCase()}`)
+    if (base.preprocessOrOcrProvider && (file.ext.toLowerCase() === '.pdf' || imageExts.includes(file.ext.toLowerCase()))) {
       try {
+
         let provider: PreprocessProvider | OcrProvider
         if (base.preprocessOrOcrProvider.type === 'preprocess') {
           provider = new PreprocessProvider(base.preprocessOrOcrProvider.provider, userId)
         } else {
           provider = new OcrProvider(base.preprocessOrOcrProvider.provider)
         }
+        Logger.info(`[KnowledgeService]Starting preprocess processing for file: ${file.path}`)
+
         // 首先检查文件是否已经被预处理过
         const alreadyProcessed = await provider.checkIfAlreadyProcessed(file)
         if (alreadyProcessed) {

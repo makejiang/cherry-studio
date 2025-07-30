@@ -174,6 +174,10 @@ interface ModelListProps {
 const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], searchText = '' }) => {
   const { t } = useTranslation()
   const { provider, updateProvider, models, removeModel } = useProvider(providerId)
+  if (provider.id === 'ovms' && provider.enabled) {
+    //console.warn('[ModelList] OVMS Models:', models.map(m => m.id))
+  }
+  
   const { assistants } = useAssistants()
   const dispatch = useAppDispatch()
   const { defaultModel, setDefaultModel } = useDefaultModel()
@@ -200,7 +204,7 @@ const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], s
   }, [modelGroups])
 
   const onManageModel = useCallback(() => {
-    EditModelsPopup.show({ provider })
+    EditModelsPopup.show({provider})    
   }, [provider])
 
   const onAddModel = useCallback(
@@ -226,6 +230,7 @@ const ModelList: React.FC<ModelListProps> = ({ providerId, modelStatuses = [], s
         return m
       })
 
+      console.log('Updating model:', updatedModel, 'in provider:', provider.id)
       updateProvider({ ...provider, models: updatedModels })
 
       // Update assistants using this model

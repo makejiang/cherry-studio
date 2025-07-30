@@ -15,6 +15,11 @@ const initialState: OcrState = {
         recognitionLevel: 0,
         minConfidence: 0.5
       }
+    },
+    {
+      id: 'ovms',
+      name: 'Intel OVMS',
+      options:{}
     }
   ],
   defaultProvider: ''
