@@ -144,7 +144,8 @@
       "update_available": "有可用更新",
       "includes_user_questions": "包含使用者提問",
       "case_sensitive": "區分大小寫",
-      "whole_word": "全字匹配"
+      "whole_word": "全字匹配",
+      "download": "下載"
     },
     "chat": {
       "add.assistant.title": "新增助手",
@@ -1001,7 +1002,11 @@
       "per_image": "每張圖片",
       "per_images": "每張圖片",
       "required_field": "必填欄位",
-      "uploaded_input": "已上傳輸入"
+      "uploaded_input": "已上傳輸入",
+      "image_size": "圖片尺寸",
+      "ovms": {
+        "num_inference_steps": "推理步數"
+      }
     },
     "prompts": {
       "explanation": "幫我解釋一下這個概念",
@@ -1982,7 +1987,32 @@
         "backup": "備份訊息",
         "knowledge_embed": "知識庫訊息"
       },
-      "mineru.api_key": "Mineru 現在每天提供 500 頁的免費配額，且無需輸入金鑰。"
+      "mineru.api_key": "Mineru 現在每天提供 500 頁的免費配額，且無需輸入金鑰。",
+      "models": {
+        "download": {
+          "ov": {
+            "title": "從 modelscope.cn 下載 OV 模型",
+            "success": "下載成功",
+            "success.content": "下載「{{modelName}}|{{modelId}}」成功",
+            "error": "下載錯誤",
+            "button": "下載",
+            "model_name": {
+              "placeholder": "必填，例如：Qwen3-8B-int4",
+              "required": "請輸入模型名稱"
+            },
+            "model_id": {
+              "placeholder": "必填，例如：OpenVINO/Qwen3-8B-int4-ov",
+              "required": "請輸入模型ID",
+              "model_id_pattern": "模型ID必須以OpenVINO/開頭"
+            },
+            "timeout": {
+              "label": "超時時間",
+              "required": "請輸入超時值",
+              "range": "超時時間應在60~3600秒之間"
+            }
+          }
+        }
+      }
     },
     "translate": {
       "any.language": "任意語言",

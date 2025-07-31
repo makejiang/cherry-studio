@@ -1,38 +1,135 @@
-import { getOVMSUrlBackend } from '@renderer/hooks/useOVMS'
 import { FC, useEffect, useState } from 'react'
 import { VStack } from '@renderer/components/Layout'
 import { Alert, Button } from 'antd'
-import { useTranslation } from 'react-i18next'
-
-import { SettingDescription, SettingRow, SettingSubtitle } from '..'
+import { SettingRow, SettingSubtitle } from '..'
 
 const OVMSSettings: FC = () => {
-  const urlBackend = getOVMSUrlBackend()
-  const { t } = useTranslation()
   const urlGuide = 'https://github.com/openvinotoolkit/model_server/blob/c55551763d02825829337b62c2dcef9339706f79/docs/deploying_server_baremetal.md'
 
-  const [isOVMSRunning, setIsOVMSRunning] = useState(false)
+  const [ovmsStatus, setOvmsStatus] = useState<'not-installed' | 'not-running' | 'running'>('not-running')
+  const [isInstallingOvms, setIsInstallingOvms] = useState(false)
+  const [isRunningOvms, setIsRunningOvms] = useState(false)
+  const [isStoppingOvms, setIsStoppingOvms] = useState(false)
 
   useEffect(() => {
     const checkStatus = async () => {
-      const running = await window.api.ovms.isRunning()
-      setIsOVMSRunning(running)
+      const status = await window.api.ovms.getStatus()
+      setOvmsStatus(status)
     }
     checkStatus()
   }, [])
 
+  const installOvms = async () => {
+    try {
+      setIsInstallingOvms(true)
+      await window.api.installOvmsBinary()
+      // 安装成功后重新检查状态
+      const status = await window.api.ovms.getStatus()
+      setOvmsStatus(status)
+      setIsInstallingOvms(false)
+    } catch (error: any) {
+      window.message.error({ content: `安装失败: ${error.message}`, key: 'ovms-install-error' })
+      setIsInstallingOvms(false)
+    }
+  }
+
+  const runOvms = async () => {
+    try {
+      setIsRunningOvms(true)
+      await window.api.ovms.runOvms()
+      // 运行成功后重新检查状态
+      const status = await window.api.ovms.getStatus()
+      setOvmsStatus(status)
+      setIsRunningOvms(false)
+    } catch (error: any) {
+      window.message.error({ content: `运行失败: ${error.message}`, key: 'ovms-run-error' })
+      setIsRunningOvms(false)
+    }
+  }
+
+  const stopOvms = async () => {
+    try {
+      setIsStoppingOvms(true)
+      await window.api.ovms.stopOvms()
+      // 停止成功后重新检查状态
+      const status = await window.api.ovms.getStatus()
+      setOvmsStatus(status)
+      setIsStoppingOvms(false)
+    } catch (error: any) {
+      window.message.error({ content: `停止失败: ${error.message}`, key: 'ovms-stop-error' })
+      setIsStoppingOvms(false)
+    }
+  }
+
+  const getAlertType = () => {
+    switch (ovmsStatus) {
+      case 'running':
+        return 'success'
+      case 'not-running':
+        return 'warning'
+      case 'not-installed':
+        return 'error'
+      default:
+        return 'warning'
+    }
+  }
+
+  const getStatusMessage = () => {
+    switch (ovmsStatus) {
+      case 'running':
+        return 'OVMS is running'
+      case 'not-running':
+        return 'OVMS is not running'
+      case 'not-installed':
+        return 'OVMS is not installed'
+      default:
+        return 'OVMS status unknown'
+    }
+  }
+
   return (
     <>
       <Alert
-        type={isOVMSRunning ? 'success' : 'warning'}
+        type={getAlertType()}
         banner
         style={{ borderRadius: 'var(--list-item-border-radius)' }}
         description={
           <VStack>
             <SettingRow style={{ width: '100%' }}>
               <SettingSubtitle style={{ margin: 0, fontWeight: 'normal' }}>
-                {isOVMSRunning ? 'OVMS is running' : `OVMS is not running`}
+                {getStatusMessage()}
               </SettingSubtitle>
+               {ovmsStatus==='not-installed' && (
+                <Button
+                  type="primary"
+                  onClick={installOvms}
+                  loading={isInstallingOvms}
+                  disabled={isInstallingOvms}
+                  size="small">
+                  {isInstallingOvms ? 'Installing' : 'Install'}
+                </Button>
+              )}
+              {ovmsStatus==='not-running' && (
+                <Button
+                  type="primary"
+                  onClick={runOvms}
+                  loading={isRunningOvms}
+                  disabled={isRunningOvms}
+                  size="small">
+                  {isRunningOvms ? 'Starting' : 'Run OVMS'}
+                </Button>
+              )}
+              {ovmsStatus==='running' && (
+                <Button
+                  type="primary"
+                  danger
+                  onClick={stopOvms}
+                  loading={isStoppingOvms}
+                  disabled={isStoppingOvms}
+                  size="small">
+                  {isStoppingOvms ? 'Stopping' : 'Stop OVMS'}
+                </Button>
+              )}
             </SettingRow>
           </VStack>
         }
@@ -42,10 +139,9 @@ const OVMSSettings: FC = () => {
         style={{ marginTop: 5 }}
         message={'Intel OVMS Guide:'}
         description={<div>
-          <p>1. Download OVMS runtime package: <a href={urlBackend}>{urlBackend}</a></p>
-          <p>2. Unzip the package.</p>
-          <p>3. Run OVMS with reference documents.</p>
-          <p><a href={urlGuide}>OVMS Deployment</a></p>
+          <p>You may need to configure Intel OVMS yourself.</p>
+          <p>Intel OVMS will be installed in '%USERPROFILE%\.cherrystudio\ovms\ovms\' .</p>
+          <p>Please refer to<a href={urlGuide}>Intel OVMS Guide</a></p>
         </div>}
         showIcon
       />

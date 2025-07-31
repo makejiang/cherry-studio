@@ -1,6 +1,7 @@
 const https = require('https')
+const http = require('http')
 const fs = require('fs')
-const { IRenderableView } = require('pdfjs-dist/types/web/interfaces')
+const url = require('url')
 
 /**
  * Downloads a file from a URL with redirect handling
@@ -8,16 +9,15 @@ const { IRenderableView } = require('pdfjs-dist/types/web/interfaces')
  * @param {string} destinationPath The path to save the file to
  * @returns {Promise<void>} Promise that resolves when download is complete
  */
-async function downloadWithRedirects(url, destinationPath) {
+async function downloadWithRedirects(downloadUrl, destinationPath) {
   return new Promise((resolve, reject) => {
-    const request = (url) => {
-      https
-        .get({
-          host: 'proxy-ir.intel.com',
-          port: 912,
-          path: url
-        }, 
-          (response) => {
+    const request = (downloadUrl) => {
+      const parsedUrl = url.parse(downloadUrl)
+      const isHttps = parsedUrl.protocol === 'https:'
+      const client = isHttps ? https : http
+
+      client
+        .get(parsedUrl, (response) => {
           if (response.statusCode == 301 || response.statusCode == 302) {
             request(response.headers.location)
             return
@@ -34,7 +34,7 @@ async function downloadWithRedirects(url, destinationPath) {
           reject(err)
         })
     }
-    request(url)
+    request(downloadUrl)
   })
 }
 

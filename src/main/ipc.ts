@@ -509,6 +509,7 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.App_GetBinaryPath, (_, name: string) => getBinaryPath(name))
   ipcMain.handle(IpcChannel.App_InstallUvBinary, () => runInstallScript('install-uv.js'))
   ipcMain.handle(IpcChannel.App_InstallBunBinary, () => runInstallScript('install-bun.js'))
+  ipcMain.handle(IpcChannel.App_InstallOvmsBinary, () => runInstallScript('install-ovms.js'))
 
   //copilot
   ipcMain.handle(IpcChannel.Copilot_GetAuthMessage, CopilotService.getAuthMessage)
@@ -565,7 +566,11 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.App_QuoteToMain, (_, text: string) => windowService.quoteToMainWindow(text))
 
   // OVMS
-  ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, timeout: number) => ovmsManager.addModel(modelName, modelId, timeout))
+  ipcMain.handle(IpcChannel.Ovms_AddModel, (_, modelName: string, modelId: string, modelSource: string) => ovmsManager.addModel(modelName, modelId, modelSource))
+  ipcMain.handle(IpcChannel.Ovms_StopAddModel, () => ovmsManager.stopAddModel())
   ipcMain.handle(IpcChannel.Ovms_GetModels, () => ovmsManager.getModels())
   ipcMain.handle(IpcChannel.Ovms_IsRunning, () => ovmsManager.initializeOvms())
+  ipcMain.handle(IpcChannel.Ovms_GetStatus, () => ovmsManager.getOvmsStatus())
+  ipcMain.handle(IpcChannel.Ovms_RunOVMS, () => ovmsManager.runOvms())
+  ipcMain.handle(IpcChannel.Ovms_StopOVMS, () => ovmsManager.stopOvms())
 }

@@ -144,7 +144,8 @@
       "update_available": "有可用更新",
       "includes_user_questions": "包含用户提问",
       "case_sensitive": "区分大小写",
-      "whole_word": "全字匹配"
+      "whole_word": "全字匹配",
+      "download": "下载"
     },
     "chat": {
       "add.assistant.title": "添加助手",
@@ -1001,7 +1002,11 @@
       "per_image": "每张图片",
       "per_images": "每张图片",
       "required_field": "必填项",
-      "uploaded_input": "已上传输入"
+      "uploaded_input": "已上传输入",
+      "image_size": "图片尺寸",
+      "ovms": {
+        "num_inference_steps": "推理步数"
+      }
     },
     "prompts": {
       "explanation": "帮我解释一下这个概念",
@@ -1061,7 +1066,8 @@
       "302ai": "302.AI",
       "lanyun": "蓝耘科技",
       "vertexai": "Vertex AI",
-      "ph8": "PH8 大模型开放平台"
+      "ph8": "PH8 大模型开放平台",
+      "ovms": "Intel OVMS"
     },
     "restore": {
       "confirm": "确定要恢复数据吗？",
@@ -1626,6 +1632,7 @@
       "models.add.model_name": "模型名称",
       "models.add.model_name.placeholder": "例如 GPT-4",
       "models.add.model_name.tooltip": "例如 GPT-4",
+      "models.add.model_source": "模型源",
       "models.check.all": "所有",
       "models.check.all_models_passed": "所有模型检测通过",
       "models.check.button_caption": "健康检测",
@@ -1981,7 +1988,32 @@
         },
         "preprocessOrOcr.tooltip": "在设置 -> 工具中设置文档预处理服务商或OCR，文档预处理可以有效提升复杂格式文档与扫描版文档的检索效果，OCR仅可识别文档内图片或扫描版PDF的文本"
       },
-      "mineru.api_key": "MinerU现在提供每日500页的免费额度，您不需要填写密钥。"
+      "mineru.api_key": "MinerU现在提供每日500页的免费额度，您不需要填写密钥。",
+      "models": {
+        "download": {
+          "ov": {
+            "title": "从 modelscope.cn 下载 OV 模型",
+            "success": "下载成功",
+            "success.content": "下载「{{modelName}}|{{modelId}}」成功",
+            "error": "下载错误",
+            "button": "下载",
+            "model_name": {
+              "placeholder": "必填，例如：Qwen3-8B-int4",
+              "required": "请输入模型名称"
+            },
+            "model_id": {
+              "placeholder": "必填，例如：OpenVINO/Qwen3-8B-int4-ov",
+              "required": "请输入模型ID",
+              "model_id_pattern": "模型ID必须以OpenVINO/开头"
+            },
+            "timeout": {
+              "label": "超时时间",
+              "required": "请输入超时值",
+              "range": "超时时间应在60~3600秒之间"
+            }
+          }
+        }
+      }
     },
     "translate": {
       "any.language": "任意语言",

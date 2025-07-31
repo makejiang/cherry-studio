@@ -31,6 +31,7 @@ export enum IpcChannel {
   App_GetBinaryPath = 'app:get-binary-path',
   App_InstallUvBinary = 'app:install-uv-binary',
   App_InstallBunBinary = 'app:install-bun-binary',
+  App_InstallOvmsBinary = 'app:install-ovms-binary',
 
   App_MacIsProcessTrusted = 'app:mac-is-process-trusted',
   App_MacRequestProcessTrust = 'app:mac-request-process-trust',
@@ -232,6 +233,11 @@ export enum IpcChannel {
 
   // OVMS
   Ovms_AddModel = 'ovms:add-model',
+  Ovms_StopAddModel = 'ovms:stop-addmodel',
   Ovms_GetModels = 'ovms:get-models',
-  Ovms_IsRunning = 'ovms:is-running'
+  Ovms_IsRunning = 'ovms:is-running',
+  Ovms_GetStatus = 'ovms:get-status',
+  Ovms_RunOVMS = 'ovms:run-ovms',
+  Ovms_StopOVMS = 'ovms:stop-ovms'
+  
 }
