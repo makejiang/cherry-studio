@@ -16,7 +16,7 @@ export default class OvOcrProvider extends BaseOcrProvider {
   }
 
   private getOvOcrPath(): string {
-    return path.join(os.homedir(), '.cherrystudio', 'ov-ocr')
+    return path.join(os.homedir(), '.cherrystudio', 'ovms', 'ovocr')
   }
 
   private getImgDir(): string {
@@ -64,7 +64,7 @@ export default class OvOcrProvider extends BaseOcrProvider {
         timeout: 60000 // 60秒超时
       })
     } catch (error) {
-      Logger.error('[OCR] Error running ov-ocr batch:', error)
+      Logger.error('[OCR] Error running ovocr batch:', error)
       throw new Error(`Failed to run OCR batch: ${error}`)
     }
   }

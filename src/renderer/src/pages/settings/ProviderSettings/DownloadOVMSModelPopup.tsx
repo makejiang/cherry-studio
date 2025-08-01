@@ -202,7 +202,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
         <Form.Item
           name="modelSource"
           label={t('settings.models.add.model_source')}
-          initialValue="https://hf-mirror.com"
+          initialValue="https://www.modelscope.cn/models"
           rules={[{ required: false}]}
         >
           <Select

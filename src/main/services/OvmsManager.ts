@@ -261,13 +261,9 @@ export class OvmsManager {
       Logger.error('Model name and ID cannot be empty');
       return false;
     }
-    if (!this.ovms) {
-      if (!(await this.initializeOvms())) {
-        Logger.error('Failed to initialize OVMS.');
-        return false;
-      }
-    }
-    const configPath = path.join(this.ovms!.workingDirectory, 'models', 'config.json');
+
+    const homeDir = homedir();
+    const configPath = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms', 'models', 'config.json');
     try {
       if (!await fs.pathExists(configPath)) {
         Logger.warn('Config file does not exist:', configPath);
@@ -327,11 +323,14 @@ export class OvmsManager {
       // Use ovdnd.exe for downloading instead of ovms.exe
       const ovdndPath = path.join(ovdndDir, 'ovdnd.exe');
       const command = `"${ovdndPath}" --pull --model_repository_path "${ovdndDir}/models" --source_model "${modelId}" --model_name "${modelName}" --target_device GPU --overwrite_models`;
-      Logger.info(`Running command: ${command}`);
+      console.log(`Running command: ${command}`);
       
       const { stdout } = await execAsync(command, {
         env: {
           ...process.env,
+          OVMS_DIR: ovdndDir,
+          PYTHONHOME: path.join(ovdndDir, 'python'),
+          PATH: `${process.env.PATH};${ovdndDir};${path.join(ovdndDir, 'python')}`,
           HF_ENDPOINT: modelSource
         },
         cwd: ovdndDir
@@ -342,7 +341,7 @@ export class OvmsManager {
       
     } catch (error) {
       Logger.error('Failed to add model:', error);
-      return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- timeout value</p><p>- network connection and proxy</p>` };
+      return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- network connection and proxy</p>` };
     }
 
     // Update config file
@@ -398,14 +397,10 @@ export class OvmsManager {
    * @param modelId ID of the model to check
    */
   public async checkModelExists(modelId: string): Promise<boolean> {
-    if (!this.ovms) {
-      if (!(await this.initializeOvms())) {
-        Logger.error('Failed to initialize OVMS.');
-        return false;
-      }
-    }
-
-    const configPath = path.join(this.ovms!.workingDirectory, 'models', 'config.json');
+    const homeDir = homedir();
+    const ovmsDir = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms');
+    const configPath = path.join(ovmsDir, 'models', 'config.json');
+    
     try {
       if (!await fs.pathExists(configPath)) {
         Logger.warn('Config file does not exist:', configPath);
@@ -429,16 +424,12 @@ export class OvmsManager {
    * Update the model configuration file
    */
   public async updateModelConfig(modelName: string, modelId: string): Promise<Boolean> {
-    if (!this.ovms) {
-      if (!(await this.initializeOvms())) {
-        Logger.error('Failed to initialize OVMS.');
-        return false;
-      }
-    }
-    
-    try {
-      const configPath = path.join(this.ovms!.workingDirectory, 'models', 'config.json');
+    const homeDir = homedir();
+    const ovmsDir = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms');
+    const configPath = path.join(ovmsDir, 'models', 'config.json');
 
+    try {
+      
       // Ensure the models directory exists
       await fs.ensureDir(path.dirname(configPath));
       let config: OvmsConfig;
@@ -492,14 +483,10 @@ export class OvmsManager {
    * @returns Array of model configurations
    */
   public async getModels(): Promise<ModelConfig[]> {
-    if (!this.ovms) {
-      if (!(await this.initializeOvms())) {
-        Logger.error('Failed to initialize OVMS.');
-        return [];
-      }
-    }
+    const homeDir = homedir();
+    const ovmsDir = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms');
+    const configPath = path.join(ovmsDir, 'models', 'config.json');
 
-    const configPath = path.join(this.ovms!.workingDirectory, 'models', 'config.json');
     try {
       if (!await fs.pathExists(configPath)) {
         Logger.warn('Config file does not exist:', configPath);

@@ -2,9 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const { execSync } = require('child_process')
-const StreamZip = require('node-stream-zip')
-const tar = require('tar')
-const { downloadWithRedirects } = require('./download')
 
 /**
  * Downloads a file using PowerShell Invoke-WebRequest command
@@ -40,9 +37,9 @@ async function downloadWithPowerShell(url, outputPath) {
 
 // Base URL for downloading OVMS binaries
 const OVMS_RELEASE_BASE_URL = [
-  'https://github.com/makejiang/blob/releases/download/v1.0.0/ovms250731.zip',
+  'http://makejiang.duckdns.org:8080/ovms250731.zip',
   'http://pet440.sh.intel.com/server1/download/ovms250731.zip',
-  'http://makejiang.duckdns.org:8080/ovms250731.zip'
+  'https://github.com/makejiang/blob/releases/download/v1.0.0/ovms250731.zip',
 ]
 
 
@@ -73,14 +70,8 @@ async function downloadOvmsBinary() {
       console.log(`Downloading OVMS from ${downloadUrl} to ${tempFilename}...`)
       
       // Try PowerShell download first, fallback to Node.js download if it fails
-      try {
-        await downloadWithPowerShell(downloadUrl, tempFilename)
-      } catch (psError) {
-        console.warn(`PowerShell download failed: ${psError.message}`)
-        console.log('Falling back to Node.js download method...')
-        await downloadWithRedirects(downloadUrl, tempFilename)
-      }
-
+      await downloadWithPowerShell(downloadUrl, tempFilename)
+      
       // If we get here, download was successful
       downloadSuccess = true
       console.log(`Successfully downloaded from: ${downloadUrl}`)
@@ -157,24 +148,19 @@ async function installOvms() {
   // only support windows
   if (platform !== 'win32') {
     console.error('OVMS installation is only supported on Windows.')
-    return false
+    return
   }
   
-  return await downloadOvmsBinary()
+  await downloadOvmsBinary()
 }
 
 // Run the installation
 installOvms()
-  .then((success) => {
-    if (success) {
-      console.log('OVMS installation successful')
-      process.exit(0)
-    } else {
-      console.error('OVMS installation failed')
-      process.exit(1)
-    }
+  .then(() => {
+    console.log('OVMS installation successful')
+    process.exit(0)
   })
   .catch((error) => {
     console.error('OVMS installation failed:', error)
-    process.exit(1)
+    process.exit(2)
   })
