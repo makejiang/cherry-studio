@@ -184,8 +184,8 @@ const api = {
       ipcRenderer.invoke(IpcChannel.VertexAI_ClearAuthCache, projectId, clientEmail)
   },
   ovms: {
-    addModel: (modelName: string, modelId: string, modelSource: string) =>
-      ipcRenderer.invoke(IpcChannel.Ovms_AddModel, modelName, modelId, modelSource),
+    addModel: (modelName: string, modelId: string, modelSource: string, task: string) =>
+      ipcRenderer.invoke(IpcChannel.Ovms_AddModel, modelName, modelId, modelSource, task),
     stopAddModel: () =>
       ipcRenderer.invoke(IpcChannel.Ovms_StopAddModel),
     getModels: () =>

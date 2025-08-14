@@ -76,7 +76,25 @@ export class OvmsManager {
       await execAsync(`powershell -Command "${killCommand}"`);
       Logger.info(`Terminated process with PID: ${pid}`);
 
-      return { success: true, message: `Process ${pid} and all child processes terminated successfully` };
+      // Wait for the process to disappear with 5-second timeout
+      const timeout = 5000; // 5 seconds
+      const startTime = Date.now();
+      
+      while (Date.now() - startTime < timeout) {
+        const checkCommand = `Get-Process -Id ${pid} -ErrorAction SilentlyContinue | Select-Object Id | ConvertTo-Json`;
+        const { stdout: checkStdout } = await execAsync(`powershell -Command "${checkCommand}"`);
+        
+        if (!checkStdout.trim()) {
+          Logger.info(`Process with PID ${pid} has disappeared`);
+          return { success: true, message: `Process ${pid} and all child processes terminated successfully` };
+        }
+        
+        // Wait 100ms before checking again
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      Logger.warn(`Process with PID ${pid} did not disappear within timeout`);
+      return { success: false, message: `Process ${pid} did not disappear within 5 seconds` };
 
     } catch (error) {
       Logger.error(`Failed to terminate process ${pid}:`, error);
@@ -107,10 +125,13 @@ export class OvmsManager {
         return { success: true, message: 'OVMS process is not running' };
       }
 
-      // Terminate all OVMS processes
+      // Terminate all OVMS processes using terminalProcess
       for (const process of processList) {
-        const killCommand = `Stop-Process -Id ${process.Id} -Force -ErrorAction SilentlyContinue`;
-        await execAsync(`powershell -Command "${killCommand}"`);
+        const result = await this.terminalProcess(process.Id);
+        if (!result.success) {
+          Logger.error(`Failed to terminate OVMS process with PID: ${process.Id}`, result.message);
+          return { success: false, message: `Failed to terminate OVMS process: ${result.message}` };
+        }
         Logger.info(`Terminated OVMS process with PID: ${process.Id}`);
       }
 
@@ -299,9 +320,10 @@ export class OvmsManager {
    * @param modelName Name of the model to add
    * @param modelId ID of the model to download
    * @param modelSource Model Source: huggingface, hf-mirror and modelscope, default is huggingface
+   * @param task Task type: text_generation, embedding, rerank, image_generation
    */
-  public async addModel(modelName: string, modelId: string, modelSource: string) : Promise<{ success: boolean; message?: string }> {
-    Logger.info(`Adding model: ${modelName} with ID: ${modelId}, Source: ${modelSource}`);
+  public async addModel(modelName: string, modelId: string, modelSource: string, task: string = 'text_generation') : Promise<{ success: boolean; message?: string }> {
+    Logger.info(`Adding model: ${modelName} with ID: ${modelId}, Source: ${modelSource}, Task: ${task}`);
 
     const homeDir = homedir();
     const ovdndDir = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms');
@@ -322,19 +344,27 @@ export class OvmsManager {
 
       // Use ovdnd.exe for downloading instead of ovms.exe
       const ovdndPath = path.join(ovdndDir, 'ovdnd.exe');
-      const command = `"${ovdndPath}" --pull --model_repository_path "${ovdndDir}/models" --source_model "${modelId}" --model_name "${modelName}" --target_device GPU --overwrite_models`;
-      console.log(`Running command: ${command}`);
-      
-      const { stdout } = await execAsync(command, {
-        env: {
-          ...process.env,
-          OVMS_DIR: ovdndDir,
-          PYTHONHOME: path.join(ovdndDir, 'python'),
-          PATH: `${process.env.PATH};${ovdndDir};${path.join(ovdndDir, 'python')}`,
-          HF_ENDPOINT: modelSource
-        },
-        cwd: ovdndDir
-      });
+      const command = `"${ovdndPath}" --pull ` +
+                                    `--model_repository_path "${ovdndDir}/models" ` +
+                                    `--source_model "${modelId}" ` +
+                                    `--model_name "${modelName}" ` +
+                                    `--target_device GPU ` +
+                                    `--task ${task} ` +
+                                    `--overwrite_models`;
+
+      const env: Record<string, string | undefined> = {
+        ...process.env,
+        OVMS_DIR: ovdndDir,
+        PYTHONHOME: path.join(ovdndDir, 'python'),
+        PATH: `${process.env.PATH};${ovdndDir};${path.join(ovdndDir, 'python')}`
+      };
+
+      if (modelSource) {
+        env.HF_ENDPOINT = modelSource;
+      }
+
+      console.log(`Running command: ${command} from ${modelSource}`);
+      const { stdout } = await execAsync(command, {env: env, cwd: ovdndDir});
 
       Logger.info('Model download completed');
       Logger.debug('Command output:', stdout);

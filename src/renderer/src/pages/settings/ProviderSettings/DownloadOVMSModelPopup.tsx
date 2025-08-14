@@ -15,6 +15,7 @@ type FieldType = {
   modelName: string
   modelId: string
   modelSource: string
+  task: string
 }
 
 const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
@@ -92,9 +93,9 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
     setCancelled(false) // Reset cancelled state
     startFakeProgress()
     try {
-      const { modelName, modelId, modelSource } = values
-      console.log(`🔄 Downloading model: ${modelName} with ID: ${modelId}, source: ${modelSource}`)
-      const result = await window.api.ovms.addModel(modelName, modelId, modelSource)
+      const { modelName, modelId, modelSource, task } = values
+      console.log(`🔄 Downloading model: ${modelName} with ID: ${modelId}, source: ${modelSource}, task: ${task}`)
+      const result = await window.api.ovms.addModel(modelName, modelId, modelSource, task)
 
       if (result.success) {
         stopFakeProgress(true) // Complete the progress bar
@@ -203,13 +204,29 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           name="modelSource"
           label={t('settings.models.add.model_source')}
           initialValue="https://www.modelscope.cn/models"
-          rules={[{ required: false}]}
+          rules={[{ required: false }]}
         >
           <Select
             options={[
               { value: '', label: 'HuggingFace' },
               { value: 'https://hf-mirror.com', label: 'HF-Mirror' },
               { value: 'https://www.modelscope.cn/models', label: 'ModelScope' }
+            ]}
+            disabled={loading}
+          />
+        </Form.Item>
+        <Form.Item
+          name="task"
+          label={t('settings.models.download.ov.model_task')}
+          initialValue="text_generation"
+          rules={[{ required: false }]}
+        >
+          <Select
+            options={[
+              { value: 'text_generation', label: 'Text Generation' },
+              { value: 'embedding', label: 'Embedding' },
+              { value: 'rerank', label: 'Rerank' },
+              { value: 'image_generation', label: 'Image Generation' }
             ]}
             disabled={loading}
           />

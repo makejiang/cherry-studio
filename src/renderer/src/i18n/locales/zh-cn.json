@@ -1992,7 +1992,7 @@
       "models": {
         "download": {
           "ov": {
-            "title": "从 modelscope.cn 下载 OV 模型",
+            "title": "下载 OpenVINO 模型",
             "success": "下载成功",
             "success.content": "下载「{{modelName}}|{{modelId}}」成功",
             "error": "下载错误",
@@ -2010,7 +2010,8 @@
               "label": "超时时间",
               "required": "请输入超时值",
               "range": "超时时间应在60~3600秒之间"
-            }
+            },
+            "model_task": "任务"
           }
         }
       }

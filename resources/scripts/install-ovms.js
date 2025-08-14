@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const { execSync } = require('child_process')
+const { get } = require('lodash')
 
 /**
  * Downloads a file using PowerShell Invoke-WebRequest command
@@ -36,10 +37,11 @@ async function downloadWithPowerShell(url, outputPath) {
 }
 
 // Base URL for downloading OVMS binaries
+const OVMS_PKG_NAME = 'ovms250812.zip'
 const OVMS_RELEASE_BASE_URL = [
-  'http://makejiang.duckdns.org:8080/ovms250731.zip',
-  'http://pet440.sh.intel.com/server1/download/ovms250731.zip',
-  'https://github.com/makejiang/blob/releases/download/v1.0.0/ovms250731.zip',
+  `http://makejiang.duckdns.org:8080/${OVMS_PKG_NAME}`,
+  `http://pet440.sh.intel.com/server1/download/${OVMS_PKG_NAME}`,
+  `https://github.com/makejiang/blob/releases/download/v1.0.0/${OVMS_PKG_NAME}`,
 ]
 
 
@@ -139,16 +141,52 @@ async function downloadOvmsBinary() {
 }
 
 /**
+ * Get the CPU Name and ID
+ */
+function getCpuInfo() {
+  const cpuInfo = {
+    name: '',
+    id: ''
+  }
+
+  // Use PowerShell to get CPU information
+  try {
+    const psCommand = `powershell -Command "Get-CimInstance -ClassName Win32_Processor | Select-Object Name, DeviceID | ConvertTo-Json"`
+    const psOutput = execSync(psCommand).toString()
+    const cpuData = JSON.parse(psOutput)
+    
+    if (Array.isArray(cpuData)) {
+      cpuInfo.name = cpuData[0].Name || ''
+      cpuInfo.id = cpuData[0].DeviceID || ''
+    } else {
+      cpuInfo.name = cpuData.Name || ''
+      cpuInfo.id = cpuData.DeviceID || ''
+    }
+  } catch (error) {
+    console.error(`Failed to get CPU info: ${error.message}`)
+  }
+
+  return cpuInfo
+}
+
+/**
  * Main function to install OVMS
  */
 async function installOvms() {
   const platform = os.platform()
   console.log(`Detected platform: ${platform}`)
 
+  const cpuName = getCpuInfo().name
+  console.log(`CPU Name: ${cpuName}`)
+
+  // Check if CPU name contains "Ultra"
+  if (!cpuName.toLowerCase().includes('ultra')) {
+    throw new Error('OVMS installation requires an Intel(R) Core(TM) Ultra CPU.')
+  }
+
   // only support windows
   if (platform !== 'win32') {
-    console.error('OVMS installation is only supported on Windows.')
-    return
+    throw new Error('OVMS installation is only supported on Windows.')
   }
   
   await downloadOvmsBinary()
@@ -164,3 +202,12 @@ installOvms()
     console.error('OVMS installation failed:', error)
     process.exit(2)
   })
+
+// // test getCpuInfo
+// (async () => {
+//   const cpuInfo = getCpuInfo()
+//   console.log('CPU Info:', cpuInfo)
+// })()
+//   .catch((error) => {
+//     console.error('Failed to get CPU info:', error)
+//   })

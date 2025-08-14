@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { spawn, fork } from 'child_process'
 import log from 'electron-log'
 import fs from 'fs'
 import os from 'os'
@@ -34,6 +34,37 @@ export function runInstallScript(scriptPath: string): Promise<void> {
     })
   })
 }
+
+export function runInstallScript1(scriptPath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const installScriptPath = path.join(getResourcePath(), 'scripts', scriptPath)
+    log.info(`Running script at: ${installScriptPath}`)
+
+    const nodeProcess = fork(installScriptPath, [], {
+      env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+      silent: true
+    })
+
+    nodeProcess.stdout?.on('data', (data) => {
+      log.info(`Script output: ${data}`)
+    })
+
+    nodeProcess.stderr?.on('data', (data) => {
+      log.error(`Script error: ${data}`)
+    })
+
+    nodeProcess.on('close', (code) => {
+      if (code === 0) {
+        log.info('Script completed successfully')
+        resolve()
+      } else {
+        log.error(`Script exited with code ${code}`)
+        reject(new Error(`Process exited with code ${code}`))
+      }
+    })
+  })
+}
+
 
 export async function getBinaryName(name: string): Promise<string> {
   if (process.platform === 'win32') {
