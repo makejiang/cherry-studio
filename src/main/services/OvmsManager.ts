@@ -89,7 +89,7 @@ export class OvmsManager {
           return { success: true, message: `Process ${pid} and all child processes terminated successfully` };
         }
         
-        // Wait 100ms before checking again
+        // Wait 300ms before checking again
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 

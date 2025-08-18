@@ -10,7 +10,9 @@ import BaseOcrProvider from './BaseOcrProvider'
 
 const execAsync = promisify(exec)
 
-export default class OvOcrProvider extends BaseOcrProvider {
+export default abstract class OvOcrProvider extends BaseOcrProvider {
+  protected abstract readonly batFile: string
+
   constructor(provider: OcrProvider) {
     super(provider)
   }
@@ -54,7 +56,7 @@ export default class OvOcrProvider extends BaseOcrProvider {
   }
 
   private async runOcrBatch(): Promise<void> {
-    const runBatPath = path.join(this.getOvOcrPath(), 'run.bat')
+    const runBatPath = path.join(this.getOvOcrPath(), this.batFile)
     const ovOcrPath = this.getOvOcrPath()
     
     try {
@@ -74,9 +76,9 @@ export default class OvOcrProvider extends BaseOcrProvider {
 
     try {
       // 1. 检查run.bat文件必须存在
-      const runBatPath = path.join(this.getOvOcrPath(), 'run.bat')
+      const runBatPath = path.join(this.getOvOcrPath(), this.batFile)
       if (!fs.existsSync(runBatPath)) {
-        throw new Error(`OV OCR run.bat not found at: ${runBatPath}`)
+        throw new Error(`OV OCR ${this.batFile} not found at: ${runBatPath}`)
       }
 
       // 2. 清空img目录和output目录

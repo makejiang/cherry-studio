@@ -5,7 +5,9 @@ export function getOcrProviderLogo(providerId: string) {
   switch (providerId) {
     case 'system':
       return MacOSLogo
-    case 'ovms':
+    case 'ovocrnpu':
+    case 'ovocrcpu':
+    case 'ovocrgpu':
       return OVMSLogo
     default:
       return undefined

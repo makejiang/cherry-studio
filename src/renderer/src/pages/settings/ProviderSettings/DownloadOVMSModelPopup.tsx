@@ -224,7 +224,7 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
           <Select
             options={[
               { value: 'text_generation', label: 'Text Generation' },
-              { value: 'embedding', label: 'Embedding' },
+              { value: 'embeddings', label: 'Embeddings' },
               { value: 'rerank', label: 'Rerank' },
               { value: 'image_generation', label: 'Image Generation' }
             ]}

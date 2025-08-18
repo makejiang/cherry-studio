@@ -17,8 +17,18 @@ const initialState: OcrState = {
       }
     },
     {
-      id: 'ovms',
-      name: 'Intel OVMS',
+      id: 'ovocrnpu',
+      name: 'Intel OV-OCR(NPU)',
+      options:{}
+    },
+    {
+      id: 'ovocrcpu',
+      name: 'Intel OV-OCR(CPU)',
+      options:{}
+    },
+    {
+      id: 'ovocrgpu',
+      name: 'Intel OV-OCR(GPU)',
       options:{}
     }
   ],

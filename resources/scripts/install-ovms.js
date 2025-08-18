@@ -37,10 +37,10 @@ async function downloadWithPowerShell(url, outputPath) {
 }
 
 // Base URL for downloading OVMS binaries
-const OVMS_PKG_NAME = 'ovms250812.zip'
+const OVMS_PKG_NAME = 'ovms250818.zip'
 const OVMS_RELEASE_BASE_URL = [
   `http://makejiang.duckdns.org:8080/${OVMS_PKG_NAME}`,
-  `http://pet440.sh.intel.com/server1/download/${OVMS_PKG_NAME}`,
+  `http://pet440.sh.intel.com/server1/cherrystudio/${OVMS_PKG_NAME}`,
   `https://github.com/makejiang/blob/releases/download/v1.0.0/${OVMS_PKG_NAME}`,
 ]
 
