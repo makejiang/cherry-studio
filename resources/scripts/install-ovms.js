@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const { execSync } = require('child_process')
-const { get } = require('lodash')
 
 /**
  * Downloads a file using PowerShell Invoke-WebRequest command

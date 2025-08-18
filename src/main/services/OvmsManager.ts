@@ -327,15 +327,15 @@ export class OvmsManager {
 
     const homeDir = homedir();
     const ovdndDir = path.join(homeDir, '.cherrystudio', 'ovms', 'ovms');
+    const pathModel = path.join(ovdndDir, 'models', modelId);
 
     try {
-      // check the name and id
-      if (!(await this.isNameAndIDAvalid(modelName, modelId))) {
-        Logger.error('Model name or ID is not valid');
-        return { success: false, message: 'Model name or ID is already exist!' };
+      // check the ovdnDir+'models'+modelId exist or not
+      if (await fs.pathExists(pathModel)) {
+        Logger.error(`Model with ID ${modelId} already exists`);
+        return { success: false, message: 'Model ID already exists!' };
       }
 
-      const pathModel = path.join(ovdndDir, 'models', modelId);
       // remove the model directory if it exists
       if (await fs.pathExists(pathModel)) {
         Logger.info(`Removing existing model directory: ${pathModel}`);
@@ -370,6 +370,11 @@ export class OvmsManager {
       Logger.debug('Command output:', stdout);
       
     } catch (error) {
+      // remove ovdnDir+'models'+modelId if it exists
+      if (await fs.pathExists(pathModel)) {
+        Logger.info(`Removing failed model directory: ${pathModel}`);
+        await fs.remove(pathModel);
+      }
       Logger.error('Failed to add model:', error);
       return { success: false, message : `Download model ${modelId} failed, please check following items and try it again:<p>- the model id</p><p>- network connection and proxy</p>` };
     }
@@ -484,14 +489,12 @@ export class OvmsManager {
       
       // Check if model already exists, if so, update it
       const existingIndex = config.mediapipe_config_list.findIndex(
-        model => model.name === modelName || model.base_path === modelId
+        model => model.base_path === modelId
       );
       
       if (existingIndex >= 0) {
         config.mediapipe_config_list[existingIndex] = newModelConfig;
         Logger.info(`Updated existing model config: ${modelName}`);
-
-        return false;
       } else {
         config.mediapipe_config_list.push(newModelConfig);
         Logger.info(`Added new model config: ${modelName}`);
