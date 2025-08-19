@@ -18,6 +18,7 @@ import {
 } from '@renderer/config/models'
 import { processPostsuffixQwen3Model, processReqMessages } from '@renderer/services/ModelMessageService'
 import { estimateTextTokens } from '@renderer/services/TokenService'
+import ApiLogger from '@renderer/utils/apiLogger'
 // For Copilot token
 import {
   Assistant,
@@ -75,8 +76,90 @@ export class OpenAIAPIClient extends OpenAIBaseClient<
     options?: OpenAI.RequestOptions
   ): Promise<OpenAISdkRawOutput> {
     const sdk = await this.getSdkInstance()
-    // @ts-ignore - SDK参数可能有额外的字段
-    return await sdk.chat.completions.create(payload, options)
+    
+    // Start logging session
+    ApiLogger.startSession()
+    const requestId = Date.now().toString()
+    const startTime = Date.now()
+    
+    // Get a default model for logging purposes
+    const defaultModel: Model = this.provider.models?.[0] || { id: 'unknown', name: 'Unknown Model' }
+    
+    try {
+      // Log the request
+      await ApiLogger.logRequest(this.provider, defaultModel, payload, requestId)
+      
+      // Check if this is a streaming request
+      const isStreaming = payload.stream === true
+      
+      if (isStreaming) {
+        // For streaming requests, start stream logging
+        ApiLogger.startStreamResponse(requestId)
+      }
+      
+      // @ts-ignore - SDK参数可能有额外的字段
+      const response = await sdk.chat.completions.create(payload, options)
+      
+      if (isStreaming) {
+        // For streaming responses, we need to wrap the response to log chunks
+        return this.wrapStreamingResponse(response, requestId)
+      } else {
+        // For non-streaming responses, log normally
+        const duration = Date.now() - startTime
+        await ApiLogger.logResponse(requestId, response, duration)
+        return response
+      }
+    } catch (error) {
+      // Log the error
+      const duration = Date.now() - startTime
+      await ApiLogger.logError(requestId, error as Error, duration)
+      throw error
+    } finally {
+      // Only end session for non-streaming requests
+      // Streaming requests will end session when stream completes
+      if (payload.stream !== true) {
+        await ApiLogger.endSession()
+      }
+    }
+  }
+
+  /**
+   * Wrap streaming response to log chunks
+   */
+  private wrapStreamingResponse(response: any, requestId: string): any {
+    if (!response || typeof response[Symbol.asyncIterator] !== 'function') {
+      return response
+    }
+
+    const originalIterator = response[Symbol.asyncIterator].bind(response)
+    let lastUsage: any = null
+
+    response[Symbol.asyncIterator] = async function* () {
+      try {
+        for await (const chunk of originalIterator()) {
+          // Log each chunk
+          ApiLogger.logStreamChunk(requestId, chunk)
+          
+          // Extract usage information from chunks
+          if (chunk.usage) {
+            lastUsage = chunk.usage
+          }
+          
+          yield chunk
+        }
+        
+        // End stream logging when iteration completes
+        ApiLogger.endStreamResponse(requestId, lastUsage)
+        await ApiLogger.endSession()
+      } catch (error) {
+        // Log error if stream fails
+        await ApiLogger.logError(requestId, error as Error, Date.now())
+        await ApiLogger.endSession()
+        throw error
+      }
+    }
+
+    return response
   }
 
   /**
