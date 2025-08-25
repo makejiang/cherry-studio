@@ -43,5 +43,10 @@
       Abort
   ${EndIf}
   ContinueInstall:
-    Pop $0
+    Pop $0  
+!macroend
+
+!macro customInstall
+  ;Delete directory C:\Users\<user>\AppData\Roaming\CherryStudio
+  RMDir /r "$APPDATA\CherryStudio"
 !macroend

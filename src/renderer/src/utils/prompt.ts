@@ -9,7 +9,8 @@ Also, please show your the generated content in your last message.
 
 ## Tool Use Formatting
 
-Tool use is formatted using XML-style tags. The tool name is enclosed in opening and closing tags, and the arguments is similarly enclosed within its own set of tags. Here's the structure:
+Tool use is formatted using XML-style tags. The tool name is enclosed in opening and closing tags, and the arguments is similarly enclosed within its own set of tags. \
+The content of the arguments is presented as a JSON object. Here's the structure:
 
 <tool_use>
   <name>{tool_name}</name>
@@ -52,9 +53,10 @@ Here are the rules you should always follow to solve your task:
 1. Always use the right arguments for the tools. Never use variable names as the action arguments, use the value instead.
 2. Call a tool only when needed: do not call the search agent if you do not need information, try to solve the task yourself.
 3. If no tool call is needed, just answer the question directly.
-4. For tool use, MARK SURE use XML tag format as shown in the examples above. Do not use any other format.
-5. If you encounter a failure in calling a tool, please check and adjust the parameters and try again.
-6. No operation requires user confirmation.
+4. Never re-do a tool call that you previously did with the exact same parameters.
+5. For tool use, MAKE SURE use XML tag format as shown in the examples above. Do not use any other format.
+6. If you encounter a failure in calling a tool, please check and adjust the parameters and try again.
+7. No operation requires user confirmation.
 
 # User Instructions
 {{ USER_SYSTEM_PROMPT }}
@@ -226,7 +228,18 @@ export const buildSystemPrompt = async (
   }
 
   if (tools && tools.length > 0) {
-    return SYSTEM_PROMPT.replace('{{ USER_SYSTEM_PROMPT }}', userSystemPrompt)
+    let prompts = SYSTEM_PROMPT
+    try {
+      prompts = await window.api.file.read('prompts.txt')
+      // remove all '\\\r\n' in prompts
+      prompts = prompts.replace(/\\\r\n/g, '')
+
+      console.log('Loaded prompts from prompts.txt')
+    } catch (error) {
+      console.error('Failed to get user system prompt:', error)
+    }
+
+    return prompts.replace('{{ USER_SYSTEM_PROMPT }}', userSystemPrompt)
       .replace('{{ TOOL_USE_EXAMPLES }}', ToolUseExamples)
       .replace('{{ AVAILABLE_TOOLS }}', AvailableTools(tools))
   }

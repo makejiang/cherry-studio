@@ -209,8 +209,8 @@ export const initialState: SettingsState = {
   showInputEstimatedTokens: false,
   launchOnBoot: false,
   launchToTray: false,
-  trayOnClose: true,
-  tray: true,
+  trayOnClose: false,
+  tray: false,
   theme: ThemeMode.system,
   userTheme: {
     colorPrimary: '#00b96b'
@@ -224,7 +224,7 @@ export const initialState: SettingsState = {
   pasteLongTextAsFile: false,
   pasteLongTextThreshold: 1500,
   clickAssistantToShowTopic: true,
-  autoCheckUpdate: true,
+  autoCheckUpdate: false,
   testPlan: false,
   testChannel: UpgradeChannel.LATEST,
   renderInputMessageAsMarkdown: false,

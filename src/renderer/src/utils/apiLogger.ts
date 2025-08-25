@@ -353,8 +353,8 @@ export class ApiLogger {
     if (sanitized.messages) {
       sanitized.messages = sanitized.messages.map(msg => {
         const sanitizedMsg = { ...msg }
-        if (typeof sanitizedMsg.content === 'string' && sanitizedMsg.content.length > 1000) {
-          sanitizedMsg.content = sanitizedMsg.content.substring(0, 1000) + '... [truncated]'
+        if (typeof sanitizedMsg.content === 'string' && sanitizedMsg.content.length > 3000) {
+          sanitizedMsg.content = sanitizedMsg.content.substring(0, 3000) + `... [truncated,${sanitizedMsg.content.length}]`
         }
         return sanitizedMsg
       })
@@ -374,7 +374,7 @@ export class ApiLogger {
       sanitized.choices = sanitized.choices.map(choice => {
         const sanitizedChoice = { ...choice }
         if (sanitizedChoice.message?.content && sanitizedChoice.message.content.length > 1000) {
-          sanitizedChoice.message.content = sanitizedChoice.message.content.substring(0, 1000) + '... [truncated]'
+          sanitizedChoice.message.content = sanitizedChoice.message.content.substring(0, 1000) + `... [truncated,${sanitizedChoice.message.content.length}]`
         }
         return sanitizedChoice
       })

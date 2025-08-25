@@ -86,7 +86,7 @@ export const createOvmsConfig = (models?: Array<{ label: string; value: string }
       title: 'paintings.model',
       tooltip: 'paintings.ovms.model_tip',
       options: availableModels,
-      initialValue: availableModels[0]?.value || 'SD-v1.5-int8'
+      initialValue: availableModels[0]?.value || 'Select Model Here'
     },
     {
       type: 'select',
@@ -118,7 +118,7 @@ export const createOvmsConfig = (models?: Array<{ label: string; value: string }
 // Default painting configuration for OVMS
 export const DEFAULT_OVMS_PAINTING: PaintingAction = {
   id: uuid(),
-  model: 'SD-v1.5-int8',
+  model: '',
   prompt: '',
   size: '512x512',
   num_inference_steps: 4,
@@ -133,6 +133,6 @@ export const createDefaultOvmsPainting = (models?: Array<{ label: string; value:
   return {
     ...DEFAULT_OVMS_PAINTING,
     id: uuid(),
-    model: availableModels[0]?.value || 'SD-v1.5-int8'
+    model: availableModels[0]?.value || 'Select Model Here'
   };
 }

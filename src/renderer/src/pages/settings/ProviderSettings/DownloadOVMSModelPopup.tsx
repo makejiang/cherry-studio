@@ -1,5 +1,5 @@
 import { TopView } from '@renderer/components/TopView'
-import { Button, Flex, Form, FormProps, Input, Modal, Progress, Select } from 'antd'
+import { AutoComplete, Button, Flex, Form, FormProps, Input, Modal, Progress, Select } from 'antd'
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -17,6 +17,59 @@ type FieldType = {
   modelSource: string
   task: string
 }
+
+interface PresetModel {
+  modelId: string
+  modelName: string
+  modelSource: string
+  task: string
+  label: string
+}
+
+const PRESET_MODELS: PresetModel[] = [
+  {
+    modelId: 'OpenVINO/Qwen3-8B-int4-ov',
+    modelName: 'Qwen3-8B-int4-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'text_generation',
+    label: 'Qwen3-8B-int4-ov (Text Generation)'
+  },
+  {
+    modelId: 'OpenVINO/bge-base-en-v1.5-fp16-ov',
+    modelName: 'bge-base-en-v1.5-fp16-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'embeddings',
+    label: 'bge-base-en-v1.5-fp16-ov (Embeddings)'
+  },
+  {
+    modelId: 'OpenVINO/bge-reranker-base-fp16-ov',
+    modelName: 'bge-reranker-base-fp16-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'rerank',
+    label: 'bge-reranker-base-fp16-ov (Rerank)'
+  },
+  {
+    modelId: 'OpenVINO/DeepSeek-R1-Distill-Qwen-7B-int4-ov',
+    modelName: 'DeepSeek-R1-Distill-Qwen-7B-int4-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'text_generation',
+    label: 'DeepSeek-R1-Distill-Qwen-7B-int4-ov (Text Generation)'
+  },
+  {
+    modelId: 'OpenVINO/stable-diffusion-v1-5-int8-ov',
+    modelName: 'stable-diffusion-v1-5-int8-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'image_generation',
+    label: 'stable-diffusion-v1-5-int8-ov (Image Generation)'
+  },
+  {
+    modelId: 'OpenVINO/FLUX.1-schnell-int4-ov',
+    modelName: 'FLUX.1-schnell-int4-ov',
+    modelSource: 'https://www.modelscope.cn/models',
+    task: 'image_generation',
+    label: 'FLUX.1-schnell-int4-ov (Image Generation)'
+  }
+]
 
 const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
   const [open, setOpen] = useState(true)
@@ -64,6 +117,29 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
       setTimeout(() => setProgress(0), 1500)
     } else {
       setProgress(0)
+    }
+  }
+
+  const handlePresetSelect = (value: string) => {
+    const selectedPreset = PRESET_MODELS.find(model => model.modelId === value)
+    if (selectedPreset) {
+      form.setFieldsValue({
+        modelId: selectedPreset.modelId,
+        modelName: selectedPreset.modelName,
+        modelSource: selectedPreset.modelSource,
+        task: selectedPreset.task
+      })
+    }
+  }
+
+  const handleModelIdChange = (value: string) => {
+    if (value) {
+      // Extract model name from model ID (part after last '/')
+      const lastSlashIndex = value.lastIndexOf('/')
+      if (lastSlashIndex !== -1 && lastSlashIndex < value.length - 1) {
+        const modelName = value.substring(lastSlashIndex + 1)
+        form.setFieldValue('modelName', modelName)
+      }
     }
   }
 
@@ -170,22 +246,16 @@ const PopupContainer: React.FC<Props> = ({ title, resolve }) => {
             }
           ]}
         >
-          <Input
+          <AutoComplete
             placeholder={t('settings.models.download.ov.model_id.placeholder')}
-            spellCheck={false}
-            maxLength={200}
+            options={PRESET_MODELS.map(model => ({
+              value: model.modelId,
+              label: model.label
+            }))}
+            onSelect={handlePresetSelect}
+            onChange={handleModelIdChange}
             disabled={loading}
-            onChange={(e) => {
-              const modelId = e.target.value
-              if (modelId) {
-                // Extract model name from model ID (part after last '/')
-                const lastSlashIndex = modelId.lastIndexOf('/')
-                if (lastSlashIndex !== -1 && lastSlashIndex < modelId.length - 1) {
-                  const modelName = modelId.substring(lastSlashIndex + 1)
-                  form.setFieldValue('modelName', modelName)
-                }
-              }
-            }}
+            allowClear
           />
         </Form.Item>
         <Form.Item

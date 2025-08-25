@@ -110,14 +110,24 @@ const OVMSSettings: FC = () => {
                 </Button>
               )}
               {ovmsStatus==='not-running' && (
-                <Button
-                  type="primary"
-                  onClick={runOvms}
-                  loading={isRunningOvms}
-                  disabled={isRunningOvms}
-                  size="small">
-                  {isRunningOvms ? 'Starting' : 'Run OVMS'}
-                </Button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <Button
+                    type="primary"
+                    onClick={installOvms}
+                    loading={isInstallingOvms}
+                    disabled={isInstallingOvms}
+                    size="small">
+                     {isInstallingOvms ? 'Installing' : 'Re-Install'}
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={runOvms}
+                    loading={isRunningOvms}
+                    disabled={isRunningOvms}
+                    size="small">
+                    {isRunningOvms ? 'Starting' : 'Run OVMS'}
+                  </Button>
+                </div>
               )}
               {ovmsStatus==='running' && (
                 <Button
