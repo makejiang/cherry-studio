@@ -136,6 +136,7 @@ User: <tool_use_result>
 Assistant: The population of Shanghai is 26 million, while Guangzhou has a population of 15 million. Therefore, Shanghai has the highest population.
 `
 
+
 export const AvailableTools = (tools: MCPTool[]) => {
   const availableTools = tools
     .map((tool) => {
@@ -154,6 +155,44 @@ export const AvailableTools = (tools: MCPTool[]) => {
 ${availableTools}
 </tools>`
 }
+
+const useQA = true
+
+export const SYSTEM_PROMPT_QA =`# Tools
+
+You may call one or more functions to assist with the user query.
+
+You are provided with function signatures within <tools></tools> XML tags:
+{{ AVAILABLE_TOOLS }}
+
+For each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:
+<tool_call>
+{"name": <function-name>, "arguments": <args-json-object>}
+</tool_call>
+`
+
+export const ToolUseExamples_QA = ``
+
+export const AvailableToolsQA = (tools: MCPTool[]) => {
+  const availableTools = tools
+    .map((tool) => {
+      return `{
+  "type":"function",
+  "function":{
+    "name":"${tool.id}",
+    "description":"${tool.description}",
+    "parameters":${tool.inputSchema ? JSON.stringify(tool.inputSchema) : '{}'}
+  }
+}
+`
+    })
+    .join('\n')
+  return `<tools>
+${availableTools}
+</tools>`
+}
+
+
 
 export const buildSystemPrompt = async (
   userSystemPrompt: string,
@@ -226,22 +265,29 @@ export const buildSystemPrompt = async (
       }
     }
   }
-
+  
   if (tools && tools.length > 0) {
-    let prompts = SYSTEM_PROMPT
-    try {
-      prompts = await window.api.file.read('prompts.txt')
-      // remove all '\\\r\n' in prompts
-      prompts = prompts.replace(/\\\r\n/g, '')
+    if (useQA) {
+      return SYSTEM_PROMPT_QA.replace('{{ USER_SYSTEM_PROMPT }}', userSystemPrompt)
+        .replace('{{ AVAILABLE_TOOLS }}', AvailableToolsQA(tools))
+    } else {
+      let prompts = SYSTEM_PROMPT
+      try {
+        prompts = await window.api.file.read('prompts.txt')
+        // remove all '\\\r\n' in prompts
+        prompts = prompts.replace(/\\\r\n/g, '')
 
-      console.log('Loaded prompts from prompts.txt')
-    } catch (error) {
-      console.error('Failed to get user system prompt:', error)
+        console.log('Loaded prompts from prompts.txt')
+      } catch (error) {
+        console.error('Failed to get user system prompt:', error)
+      }
+
+      return prompts.replace('{{ USER_SYSTEM_PROMPT }}', userSystemPrompt)
+        .replace('{{ TOOL_USE_EXAMPLES }}', ToolUseExamples)
+        .replace('{{ AVAILABLE_TOOLS }}', AvailableTools(tools))
     }
 
-    return prompts.replace('{{ USER_SYSTEM_PROMPT }}', userSystemPrompt)
-      .replace('{{ TOOL_USE_EXAMPLES }}', ToolUseExamples)
-      .replace('{{ AVAILABLE_TOOLS }}', AvailableTools(tools))
+    
   }
 
   return userSystemPrompt

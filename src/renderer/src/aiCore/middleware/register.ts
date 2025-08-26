@@ -13,6 +13,7 @@ import * as TransformCoreToSdkParamsModule from './core/TransformCoreToSdkParams
 import * as WebSearchModule from './core/WebSearchMiddleware'
 import * as ImageGenerationModule from './feat/ImageGenerationMiddleware'
 import * as ThinkingTagExtractionModule from './feat/ThinkingTagExtractionMiddleware'
+import * as ToolCallExtractionMiddleware from './feat/ToolCallExtractionMiddleware'
 import * as ToolUseExtractionMiddleware from './feat/ToolUseExtractionMiddleware'
 
 /**
@@ -65,6 +66,10 @@ export const MiddlewareRegistry = {
     name: ToolUseExtractionMiddleware.MIDDLEWARE_NAME,
     middleware: ToolUseExtractionMiddleware.ToolUseExtractionMiddleware
   },
+  [ToolCallExtractionMiddleware.MIDDLEWARE_NAME]: {
+    name: ToolCallExtractionMiddleware.MIDDLEWARE_NAME,
+    middleware: ToolCallExtractionMiddleware.ToolCallExtractionMiddleware
+  },
   [ThinkChunkModule.MIDDLEWARE_NAME]: {
     name: ThinkChunkModule.MIDDLEWARE_NAME,
     middleware: ThinkChunkModule.ThinkChunkMiddleware
@@ -116,6 +121,7 @@ export const DefaultCompletionsNamedMiddlewares = [
   MiddlewareRegistry[TextChunkModule.MIDDLEWARE_NAME], // 文本处理
   MiddlewareRegistry[WebSearchModule.MIDDLEWARE_NAME], // Web搜索处理
   MiddlewareRegistry[ToolUseExtractionMiddleware.MIDDLEWARE_NAME], // 工具使用提取处理
+  MiddlewareRegistry[ToolCallExtractionMiddleware.MIDDLEWARE_NAME], // 工具调用提取处理
   MiddlewareRegistry[ThinkingTagExtractionModule.MIDDLEWARE_NAME], // 思考标签提取处理（特定provider）
   MiddlewareRegistry[ThinkChunkModule.MIDDLEWARE_NAME], // 思考处理（通用SDK）
   MiddlewareRegistry[ResponseTransformModule.MIDDLEWARE_NAME], // 响应转换
@@ -144,6 +150,7 @@ export {
   TextChunkModule,
   ThinkChunkModule,
   ThinkingTagExtractionModule,
+  ToolCallExtractionMiddleware,
   TransformCoreToSdkParamsModule,
   WebSearchModule
 }

@@ -499,6 +499,70 @@ export function parseToolUse(content: string, mcpTools: MCPTool[]): ToolUseRespo
   return tools
 }
 
+export function parseToolCall(content: string, mcpTools: MCPTool[]): ToolUseResponse[] {
+  if (!content || !mcpTools || mcpTools.length === 0) {
+    return []
+  }
+
+  // 支持两种格式：
+  // 1. 完整的 <tool_call></tool_call> 标签包围的内容
+  // 2. 只有内部内容（从 TagExtractor 提取出来的）
+
+  let contentToProcess = content
+
+  // 如果内容不包含 <tool_call> 标签，说明是从 TagExtractor 提取的内部内容，需要包装
+  if (!content.includes('<tool_call>')) {
+    contentToProcess = `<tool_call>\n${content}\n</tool_call>`
+  }
+
+  const toolCallPattern = /<tool_call>([\s\S]*?)<\/tool_call>/g
+  const tools: ToolUseResponse[] = []
+  let match
+  let idx = 0
+
+  // Find all tool call blocks
+  while ((match = toolCallPattern.exec(contentToProcess)) !== null) {
+    const toolCallContent = match[1].trim()
+
+    // Try to parse the JSON content
+    let toolCallData
+    try {
+      toolCallData = JSON.parse(toolCallContent)
+    } catch (error) {
+      Logger.error(`Failed to parse tool call JSON: ${toolCallContent}`, error)
+      continue
+    }
+
+    // Validate required fields
+    if (!toolCallData.name || typeof toolCallData.name !== 'string') {
+      Logger.error(`Tool call missing or invalid name field: ${toolCallContent}`)
+      continue
+    }
+
+    const toolName = toolCallData.name
+    const toolArgs = toolCallData.arguments || {}
+
+    // Find the corresponding MCP tool
+    const mcpTool = mcpTools.find((tool) => tool.id === toolName || tool.name === toolName)
+    if (!mcpTool) {
+      Logger.error(`Tool "${toolName}" not found in MCP tools`)
+      window.message.error(i18n.t('settings.mcp.errors.toolNotFound', { name: toolName }))
+      continue
+    }
+
+    // Add to tools array
+    tools.push({
+      id: `${toolName}-${idx++}`, // Unique ID for each tool call
+      toolUseId: mcpTool.id,
+      tool: mcpTool,
+      arguments: toolArgs,
+      status: 'pending'
+    })
+  }
+  
+  return tools
+}
+
 export async function parseAndCallTools<R>(
   tools: MCPToolResponse[],
   allToolResponses: MCPToolResponse[],
