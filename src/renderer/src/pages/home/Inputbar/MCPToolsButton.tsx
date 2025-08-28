@@ -134,12 +134,14 @@ const MCPToolsButton: FC<Props> = ({ ref, setInputValue, resizeTextArea, Toolbar
   const handleMcpServerSelect = useCallback(
     (server: MCPServer) => {
       if (assistantMcpServers.some((s) => s.id === server.id)) {
-        updateAssistant({ ...assistant, mcpServers: mcpServers?.filter((s) => s.id !== server.id) })
+        // 如果点击的是已选择的服务器，则取消选择
+        updateAssistant({ ...assistant, mcpServers: [] })
       } else {
-        updateAssistant({ ...assistant, mcpServers: [...mcpServers, server] })
+        // 如果点击的是未选择的服务器，则只选择这一个服务器（替换原有选择）
+        updateAssistant({ ...assistant, mcpServers: [server] })
       }
     },
-    [assistant, assistantMcpServers, mcpServers, updateAssistant]
+    [assistant, assistantMcpServers, updateAssistant]
   )
 
   // 使用 useRef 缓存事件处理函数
