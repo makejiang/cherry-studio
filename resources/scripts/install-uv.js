@@ -3,7 +3,7 @@ const path = require('path')
 const os = require('os')
 const { execSync } = require('child_process')
 const StreamZip = require('node-stream-zip')
-const { downloadWithRedirects } = require('./download')
+const { downloadWithPowerShell } = require('./download')
 
 // Base URL for downloading uv binaries
 const UV_RELEASE_BASE_URL = 'https://gitcode.com/CherryHQ/uv/releases/download'
@@ -61,8 +61,11 @@ async function downloadUvBinary(platform, arch, version = DEFAULT_UV_VERSION, is
     console.log(`Downloading uv ${version} for ${platformKey}...`)
     console.log(`URL: ${downloadUrl}`)
     console.log(`TempFile Path ${tempFilename}`)
-
-    await downloadWithRedirects(downloadUrl, tempFilename)
+    if (platform === 'win32') {
+      await downloadWithPowerShell(downloadUrl, tempFilename)
+    } else {
+      await downloadWithRedirects(downloadUrl, tempFilename)
+    }
 
     console.log(`Extracting ${packageName} to ${binDir}...`)
 

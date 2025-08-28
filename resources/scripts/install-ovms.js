@@ -2,47 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const { execSync } = require('child_process')
-
-/**
- * Downloads a file using PowerShell Invoke-WebRequest command
- * @param {string} url The URL to download from
- * @param {string} outputPath The path to save the file to
- * @returns {Promise<boolean>} Promise that resolves to true if download succeeds
- */
-async function downloadWithPowerShell(url, outputPath) {
-  return new Promise((resolve, reject) => {
-    try {
-      // Ensure the output directory exists
-      const outputDir = path.dirname(outputPath)
-      fs.mkdirSync(outputDir, { recursive: true })
-
-      // PowerShell command to download the file with progress disabled for faster download
-      const psCommand = `powershell -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest '${url}' -OutFile '${outputPath}'"`
-      
-      console.log(`Downloading with PowerShell: ${url}`)
-      execSync(psCommand, { stdio: 'inherit' })
-      
-      // Check if file was downloaded successfully
-      if (fs.existsSync(outputPath)) {
-        console.log(`Download completed: ${outputPath}`)
-        resolve(true)
-      } else {
-        reject(new Error('Download failed: File not found after download'))
-      }
-    } catch (error) {
-      reject(new Error(`PowerShell download failed: ${error.message}`))
-    }
-  })
-}
+const { downloadWithPowerShell } = require('./download')
 
 // Base URL for downloading OVMS binaries
 const OVMS_PKG_NAME = 'ovms250818.zip'
 const OVMS_RELEASE_BASE_URL = [
-  `http://makejiang.duckdns.org:9090/${OVMS_PKG_NAME}`,
-  `http://pet440.sh.intel.com/server1/cherrystudio/${OVMS_PKG_NAME}`,
-  `https://github.com/makejiang/blob/releases/download/v1.0.0/${OVMS_PKG_NAME}`,
+  `https://gitcode.com/gcw_ggDjjkY3/kjfile/releases/download/download/${OVMS_PKG_NAME}`,
 ]
-
 
 
 /**
