@@ -198,7 +198,7 @@ export class ApiLogger {
       duration: 0,
       data: {
         status: 'streaming',
-        chunks: [],
+        chunkCount: 0,
         startTime: Date.now()
       }
     }
@@ -219,31 +219,79 @@ export class ApiLogger {
       log => log.requestId === requestId && log.type === 'STREAM_START'
     )
 
-    if (streamEntry && streamEntry.data.chunks) {
-      const chunkCount = streamEntry.data.chunks.length
-      const timestamp = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS')
-      
-      // 第一个chunk，详细记录
-      if (chunkCount === 0) {
-        streamEntry.data.chunks.push({
-          timestamp,
-          chunkIndex: chunkCount,
-          type: 'FIRST_CHUNK',
-          chunk: this.sanitizeResponse(chunk)
-        })
-      } else {
-        // 中间的chunk，只记录简要信息
-        const simplifiedChunk = this.createSimplifiedChunkRecord(chunk, chunkCount)
-        streamEntry.data.chunks.push({
-          summary: simplifiedChunk
-        })
+    if (streamEntry) {
+      // 记录chunk计数，但不存储详细的chunk数据
+      if (!streamEntry.data.chunkCount) {
+        streamEntry.data.chunkCount = 0
       }
-      
-      // 存储完整的最后一个chunk，稍后在endStreamResponse中处理
+      streamEntry.data.chunkCount++
+
+      // 存储最后一个chunk的基本信息，用于获取metadata
       streamEntry.data.lastChunk = {
-        timestamp,
-        chunkIndex: chunkCount,
-        chunk: this.sanitizeResponse(chunk)
+        timestamp: dayjs().format('YYYY-MM-DD HH:mm:ss.SSS'),
+        chunkIndex: streamEntry.data.chunkCount - 1,
+        chunk: {
+          id: chunk.id,
+          model: chunk.model,
+          usage: chunk.usage,
+          choices: chunk.choices ? [{
+            finish_reason: chunk.choices[0]?.finish_reason
+          }] : []
+        }
+      }
+
+      // 累积完整响应内容
+      if (!streamEntry.data.accumulatedResponse) {
+        streamEntry.data.accumulatedResponse = {
+          content: '',
+          tool_calls: [],
+          function_call: null,
+          role: 'assistant'
+        }
+      }
+
+      // 提取并累积内容
+      if (chunk.choices?.[0]?.delta?.content) {
+        streamEntry.data.accumulatedResponse.content += chunk.choices[0].delta.content
+      }
+
+      // 累积tool_calls
+      if (chunk.choices?.[0]?.delta?.tool_calls) {
+        const toolCalls = chunk.choices[0].delta.tool_calls
+        for (const toolCall of toolCalls) {
+          if (toolCall.index !== undefined) {
+            // 确保数组有足够的长度
+            while (streamEntry.data.accumulatedResponse.tool_calls.length <= toolCall.index) {
+              streamEntry.data.accumulatedResponse.tool_calls.push({
+                id: '',
+                type: 'function',
+                function: { name: '', arguments: '' }
+              })
+            }
+            
+            const existingToolCall = streamEntry.data.accumulatedResponse.tool_calls[toolCall.index]
+            if (toolCall.id) existingToolCall.id = toolCall.id
+            if (toolCall.type) existingToolCall.type = toolCall.type
+            if (toolCall.function?.name) existingToolCall.function.name = toolCall.function.name
+            if (toolCall.function?.arguments) {
+              existingToolCall.function.arguments += toolCall.function.arguments
+            }
+          }
+        }
+      }
+
+      // 累积function_call (旧版API)
+      if (chunk.choices?.[0]?.delta?.function_call) {
+        const functionCall = chunk.choices[0].delta.function_call
+        if (!streamEntry.data.accumulatedResponse.function_call) {
+          streamEntry.data.accumulatedResponse.function_call = { name: '', arguments: '' }
+        }
+        if (functionCall.name) {
+          streamEntry.data.accumulatedResponse.function_call.name += functionCall.name
+        }
+        if (functionCall.arguments) {
+          streamEntry.data.accumulatedResponse.function_call.arguments += functionCall.arguments
+        }
       }
     }
   }
@@ -269,18 +317,49 @@ export class ApiLogger {
       streamEntry.data.status = 'completed'
       streamEntry.data.endTime = endTime
       streamEntry.data.finalUsage = finalUsage
-      streamEntry.data.totalChunks = streamEntry.data.chunks?.length || 0
+      streamEntry.data.totalChunks = streamEntry.data.chunkCount || 0
+      
+      // 添加完整的累积响应数据
+      if (streamEntry.data.accumulatedResponse) {
+        // 构建完整的消息对象
+        const messageContent: any = {
+          role: streamEntry.data.accumulatedResponse.role,
+          content: streamEntry.data.accumulatedResponse.content || null
+        }
 
-      // 如果有最后一个chunk的完整数据，将其作为最后一个详细记录添加
-      if (streamEntry.data.lastChunk && streamEntry.data.totalChunks > 1) {
-        // 更新最后一个chunk为详细记录
-        const lastChunkIndex = streamEntry.data.chunks.length - 1
-        if (lastChunkIndex >= 0) {
-          streamEntry.data.chunks[lastChunkIndex] = {
-            ...streamEntry.data.lastChunk,
-            type: 'LAST_CHUNK'
+        // 添加tool_calls（如果有）
+        if (streamEntry.data.accumulatedResponse.tool_calls.length > 0) {
+          messageContent.tool_calls = streamEntry.data.accumulatedResponse.tool_calls.filter(tc => tc.id) // 过滤掉空的tool_calls
+        }
+
+        // 添加function_call（如果有，旧版API）
+        if (streamEntry.data.accumulatedResponse.function_call?.name) {
+          messageContent.function_call = streamEntry.data.accumulatedResponse.function_call
+        }
+
+        // 获取finish_reason
+        const finishReason = streamEntry.data.lastChunk?.chunk?.choices?.[0]?.finish_reason || 'stop'
+
+        // 构建完整的OpenAI格式响应
+        streamEntry.data.fullApiResponse = {
+          id: streamEntry.data.lastChunk?.chunk?.id || `chatcmpl-${Date.now()}`,
+          object: 'chat.completion',
+          created: Math.floor(startTime / 1000),
+          model: streamEntry.data.lastChunk?.chunk?.model || 'unknown',
+          choices: [{
+            message: messageContent,
+            finish_reason: finishReason,
+            index: 0
+          }],
+          usage: finalUsage || streamEntry.data.lastChunk?.chunk?.usage || {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0
           }
         }
+
+        // 清理中间累积数据
+        delete streamEntry.data.accumulatedResponse
       }
       
       // 清理临时存储的lastChunk
@@ -364,26 +443,6 @@ export class ApiLogger {
   }
 
   /**
-   * 清理响应数据
-   */
-  private sanitizeResponse(response: any): any {
-    const sanitized = { ...response }
-    
-    // 安全地检查并处理choices属性
-    if (sanitized && typeof sanitized === 'object' && 'choices' in sanitized && Array.isArray(sanitized.choices)) {
-      sanitized.choices = sanitized.choices.map(choice => {
-        const sanitizedChoice = { ...choice }
-        if (sanitizedChoice.message?.content && sanitizedChoice.message.content.length > 1000) {
-          sanitizedChoice.message.content = sanitizedChoice.message.content.substring(0, 1000) + `... [truncated,${sanitizedChoice.message.content.length}]`
-        }
-        return sanitizedChoice
-      })
-    }
-
-    return sanitized
-  }
-
-  /**
    * 计算会话总持续时间
    */
   private calculateTotalDuration(): number {
@@ -406,44 +465,6 @@ export class ApiLogger {
    */
   public hasActiveSession(): boolean {
     return this.currentSession !== null
-  }
-
-  /**
-   * 创建简化的chunk记录
-   */
-  private createSimplifiedChunkRecord(chunk: any, chunkIndex: number): string {
-    try {
-      // 提取关键信息
-      let summary = `Chunk #${chunkIndex}`
-      
-      if (chunk && typeof chunk === 'object') {
-        // 提取文本内容
-        if (chunk.choices?.[0]?.delta?.content) {
-          const content = chunk.choices[0].delta.content
-          const preview = content.length > 50 ? content.substring(0, 50) + '...' : content
-          summary += ` | Content: "${preview}"`
-        }
-        
-        // 提取finish_reason
-        if (chunk.choices?.[0]?.finish_reason) {
-          summary += ` | Finish: ${chunk.choices[0].finish_reason}`
-        }
-        
-        // 提取usage信息
-        if (chunk.usage) {
-          summary += ` | Tokens: ${chunk.usage.total_tokens || 'N/A'}`
-        }
-        
-        // 提取tool_calls信息
-        if (chunk.choices?.[0]?.delta?.tool_calls) {
-          summary += ` | Tool calls: ${chunk.choices[0].delta.tool_calls.length}`
-        }
-      }
-      
-      return summary
-    } catch (error) {
-      return `Chunk #${chunkIndex} | Error parsing chunk`
-    }
   }
 }
 

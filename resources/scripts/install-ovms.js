@@ -7,6 +7,7 @@ const { downloadWithPowerShell } = require('./download')
 // Base URL for downloading OVMS binaries
 const OVMS_PKG_NAME = 'ovms250818.zip'
 const OVMS_RELEASE_BASE_URL = [
+  `http://pet440.sh.intel.com/server1/cherrystudio/${OVMS_PKG_NAME}`,
   `https://gitcode.com/gcw_ggDjjkY3/kjfile/releases/download/download/${OVMS_PKG_NAME}`,
 ]
 

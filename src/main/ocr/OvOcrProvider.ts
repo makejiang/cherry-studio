@@ -56,9 +56,10 @@ export default abstract class OvOcrProvider extends BaseOcrProvider {
   }
 
   private async runOcrBatch(): Promise<void> {
-    const runBatPath = path.join(this.getOvOcrPath(), this.batFile)
     const ovOcrPath = this.getOvOcrPath()
-    
+    const runBatPath = path.join(ovOcrPath, this.batFile)
+        
+
     try {
       // 在ov-ocr目录下执行run.bat
       await execAsync(`"${runBatPath}"`, { 
