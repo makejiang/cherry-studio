@@ -314,6 +314,4 @@ export enum IpcChannel {
 
   // Cherryin
   Cherryin_GetSignature = 'cherryin:get-signature'
-
-
 }
