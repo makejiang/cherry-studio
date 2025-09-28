@@ -1,8 +1,10 @@
 import { loggerService } from '@logger'
-import { isLinux } from '@main/constant'
+import { isLinux, isWin } from '@main/constant'
+import os from 'os'
 import { BuiltinOcrProviderIds, OcrHandler, OcrProvider, OcrResult, SupportedOcrFile } from '@types'
 
 import { ppocrService } from './builtin/PpocrService'
+import { ovOcrService } from './builtin/OvOcrService'
 import { systemOcrService } from './builtin/SystemOcrService'
 import { tesseractService } from './builtin/TesseractService'
 
@@ -39,3 +41,5 @@ ocrService.register(BuiltinOcrProviderIds.tesseract, tesseractService.ocr.bind(t
 !isLinux && ocrService.register(BuiltinOcrProviderIds.system, systemOcrService.ocr.bind(systemOcrService))
 
 ocrService.register(BuiltinOcrProviderIds.paddleocr, ppocrService.ocr.bind(ppocrService))
+
+os.cpus()[0].model.toLowerCase().includes('intel') && isWin && ocrService.register(BuiltinOcrProviderIds.ovocr, ovOcrService.ocr.bind(ovOcrService))

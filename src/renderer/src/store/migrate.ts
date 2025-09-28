@@ -2544,7 +2544,16 @@ const migrateConfig = {
       addProvider(state, 'ovms')
       return state
     } catch (error) {
-      logger.error('migrate 157 error', error as Error)
+      logger.error('migrate 159 error', error as Error)
+      return state
+    }
+  },
+  '159': (state: RootState) => {
+    try {
+      addOcrProvider(state, BUILTIN_OCR_PROVIDERS_MAP.ovocr)
+      return state
+    } catch (error) {
+      logger.error('migrate 159 error', error as Error)
       return state
     }
   }
